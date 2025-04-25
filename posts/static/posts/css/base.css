@@ -1,0 +1,132 @@
+:root {
+    --main-color: #4a90e2;
+    --text-color: #212020;
+    --main-background: #fafafc;
+    --main-element-background: #fcfcfc;
+    --main-border: #f3f4f5;
+}
+
+/* header */
+
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+.main-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background-color: var(--main-background);
+    overflow: auto;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+header {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    top: 0;
+    z-index: 100;
+    height: 50px;
+    background-color: var(--main-element-background);
+    border-bottom: 1px solid var(--main-border);
+    width: 100%;
+    padding: 0 235px;
+    box-sizing: border-box;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.head-links {
+    display: inline-flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.nav-links li {
+    display: inline-flex;
+    padding: 15px 8px 15px 8px;
+    list-style: none;
+    cursor: pointer;
+}
+
+li.active {
+    border-bottom: 3px solid var(--main-color);
+}
+
+li a:hover {
+    color: var(--main-color);
+    transition: color 200ms ease ease-out;
+}
+
+.nav-links ul {
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.search-img, .pencil-img {
+    background-color: transparent;
+    /* filter: brightness(0) invert(0.5); */
+    height: 20px;
+    width: 20px;
+}
+
+.head-links a:hover {
+    filter: grayscale(0%) brightness(1) invert(0) sepia(1) saturate(30) hue-rotate(-50deg);
+}
+
+.head-links-cont {
+    height: auto;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.head-links a {
+    display: inline-block;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 15px;
+    color: var(--text-color);
+}
+
+.head-links-cont a {
+    font-size: 13px;
+}
+
+.head-links-cont img:first-of-type {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+}
+
+.head-links-cont img:last-of-type {
+    height: 25px;
+    width: 25px;
+    /* filter: brightness(0) saturate(100%) invert(42%) sepia(37%) saturate(26%) hue-rotate(335deg) brightness(93%) contrast(78%); */
+
+
+}
+
+/* header */

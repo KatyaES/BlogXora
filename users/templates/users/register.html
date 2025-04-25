@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{% static 'users/css/register.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Регистрация</h2>
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+<!--            <label for="username">Имя пользователя:</label>-->
+<!--            <input type="text" id="username" name="username" required>-->
+
+<!--            <label for="password">Пароль:</label>-->
+<!--            <input type="password" id="password" name="password" required>-->
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <div class="link">
+            <p>Есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+        </div>
+    </div>
+</body>
+</html>

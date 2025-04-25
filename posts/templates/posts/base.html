@@ -1,0 +1,42 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    {% block link %} {% endblock %}
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'posts/css/base.css' %}"
+</head>
+<body>
+    <header>
+        <a class="logo">Xora</a>
+        <nav class="nav-links">
+            <ul>
+                <li class="{% if request.path == '/hot/' %}active{% endif %}"><a href="{% url 'hot' %}">Популярное</a></li>
+                <li class="{% if request.path == '/best/' %}active{% endif %}"><a href="{% url 'index' %}">Лучшее</a></li>
+                <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'index' %}">Моя лента</a></li>
+                <li class="{% if request.path == '/now/' %}active{% endif %}"><a href="{% url 'index' %}">Свежее</a></li>
+                <li class="{% if request.path == '/subscribes/' %}active{% endif %}"><a href="{% url 'index' %}">Подписки</a></li>
+            </ul>
+        </nav>
+        <div class="head-links">
+            <a href="{% url 'search' %}"><img class="search-img" src="/media/icons/search.svg"></a>
+            <a href="{% url 'add_post' %}"><img class="pencil-img" src="/media/icons/pencil.svg"></a>
+            <div class="head-links-cont">
+                {% if user.is_authenticated %}
+                <img src="{{ user.image.url }}">
+                <img class="head-arrow" src="/media/icons/arrow-up.svg">
+            {% else %}
+                <a class="login-logout" href="{% url 'login' %}">Войти</a>
+            {% endif %}
+            </div>
+        </div>
+    </header>    
+    {% block body %} {% endblock %}
+    <script>
+        const csrfToken = '{{ csrf_token }}'
+    </script>
+</body>
+</html>

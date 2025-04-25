@@ -1,0 +1,61 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'users/css/profile.css' %}">
+    <title>Profile</title>
+</head>
+<header>
+    <div class="main-header">
+        <div class="head-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Выйти</a>
+            {% else %}
+                <a href="{% url 'login' %}" id="logout" onclick="logout()">Войти</a>
+            {% endif %}
+        </div>
+        <div class="head-container">
+            {% for key, data in datas.items %}
+                <a href="{% url data  %}?filter={{ key }}" class="{% if request.GET.filter == key %}active{% endif %}">{{ key }}</a>
+            {% endfor %}
+        </div>
+        <div class="search">
+            <div class="search-cont">
+                <a href="{% url 'search' %}"><img src="/media/icons/search.svg"></a>
+            </div>
+        </div>
+        <div class="pencil">
+            <div class="pencil-cont">
+                <a href="{% url 'add_post' %}"><img src="/media/icons/pencil.svg"></a>
+            </div>
+        </div>
+    </div>
+</header>
+<body>
+    <div class="container">
+        <p>Мой профиль</p>
+        <div class="container-1">
+            <span class="username">Имя пользователя:</span><span class="user-username">{{ user.username }}</span>
+            <br>
+                <span class="avatar">Аватар: </span><img src="{{ user.image.url }}" style="width: 40px" >
+            <br>
+                <form method="post">
+                    {% if messages %}
+                    <div class="messages"></div>
+                        {% for message in messages %}
+                            <div class="alert alert-success">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit">Изменить пароль</button>
+                </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Войти</title>
+    <link rel="stylesheet" href="{% static 'users/css/login.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Войти</h2>
+<!--            {% if messages %}-->
+<!--                <div class="alert alert-success">-->
+<!--                    <p>{{ message }}</p>-->
+<!--                </div>-->
+<!--            {% endif %}-->
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {{ form.as_p }}
+<!--            <label for="username">Имя пользователя:</label>-->
+<!--            <input type="text" id="username" name="username" required>-->
+
+<!--            <label for="password">Пароль:</label>-->
+<!--            <input type="password" id="password" name="password" required>-->
+
+            <button type="submit">Войти</button>
+        </form>
+
+        <div class="link">
+            <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+        </div>
+        <div class="restore-account">
+            <a href="{% url 'password_reset' %}">Восстановить аккаунт</a>
+        </div>
+    </div>
+</body>
+</html>

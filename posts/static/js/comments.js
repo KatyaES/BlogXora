@@ -18,23 +18,27 @@ async function sendComment() {
 	console.log(data)
 
 	const newComment = `
-		<div class="comment-item">
-			<div class="comment-head">
-				<img src="${data.image}" alt="">
-				<a href="">${data.username}</a>
-				<span class="comment_pub-date">только что</span>
-			</div>
-			<div class="comment-content">
-				${data.description}
-			</div>
-			<div class="comment-reactions">
-				<div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}">
-					<img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-					<span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
-				</div>
-				<span class="reply">Ответить</span>
-			</div>
-		</div>
+		<div class="comment-item" id="comment-item-${data.id}">
+            <div class="comment-head">
+                <img src="${data.image}" alt="">
+                <a href="">${data.username}</a>
+                <span class="comment_pub-date">только что</span>
+            </div>
+            <div class="comment-content">
+                ${data.description}
+            </div>
+            <div class="comment-reactions">
+                <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}">
+                    <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+                    <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+                </div>
+                <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
+            </div>
+            <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
+                <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
+                <div class="reply_send-comment" id="reply_comment-${data.id}" onclick="replySendComment(this)" data-id="${data.id}">Отправить</div>
+            </div>
+        </div>
 	`
 
 	const commentsCont = document.querySelector('.comments')
@@ -131,18 +135,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 })
 
 
-async function commentReply(div) {
+async function commentReply(span) {
 
-    const id = div.getAttribute('data-id')
-    const commentWrapper = document.getElementById(`reply_id-${id}`)
+    const id = span.getAttribute('data-id')
+    const commentWrapper = document.getElementById(`reply_comment-wrapper-${id}`)
 
-    if (div.classList.contains('deployed')) {
+
+    if (span.classList.contains('deployed')) {
         commentWrapper.style.display = 'none'
-        div.classList.add('hidden')
-        div.classList.remove('deployed')
+        span.textContent = 'Ответить'
+        span.classList.add('hidden')
+        span.classList.remove('deployed')
     } else {
-        div.classList.add('deployed')
-        div.classList.add('hidden')
+        span.classList.add('deployed')
+        span.textContent = 'Скрыть'
+        span.classList.add('hidden')
         commentWrapper.style.display = 'flex'
     }
+}
+
+
+async function replySendComment(div) {
+    const id = div.getAttribute('data-id')
+    const comment = document.getElementById(`reply_comment-input-${id}`)
+
+	const request = await fetch(`http://127.0.0.1:8000/api/add_comment/${postID}/`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': csrfToken,
+		},
+		body: JSON.stringify({
+			'comment':comment.value,
+		})
+	})
+
+	const data = await request.json()
+	const commentCont = document.getElementById(`reply_comment-wrapper-${id}`)
+
+	const newComment = `
+		<div class="reply_comment-item">
+			<div class="comment-head">
+				<img src="${data.image}" alt="">
+				<a href="">${data.username}</a>
+				<span class="comment_pub-date">только что</span>
+			</div>
+			<div class="comment-content">
+				${data.description}
+			</div>
+			<div class="comment-reactions">
+				<div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}">
+					<img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+					<span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+				</div>
+				<span class="reply">Ответить</span>
+			</div>
+		</div>
+	`
+
+	commentCont.insertAdjacentHTML('beforeend', newComment)
+
 }

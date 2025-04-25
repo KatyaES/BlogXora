@@ -20,6 +20,7 @@ class CommentApiView(generics.ListAPIView):
 class AddCommentApiView(APIView):
     def post(self, request, pk):
         comment = request.data.get('comment')
+        id = request.data.get('id')
         post = get_object_or_404(Post, id=pk)
         print(comment)
         last_comment = Comment.objects.create(
@@ -31,12 +32,8 @@ class AddCommentApiView(APIView):
         last_comment.save()
         post.save()
 
-        serializer = CommentSerializer(last_comment)
-
-        if serializer.is_valid():
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = CommentSerializer(last_comment, context={'request': request})
+        return Response(serializer.data)
 
 
 class CommentToggleApiView(APIView):

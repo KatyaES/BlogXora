@@ -84,15 +84,15 @@
                                     {{ comment.description }}
                                 </div>
                                 <div class="comment-reactions">
-                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ comment.id }}">                                                
+                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ comment.id }}">
                                         <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
                                         <span class="comment_likes-count" id="comment_likes-count-{{ comment.id }}">{{ comment.liked_by.count }}</span>
                                     </div>
                                     <span class="reply" onclick="commentReply(this)" data-id="{{ comment.id }}">Ответить</span>
                                 </div>
-                                <div class="reply_comment-wrapper" id="reply_id-{{ comment.id }}">
-                                    <textarea class="reply_comment-input" placeholder="Комментарий"></textarea>
-                                    <div class="reply_send-comment">Отправить</div>
+                                <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ comment.id }}">
+                                    <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-{{ comment.id }}"></textarea>
+                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-id="{{ comment.id }}">Отправить</div>
                                 </div>
                             </div>
                         {% endfor %}

@@ -43,11 +43,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_liked(self, obj):
         request = self.context.get('request')
+        print(request)
         return obj.liked_by.filter(id=request.user.id).exists()
 
     def get_is_authenticated(self, obj):
         request = self.context.get('request')
         return request.user.is_authenticated
+
 
 class PostSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()

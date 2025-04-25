@@ -253,3 +253,13 @@ textarea.reply_comment-input:focus {
     color: #ebebeb;
 }
 
+.reply_comment-item {
+    width: 680px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    margin-left: 40px;
+}
+

@@ -84,7 +84,7 @@
                                     {{ comment.description }}
                                 </div>
                                 <div class="comment-reactions">
-                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ comment.id }}">
+                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ comment.id }}" data-type="common">
                                         <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
                                         <span class="comment_likes-count" id="comment_likes-count-{{ comment.id }}">{{ comment.liked_by.count }}</span>
                                     </div>
@@ -93,6 +93,27 @@
                                 <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ comment.id }}">
                                     <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-{{ comment.id }}"></textarea>
                                     <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-id="{{ comment.id }}">Отправить</div>
+                                    {% for reply in reply_comments %}
+                                        {% if reply.id == comment.id %}
+                                            <div class="reply_comment-item" id="comment-item-{{ reply.id }}">
+                                                <div class="comment-head">
+                                                    <img src="{{ reply.user.image.url }}" alt="">
+                                                    <a href="">{{ reply.user.username }}</a>
+                                                    <span class="comment_pub-date">{{ reply.pub_date|smart_time }}</span>
+                                                </div>
+                                                <div class="comment-content">
+                                                    {{ reply.description }}
+                                                </div>
+                                                <div class="comment-reactions">
+                                                    <div class="reply-comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ reply.id }}" data-type="reply">
+                                                        <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+                                                        <span class="comment_likes-count" id="comment_likes-count-{{ reply.id }}">{{ reply.liked_by.count }}</span>
+                                                    </div>
+                                                    <span class="reply" onclick="commentReply(this)" data-id="{{ reply.id }}">Ответить</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             </div>
                         {% endfor %}

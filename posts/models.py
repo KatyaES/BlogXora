@@ -35,3 +35,11 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     liked_by = models.ManyToManyField(User, related_name="likedBy", default='none')
+
+
+class ReplyComment(models.Model):
+    parent = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='parent')
+    description = models.CharField(max_length=2000)
+    pub_date = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reply_user')
+    liked_by = models.ManyToManyField(User, default='none', related_name='reply_liked_by')

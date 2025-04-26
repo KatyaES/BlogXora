@@ -9,8 +9,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import CommentSerializer, PostSerializer
-from posts.models import Comment, Post
+from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer
+from posts.models import Comment, Post, ReplyComment
 
 
 class CommentApiView(generics.ListAPIView):
@@ -38,22 +38,30 @@ class AddCommentApiView(APIView):
 
 class CommentToggleApiView(APIView):
     def post(self, request, post_pk, comment_pk):
+        comment_type = request.GET.get('type')
         print('post')
-        comments = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        if comment_type == 'common':
+            comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        else: comment = get_object_or_404(ReplyComment, id=comment_pk)
 
-        if comments.liked_by.filter(id=request.user.id).exists():
-            comments.liked_by.remove(request.user)
+        if comment.liked_by.filter(id=request.user.id).exists():
+            comment.liked_by.remove(request.user)
         else:
-            comments.liked_by.add(request.user)
-        comments.save()
+            comment.liked_by.add(request.user)
+        comment.save()
 
-        serializer = CommentSerializer(comments, context={'request': request})
+        serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
     def get(self, request, post_pk, comment_pk):
-        comments = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        comment_type = request.GET.get('type')
+        print(comment_type)
+        if comment_type == 'common':
+            comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        else:
+            comment = get_object_or_404(ReplyComment, id=comment_pk)
 
-        serializer = CommentSerializer(comments, context={'request': request})
+        serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
 
@@ -72,4 +80,20 @@ class PostToggleApiView(APIView):
     def get(self, request, pk):
         post = get_object_or_404(Post, id=pk)
         serializer = PostSerializer(post, context={'request': request})
+        return Response(serializer.data)
+
+class ReplyCommentApiView(APIView):
+    def post(self, request):
+        comment = request.data.get('comment')
+        id = request.data.get('id')
+        parent = get_object_or_404(Comment, id=id)
+        print(comment)
+        reply_comment = ReplyComment.objects.create(
+            parent=parent,
+            description=comment,
+            user=request.user,
+        )
+        reply_comment.save()
+
+        serializer = ReplyCommentSerializer(reply_comment, context={'request': request})
         return Response(serializer.data)

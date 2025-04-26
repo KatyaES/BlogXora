@@ -14,7 +14,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import PostForm, CommentForm
-from .models import Post, Comment, User
+from .models import Post, Comment, User, ReplyComment
 
 
 def all_categories(request):
@@ -127,6 +127,7 @@ def post_detail(request, pk):
         count=Count("category")).order_by("-count")[:10]
     post = get_object_or_404(Post, id=pk)
     comments = Comment.objects.filter(post=post)
+    reply_comments = ReplyComment.objects.all()
     print(f"comments: {comments}")
     post.views_count += 1
     post.save()
@@ -163,7 +164,8 @@ def post_detail(request, pk):
                                                           "popular_categories": popular_categories,
                                                           "user": user,
                                                           "form": form,
-                                                          "comments": comments})
+                                                          "comments": comments,
+                                                          'reply_comments': reply_comments})
 
 # def comment_data(request, pk):
 #     data = json.loads(request.body)

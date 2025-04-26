@@ -71,6 +71,20 @@
     cursor: pointer;
 }
 
+.reply-comment_like-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    min-width: 30px;
+    width: auto;
+    padding-right: 8px;
+    padding-left: 8px;
+    border-radius: 30px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
 .comment_like-wrapper-liked {
     display: flex;
     justify-content: center;
@@ -86,6 +100,23 @@
     color: white;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
+.reply-comment_like-wrapper-liked {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    min-width: 30px;
+    width: auto;
+    padding-right: 8px;
+    padding-left: 8px;
+    border-radius: 30px;
+    background-color: var(--main-color);
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
 
 .comment_heart-img {
     width: 17px!important;
@@ -113,6 +144,10 @@
 }
 
 .comment_like-wrapper:hover {
+    background-color: #ebebeb;
+}
+
+.reply-comment_like-wrapper:hover {
     background-color: #ebebeb;
 }
 

@@ -291,7 +291,7 @@ async function replySendComment(div) {
             </div>
             <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
                 <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
-                <div class="reply_send-comment" onclick="replySendComment(this)" data-key="${data.id}" data-id="${id}">Отправить</div>
+                <div class="reply_send-comment" onclick="replySendComment(this)" data-field-id="${postId}" data-key="${commentId}" data-id="${id}">Отправить</div>
             </div>
         </div>
 	`
@@ -307,11 +307,14 @@ async function commentDelete(span) {
     const postId = span.getAttribute('data-id')
     const id = span.getAttribute('data-key')
     console.log('id::', id)
+    console.log('postId: ', postId)
+    console.log('span: ', span)
     let commentsCont = document.querySelector('.comments')
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
     console.log('token: ', token)
     console.log('token refresh: ', refresh)
+    console.log('comment id::', commentId)
 
     const request = await fetch(`http://127.0.0.1:8000/api/delete_comment/${id}/post/${postId}/?type=${type}`, {
         method: 'DELETE',
@@ -326,7 +329,8 @@ async function commentDelete(span) {
     if (request.status === 204) {
         console.log(204)
         const successMessage = document.createElement('div')
-        successMessage.innerText = 'Comment was deleted'
+        successMessage.innerText = 'Комментарий удален'
+        successMessage.style.color = 'var(--main-color)'
         const delComment = document.getElementById(`comment-item-${id}`)
         console.log('del comment: ', delComment, id)
         commentsCont.replaceChild(successMessage, delComment)

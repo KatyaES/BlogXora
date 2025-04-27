@@ -49,6 +49,11 @@ async function loginHandler() {
         
         if (data.status === 204) {
             console.log(204)
+            console.log(data)
+            console.log(data.access)
+            localStorage.setItem('access', data.access)
+            localStorage.setItem('refresh', data.refresh)
+            console.log(localStorage.getItem('access'))
             window.location.href = '/'
         } else {
             console.log(400)
@@ -247,6 +252,10 @@ async function registerHandler() {
         
         if (data.status === 204) {
             console.log(204)
+            console.log(data.access)
+            localStorage.setItem('access', data.access)
+            localStorage.setItem('refresh', data.refresh)
+            console.log(localStorage.getItem('access'))
             window.location.href = '/'
         } else {
             console.log(400)

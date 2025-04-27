@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
-from api.views import CommentApiView, AddCommentApiView
+from api.views import CommentApiView, CommentApiView
 from blog import settings
 from posts.views import index
 

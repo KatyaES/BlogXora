@@ -632,12 +632,17 @@
     flex-shrink: 0;
     align-items: flex-start;
     width: 296px;
-    height: 370px;
+    min-height: 360px;
+    max-height: 390px;
     overflow: hidden;
     background: var(--main-element-background);
     border: 1px solid var(--main-border);
     border-radius: 10px;
     --profile-cont-height: 410px;
+}
+
+.profile-cont:has(.admin-cont) {
+    height: 390px;
 }
 
 .profile-data {
@@ -729,7 +734,8 @@
 .posts-cont,
 .comment-cont,
 .answers-cont,
-.activity-cont {
+.activity-cont,
+.admin-cont {
     display: flex;
     align-items: center;
     padding: 0 0 0 20px;
@@ -737,19 +743,46 @@
     background-color: var(--main-element-background);
     height: 40px;
     width: 100%;
-    font-size: 15px;
     color: #444850;
-    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.notifications-cont:hover,
+.notifications-cont a,
+.subscribes-cont a,
+.bookmarks-cont a,
+.posts-cont a,
+.comment-cont a,
+.answers-cont a,
+.activity-cont a,
+.admin-cont a {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #444850;
+}
+
+.notifications-cont:hover ,
 .subscribes-cont:hover,
 .bookmarks-cont:hover,
 .posts-cont:hover,
 .comment-cont:hover,
 .answers-cont:hover,
-.activity-cont:hover {
+.activity-cont:hover,
+.admin-cont:hover {
     border-left: 3px solid var(--main-color);
+    color: var(--main-color);
+}
+
+
+.notifications-cont:hover a ,
+.subscribes-cont:hover a,
+.bookmarks-cont:hover a,
+.posts-cont:hover a,
+.comment-cont:hover a,
+.answers-cont:hover a,
+.activity-cont:hover a,
+.admin-cont:hover a {
     color: var(--main-color);
 }
 

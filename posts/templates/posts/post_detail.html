@@ -72,7 +72,7 @@
                     <div class="comments">
                         <div class="comments-title">Все комментарии</div>
                         <textarea class="comment-input" placeholder="Комментарий"></textarea>
-                        <div class="send-comment" onclick="sendComment()">Отправить</div>
+                        <div class="send-comment" onclick="sendComment(this)" data-id="{{ post.id }}">Отправить</div>
                         {% for comment in comments %}
                             <div class="comment-item" id="comment-item-{{ comment.id }}">
                                 <div class="comment-head">
@@ -84,17 +84,23 @@
                                     {{ comment.description }}
                                 </div>
                                 <div class="comment-reactions">
-                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ comment.id }}" data-type="common">
+                                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-type="common" data-id="{{ comment.id }}">
                                         <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
                                         <span class="comment_likes-count" id="comment_likes-count-{{ comment.id }}">{{ comment.liked_by.count }}</span>
                                     </div>
                                     <span class="reply" onclick="commentReply(this)" data-id="{{ comment.id }}">Ответить</span>
+                                    {% if request.user == comment.user %}
+                                        <span class="delete-comment" onclick="commentDelete(this)" id="{{ comment.id }}" data-key="{{ comment.id }}" data-type="common" data-id="{{ post.id }}">Удалить</span>
+                                    {% endif %}
                                 </div>
+                                {% if comment.reply_count %}
+                                    <div class="all-reply_comments-btn" onclick="commentReply(this)" data-id="{{ comment.id }}" datatype="{{ comment.reply_count }}">показать ответы ({{ comment.reply_count }})</div>
+                                {% endif %}
                                 <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ comment.id }}">
                                     <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-{{ comment.id }}"></textarea>
-                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-id="{{ comment.id }}">Отправить</div>
+                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-key="{{ comment.id }}" data-field-id="{{ post.id }}" data-id="{{ comment.id }}">Отправить</div>
                                     {% for reply in reply_comments %}
-                                        {% if reply.id == comment.id %}
+                                        {% if reply.parent.id == comment.id %}
                                             <div class="reply_comment-item" id="comment-item-{{ reply.id }}">
                                                 <div class="comment-head">
                                                     <img src="{{ reply.user.image.url }}" alt="">
@@ -110,6 +116,13 @@
                                                         <span class="comment_likes-count" id="comment_likes-count-{{ reply.id }}">{{ reply.liked_by.count }}</span>
                                                     </div>
                                                     <span class="reply" onclick="commentReply(this)" data-id="{{ reply.id }}">Ответить</span>
+                                                    {% if request.user == reply.user %}
+                                                        <span class="delete-comment" onclick="commentDelete(this)" data-field-id="{{ comment.id }}" id="{{ reply.id }}" data-key="{{ reply.id }}" data-type="reply" data-id="{{ post.id }}">Удалить</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ reply.id }}">
+                                                    <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-{{ reply.id }}"></textarea>
+                                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-field-id="{{ post.id }}" data-key="{{ reply.id }}" data-id="{{ comment.id }}">Отправить</div>
                                                 </div>
                                             </div>
                                         {% endif %}
@@ -134,6 +147,11 @@
                             <img class="settings-img" src="/media/icons/settings.svg" alt="">
                         </div>
                         <div class="profile-elements">
+                            {% if request.user.is_staff %}
+                            <div class="admin-cont">
+                                <a href="{% url 'admin:login' %}">Админка</a>
+                            </div>
+                            {% endif %}
                             <div class="notifications-cont">
                                 <a>Уведомления</a>
                             </div>
@@ -335,8 +353,10 @@
     <script src="{% static 'js/comments.js' %}"></script>
     <script src="{% static 'js/likes.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
     <script>
         const csrfToken = '{{ csrf_token }}'
         const postID = '{{ post.id }}'
+        const currentUser = '{{ request.user }}'
     </script>    
 {% endblock %}

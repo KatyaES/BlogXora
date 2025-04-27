@@ -298,3 +298,14 @@ textarea.reply_comment-input:focus {
     margin-left: 40px;
 }
 
+.all-reply_comments-btn {
+    color: var(--main-color);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.delete-comment {
+    cursor: pointer;
+    color: red;
+    font-size: 15px;
+}

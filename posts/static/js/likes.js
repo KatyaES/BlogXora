@@ -1,5 +1,8 @@
 async function func(div) {
     try {
+
+        const token = localStorage.getItem('access')
+        const refresh = localStorage.getItem('refresh')
         const id = div.getAttribute("data-id")
 
         const likesCount = document.getElementById(`likes-count-${id}`);
@@ -10,10 +13,17 @@ async function func(div) {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({})
         })
-        const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`)
+        const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    }
+                })
         const data = await response.json()
         document.getElementById(`likes-count-${id}`).textContent = data.likes;
         
@@ -38,7 +48,10 @@ async function func(div) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log(1)
-    // Убедимся, что весь HTML загружен и есть элементы с классом .heart-img
+
+    const token = localStorage.getItem('access')
+    const refresh = localStorage.getItem('refresh')
+
     const imgWrapper = document.querySelectorAll(".like-wrapper");
 
     for (const img of imgWrapper) {
@@ -47,7 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Запрос к серверу
-            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`);
+            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                    }
+                });
             const data = await response.json();
 
             // Печатаем, что вернул сервер

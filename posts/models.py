@@ -27,18 +27,31 @@ class Post(models.Model):
     
     class Meta:
         ordering = ['status']
-    
+
+    def update_comment_count(self):
+        total_reply_count = 0
+        for comment in self.comments.all():
+            total_reply_count += comment.replies.count()
+        self.comment_count = self.comments.count() + total_reply_count
+        self.save()
+        return total_reply_count, self.comments.count()
+
 
 class Comment(models.Model):
     description = models.CharField(max_length=2000)
     pub_date = models.DateTimeField(default=timezone.now)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     liked_by = models.ManyToManyField(User, related_name="likedBy", default='none')
+    reply_count = models.IntegerField(default=0)
+
+    def update_reply_count(self):
+        self.reply_count = self.replies.count()
+        self.save()
 
 
 class ReplyComment(models.Model):
-    parent = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='parent')
+    parent = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     description = models.CharField(max_length=2000)
     pub_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reply_user')

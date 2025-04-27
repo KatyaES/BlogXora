@@ -13,11 +13,7 @@ from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSeria
 from posts.models import Comment, Post, ReplyComment
 
 
-class CommentApiView(generics.ListAPIView):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-
-class AddCommentApiView(APIView):
+class CommentApiView(APIView):
     def post(self, request, pk):
         comment = request.data.get('comment')
         id = request.data.get('id')
@@ -30,18 +26,30 @@ class AddCommentApiView(APIView):
         )
         post.comment_count += 1
         last_comment.save()
+        result = post.update_comment_count()
+        print('method:',result)
         post.save()
 
         serializer = CommentSerializer(last_comment, context={'request': request})
         return Response(serializer.data)
+
+    def delete(self, request, comment_pk, post_pk):
+        type = request.GET.get('type')
+        if type == 'common': comment = get_object_or_404(Comment, id=comment_pk)
+        else: comment = get_object_or_404(ReplyComment, id=comment_pk)
+        comment.delete()
+        post = get_object_or_404(Post, id=post_pk)
+        post.update_comment_count()
+        for comment in post.comments.all():
+            comment.update_reply_count()
+        return HttpResponse(status=204)
 
 
 class CommentToggleApiView(APIView):
     def post(self, request, post_pk, comment_pk):
         comment_type = request.GET.get('type')
         print('post')
-        if comment_type == 'common':
-            comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        if comment_type == 'common': comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
         else: comment = get_object_or_404(ReplyComment, id=comment_pk)
 
         if comment.liked_by.filter(id=request.user.id).exists():
@@ -86,6 +94,7 @@ class ReplyCommentApiView(APIView):
     def post(self, request):
         comment = request.data.get('comment')
         id = request.data.get('id')
+        post_pk = request.data.get('post_pk')
         parent = get_object_or_404(Comment, id=id)
         print(comment)
         reply_comment = ReplyComment.objects.create(
@@ -94,6 +103,9 @@ class ReplyCommentApiView(APIView):
             user=request.user,
         )
         reply_comment.save()
+        parent.update_reply_count()
+        parent.post.update_comment_count()
+        print(f'user: {request.user.is_staff}')
 
         serializer = ReplyCommentSerializer(reply_comment, context={'request': request})
         return Response(serializer.data)

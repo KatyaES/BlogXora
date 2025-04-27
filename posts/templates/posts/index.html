@@ -86,26 +86,31 @@
                             <img class="settings-img" src="/media/icons/settings.svg" alt="">
                         </div>
                         <div class="profile-elements">
-                            <div class="notifications-cont">
-                                <a>Уведомления</a>
+                            {% if request.user.is_staff %}
+                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
+                                <a href="{% url 'admin:login' %}">Администрация</a>
                             </div>
-                            <div class="subscribes-cont">
-                                <a>Подписки</a>
+                            {% endif %}
+                            <div class="notifications-cont" onclick="window.location.href = '/'">
+                                <a href="#">Уведомления</a>
                             </div>
-                            <div class="bookmarks-cont">
-                                <a>Закладки</a>
+                            <div class="subscribes-cont" onclick="window.location.href = '/'">
+                                <a href="#">Подписки</a>
                             </div>
-                            <div class="posts-cont">
-                                <a>Посты</a>
+                            <div class="bookmarks-cont" onclick="window.location.href = '/'">
+                                <a href="#">Закладки</a>
                             </div>
-                            <div class="comment-cont">
-                                <a>Комментарии</a>
+                            <div class="posts-cont" onclick="window.location.href = '/'">
+                                <a href="#">Посты</a>
                             </div>
-                            <div class="answers-cont">
-                                <a>Ответы</a>
+                            <div class="comment-cont" onclick="window.location.href = '/'">
+                                <a href="#">Комментарии</a>
                             </div>
-                            <div class="activity-cont">
-                                <a>История активности</a>
+                            <div class="answers-cont" onclick="window.location.href = '/'">
+                                <a href="#">Ответы</a>
+                            </div>
+                            <div class="activity-cont" onclick="window.location.href = '/'">
+                                <a href="#">История активности</a>
                             </div>
                         </div>
                     </div>
@@ -288,4 +293,5 @@
     </script>
     <script src="{% static 'js/likes.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}

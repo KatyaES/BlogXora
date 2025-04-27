@@ -9,6 +9,7 @@ import random
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from posts.models import Post
 from users.forms import UserRegistrationForm, UserLoginForm,  UserUpdateForm, \
@@ -40,7 +41,8 @@ def register(request):
         if form.is_valid():
             user = form.save()
             auth.login(request, user)
-            return JsonResponse({'status': 204})
+            refresh = RefreshToken.for_user(user)
+            return JsonResponse({'status': 204,  'access': str(refresh.access_token), 'refresh': str(refresh)})
         else:
             return JsonResponse({'status': 400})
     else:
@@ -56,7 +58,8 @@ def login(request):
         user = auth_and_login(username, password)
         if user:
             auth.login(request, user)
-            return JsonResponse({'status': 204})
+            refresh = RefreshToken.for_user(user)
+            return JsonResponse({'status': 204, 'access': str(refresh.access_token), 'refresh': str(refresh)})
         else:
             return JsonResponse({'status': 400})
     else:

@@ -167,35 +167,7 @@ def post_detail(request, pk):
                                                           "comments": comments,
                                                           'reply_comments': reply_comments})
 
-# def comment_data(request, pk):
-#     data = json.loads(request.body)
-#     comment = data.get('comment')
-#     post = get_object_or_404(Post, id=pk)
-#     print(data)
-#
-#     last_comment = Comment.objects.create (
-#         post=post,
-#         description=comment,
-#         user=request.user,
-#     )
-#     post.comment_count +=1
-#     last_comment.save()
-#     post.save()
-#
-#     comment = last_comment.description
-#     image = last_comment.user.image.url
-#     username = last_comment.user.username
-#     pub_date = last_comment.pub_date
-#     likes = last_comment.liked_by.count()
-#     liked_by = list(last_comment.liked_by.values('id', 'username'))
-#
-#     return JsonResponse({'comment':comment,
-#                          'image':image,
-#                          'username':username,
-#                          'pub_date':pub_date,
-#                          'likes':likes,
-#                          'liked_by':liked_by,
-#                          'id': last_comment.id,})
+
 
 
 def hot(request):

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from posts.models import Post, Comment
+from posts.models import Post, Comment, ReplyComment
+
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -12,4 +13,8 @@ class PostAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
 	exclude = ('liked_by',)
 	list_display = ['description', 'pub_date', 'post', 'user']
+
+@admin.register(ReplyComment)
+class ReplyCommentAdmin(admin.ModelAdmin):
+	list_display = ['description', 'pub_date', 'user']
 

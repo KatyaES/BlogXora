@@ -171,14 +171,14 @@ def post_detail(request, pk):
 
 
 def hot(request):
-    user = request.user
-    datas = {"Горячее": "hot", "Все посты": "index", "Темы": "all_categories", "Мой профиль": "profile"}
-    popular_categories = Post.objects.filter(status__icontains="draft").values("category").annotate(
-        count=Count("category")).order_by("-count")[:10]
-
     posts = Post.objects.filter(status__icontains="draft").order_by("-views_count")
-    return render(request, "posts/hot.html", {"posts": posts,
-                                                                            "datas": datas,
-                                                                            "popular_categories": popular_categories,
-                                                                            "user": user,
-                                                                            })
+    return render(request, "posts/hot.html", {"posts": posts})
+
+
+def discussion(request):
+    posts = Post.objects.filter(status__icontains="draft").order_by("-comment_count")
+    return render(request, "posts/discussion.html", {"posts": posts})
+
+def new(request):
+    posts = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
+    return render(request, "posts/new.html", {"posts": posts})

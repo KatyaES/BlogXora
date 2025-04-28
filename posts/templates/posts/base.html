@@ -6,7 +6,9 @@
 <head>
     <meta charset="UTF-8">
     {% block link %} {% endblock %}
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'posts/css/base.css' %}"
 </head>
 <body>
@@ -14,11 +16,11 @@
         <a class="logo">Xora</a>
         <nav class="nav-links">
             <ul>
-                <li class="{% if request.path == '/hot/' %}active{% endif %}"><a href="{% url 'hot' %}">Популярное</a></li>
-                <li class="{% if request.path == '/best/' %}active{% endif %}"><a href="{% url 'index' %}">Лучшее</a></li>
+                <li class="{% if request.path == '/home/hot/' %}active{% endif %}"><a href="{% url 'hot' %}">Популярное</a></li>
+                <li class="{% if request.path == '/home/discussion/' %}active{% endif %}"><a href="{% url 'discussion' %}">Обсуждаемое</a></li>
                 <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'index' %}">Моя лента</a></li>
-                <li class="{% if request.path == '/now/' %}active{% endif %}"><a href="{% url 'index' %}">Свежее</a></li>
-                <li class="{% if request.path == '/subscribes/' %}active{% endif %}"><a href="{% url 'index' %}">Подписки</a></li>
+                <li class="{% if request.path == '/home/new/' %}active{% endif %}"><a href="{% url 'new' %}">Свежее</a></li>
+                <li class="{% if request.path == '/home/subscribes/' %}active{% endif %}"><a href="{% url 'index' %}">Подписки</a></li>
             </ul>
         </nav>
         <div class="head-links">

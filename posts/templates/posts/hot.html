@@ -2,90 +2,296 @@
 {% load static %}
 {% load custom_filters %}
 
-    <title>Горячее</title>
-    {% block link %}<link rel="stylesheet" href="{% static 'posts/css/hot.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">{% endblock %}
+    <title>Популярное</title>
+    {% block link %}<link rel="stylesheet" href="{% static 'posts/css/styles.css' %}">{% endblock %}
+
 
 {% block body %}
     <div class="main-container">
-        <div class="posts-cont">
-                {% csrf_token %}
-                <div class="container">
-                    <div class="last-posts-cont">
-                        <p title="rgtreo">Горячие посты</p>
-                    </div>
-                    {% for post in posts %}
+        <div class="scroll-top" id="scroll-id">
+            <div class="wrapper-btn">
+                <img src="/media/icons/arrow-up.svg">
+            </div>
+        </div>
+        <div class="container">
+            <div class="posts-container">
+                {% for post in posts %}
+                    <div class="post-wrapper">
                         <div class="posts">
                             <div class="user-photo-name">
                                 <div class="user">
-                                    {% if post.user.image.name|slice:"-11:" ==  'default.jpg' %}
-                                        <img src="/media/profile_pics/avatar.png">
-                                        <span class="letter">{{ post.user.username|first }}</span>
-                                        <div class="default-span-s3">
-                                            <span title="username">{{ post.user.username }}</span>
-                                            <span style="color: gray; margin-left: 7px">{{ post.pub_date|smart_time }}</span>
+                                    <img src="{{ post.user.image.url }}">
+                                        <div class="name-and-date-category">
+                                            <div class="username">
+                                                <a href="#">{{ post.user.username }}</a>
+                                            </div>
+                                            <div class="category-and-date">
+                                                <a href="#">#{{ post.category }}</a>
+                                                <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
+                                            </div>
                                         </div>
-                                    {% else %}
-                                        <img src="{{ post.user.image.url }}">
-                                        <div class="s3">
-                                            <span title="username">{{ post.user.username }}</span>
-                                            <span style="color: gray; margin-left: 7px">{{ post.pub_date|smart_time }}</span>
-                                        </div>
-                                    {% endif %}
+                                    </div>
                                 </div>
-                            </div>
                             <br>
                             <div class="title">
                                 <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
                             </div>
-                            {% if post.description|length > 800 %}
-                                <p>{{ post.description|linebreaksbr|truncatewords:100|slice:":-3" }}</p>
-                                <br>
-                                <div class="detail-button">
-                                    <a href="{% url 'post_detail' post.id %}#top">Читать далее</a>
+                            <br>
+                            <div class="ql-editor">
+                                <img src="{{ post.wrapp_img.url }}" alt="">
+                                <p>{{ post.content|split_content|safe }}</p>
+                            </div>
+                            <div class="detail-button">
+                                <a href="{% url 'post_detail' post.id %}#top">Читать далее</a>
+                            </div>
+                            <div class="icon-cont">
+                                <div class="post-reactions">
+                                    <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="{{ post.id }}">
+                                        <img src="/media/icons/hart.png" class="heart-img" id="like-button">
+                                        <span class="likes-count" id="likes-count-{{ post.id }}">{{ post.liked_by.count }}</span>
+                                    </div>
+                                    <div class="comment-wrapper">
+                                        <a href="{% url 'post_detail' post.id %}">
+                                            <img src="/media/icons/comment.svg" class="comment-img">
+                                        </a>
+                                        <span class="comment-count">{{ post.comment_count }}</span>
+                                    </div>
+                                    <div class="bookmark-wrapper">
+                                        <a>
+                                            <img src="/media/icons/bookmark.svg" class="bookmark-img">
+                                        </a>
+                                        <span class="bookmark-count">0</span>
+                                    </div>
                                 </div>
-                                <div class="icon-cont">
+                                <div class="view-wrapper">
                                     <img src="/media/icons/view.svg" class="views-img">
                                     <span class="views-count">{{ post.views_count }}</span>
-                                    <a href="{% url 'post_detail' post.id %}"><img src="/media/icons/comment.svg" class="comment-img"></a>
-                                    <span class="comment-count">{{ post.comment_count }}</span>
-                                            <img src="/media/icons/hart.svg" class="heart-img" id="like-button" onclick="func(this)" data-id="{{ post.id }}">
-                                            <span class="likes-count" id="likes-count-{{ post.id }}">{{ post.likes }}</span>
                                 </div>
-                            {% else %}
-                                <p>{{ post.description|linebreaksbr }}</p>
-                                <br>
-                                <div class="detail-button">
-                                    <a href="{% url 'post_detail' post.id %}#top">Читать далее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="popular-and-random">
+                {% if request.user.is_authenticated %}
+                    <div class="profile-cont">
+                        <div class="profile-data">
+                            <div class="user-data">
+                                <img src="{{ user.image.url }}" alt="" class="profile-user-img">
+                                <div class="logout-and-username">
+                                    <a href="{% url 'profile' %}">{{ user.username }}</a>
+                                    <a class="logout" onclick="logout()">выйти</a>
                                 </div>
-                                <div class="icon-cont">
-                                    <img src="/media/icons/view.svg" class="views-img">
-                                    <span class="views-count">{{ post.views_count }}</span>
-                                    <a href="{% url 'post_detail' post.id %}">
-                                        <img src="/media/icons/comment.svg" class="comment-img">
-                                    </a>
-                                    <span class="comment-count">{{ post.comment_count }}</span>
-                                    <form action="{% url 'like_view' post.id %}" method="post">
-                                        {% csrf_token %}
-                                        <img src="/media/icons/hart.svg" class="heart-img" id="like-button" onclick="func(this)" data-id="{{ post.id }}">
-                                        <span class="likes-count" id="likes-count-{{ post.id }}">{{ post.likes }}</span>
-                                    </form>
-                                </div>
+                            </div>
+                            <img class="settings-img" src="/media/icons/settings.svg" alt="">
+                        </div>
+                        <div class="profile-elements">
+                            {% if request.user.is_staff %}
+                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
+                                <a href="{% url 'admin:login' %}">Администрация</a>
+                            </div>
                             {% endif %}
+                            <div class="notifications-cont" onclick="window.location.href = '/'">
+                                <a href="#">Уведомления</a>
+                            </div>
+                            <div class="subscribes-cont" onclick="window.location.href = '/'">
+                                <a href="#">Подписки</a>
+                            </div>
+                            <div class="bookmarks-cont" onclick="window.location.href = '/'">
+                                <a href="#">Закладки</a>
+                            </div>
+                            <div class="posts-cont" onclick="window.location.href = '/'">
+                                <a href="#">Посты</a>
+                            </div>
+                            <div class="comment-cont" onclick="window.location.href = '/'">
+                                <a href="#">Комментарии</a>
+                            </div>
+                            <div class="answers-cont" onclick="window.location.href = '/'">
+                                <a href="#">Ответы</a>
+                            </div>
+                            <div class="activity-cont" onclick="window.location.href = '/'">
+                                <a href="#">История активности</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                <div class="login-cont">
+                    <div class="auth-header">Войти</div>
+                    <div class="login-password">
+                        <input class="login-form" placeholder="Логин" minlength="3">
+                        <p class="login-warning">Обязательное поле</p>
+                        <p class="login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="password-form" type="password" placeholder="Пароль">
+                        <div class="password-warnings"></div>
+                        <p class="pass-warning">Обязательное поле</p>
+                        <p class="pass-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                    </div>
+                    <div class="error-data">
+                        <p class="error-message">Ошибка.Неправильный логин или пароль</p>
+                    </div>
+                    <div class="open-create">
+                        <button onclick="loginHandler()">Войти</button>
+                        <button id="login-second-button">Создать аккаунт</button>
+                    </div>
+                    <a href="{% url 'password_reset' %}" class="forget-password">Забыли пароль?</a>
+                </div>
+                <div class="register">
+                    <div class="auth-header-reg">Создать аккаунт</div>
+                    <div class="register-data">
+                        <input class="email-form" placeholder="Email">
+                        <p class="reg-email-warning">Обязательное поле</p>
+                        <p class="reg-email-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="reg-login-form" placeholder="Никнейм" maxlength="16">
+                        <p class="reg-login-warning">Обязательное поле</p>
+                        <p class="reg-login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="reg-password-form" type="password" placeholder="Пароль">
+                        <p class="reg-pass1-warning">Обязательное поле</p>
+                        <p class="reg-pass1-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="repeat-password-form" type="password" placeholder="Повторите пароль">
+                        <p class="reg-pass2-warning">Обязательное поле</p>
+                        <p class="reg-pass2-min-length-warning">Ошибка.Пароли не совпадают</p>
+                    </div>
+                    <div class="open-create">
+                        <button onclick="registerHandler()">Создать аккаунт</button>
+                        <button id="second-button">Есть аккаунт? Войти</button>
+                    </div>
+                </div>
+                {% endif %}
+                <div id="popular-id" class="popular-cat">
+                    <p class="popular-title">Темы</p>
+                        <div class="category-item">
+                            <img src="/media/categories/psychology.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Психология</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/technologies.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Технологии</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/offtop.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Офтоп</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/travel.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Путешествия</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/sport.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Спорт</a>
+                        </div>
+                        <div class="virt-button" id="virt-button" role="button">
+                            <img class="down" id="img-id" src="/media/icons/arrow-up.svg"></img>
+                            <span>Показать все</span>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/finance.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Деньги и инвестиции</a>
+                        </div>
+                        <div class="category-item" id="cinema">
+                            <img src="/media/categories/movies.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Кино</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/creation.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Творчество</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/health.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Здоровье</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/games.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Игры</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/history.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">История</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/music.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Музыка</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/science.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Наука</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/news.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Новости</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/humor.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Юмор</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/career.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Карьера</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/development.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Разработка</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/intresting.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">А вы знали?</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/food.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Еда</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/android.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Android</a>
+                        </div>
+                        <div class="category-item" href="#">
+                            <img src="/media/categories/apple.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Apple</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/fashion.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Мода</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/education.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Образование</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/ai.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">AI</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/thoughts.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Размышления</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/animal.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Животные</a>
+                        </div>
+                </div>
+                <div class="random-posts">
+                    <div class="popular-post-p">
+                        <span>ЧИТАЮТ СЕЙЧАС</span>
+                    </div>
+                    {% for post in random_posts %}
+                        <div class="cicle-container">
+                            <div class="date-and-name">
+                                <div class="side-img-name">
+                                    <img src="{{ post.user.image.url }}">
+                                    <a>{{ post.user.username }}</a>
+                                </div>
+                                <a style="color: gray">{{ post.pub_date|smart_time }}</a>
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
                         </div>
                     {% endfor %}
                 </div>
-                <div class="popular-cat">
-                    <p>Популярные темы:</p>
-                    {% for category in popular_categories %}
-                        <div class="popular-cat-container">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">{{ category.category }} <span class="count">{{ category.count}}</span></a></div>
-                    {% endfor %}
-                    <div class="all-themes">
-                        <p></p>
-                        <a href="{% url 'all_categories' %}">Все темы</a>
-                    </div>
-                </div>
+            </div>
         </div>
     </div>
+    <script>
+        const csrfToken = '{{ csrf_token }}'
+    </script>
+    <script src="{% static 'js/likes.js' %}"></script>
+    <script src="{% static 'js/login.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}

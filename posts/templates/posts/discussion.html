@@ -2,9 +2,8 @@
 {% load static %}
 {% load custom_filters %}
 
-    <title>Главная</title>
+<title>Обсуждаемое</title>
     {% block link %}<link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3">{% endblock %}
-
 
 {% block body %}
     <div class="main-container">
@@ -37,7 +36,7 @@
                                 <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
                             </div>
                             <br>
-                            <div class="ql-editor">                                
+                            <div class="ql-editor">
                                 <img src="{{ post.wrapp_img.url }}" alt="">
                                 <p>{{ post.content|split_content|safe }}</p>
                             </div>
@@ -69,7 +68,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 {% endfor %}
             </div>
             <div class="popular-and-random">
@@ -131,7 +130,7 @@
                     </div>
                     <div class="open-create">
                         <button onclick="loginHandler()">Войти</button>
-                        <button id="login-second-button">Создать аккаунт</button> 
+                        <button id="login-second-button">Создать аккаунт</button>
                     </div>
                     <a href="{% url 'password_reset' %}" class="forget-password">Забыли пароль?</a>
                 </div>
@@ -153,7 +152,7 @@
                     </div>
                     <div class="open-create">
                         <button onclick="registerHandler()">Создать аккаунт</button>
-                        <button id="second-button">Есть аккаунт? Войти</button> 
+                        <button id="second-button">Есть аккаунт? Войти</button>
                     </div>
                 </div>
                 {% endif %}
@@ -161,23 +160,23 @@
                     <p class="popular-title">Темы</p>
                         <div class="category-item">
                             <img src="/media/categories/psychology.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Психология</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Психология</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/technologies.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Технологии</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Технологии</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/offtop.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Офтоп</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Офтоп</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/travel.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Путешествия</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Путешествия</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/sport.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Спорт</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Спорт</a>
                         </div>
                         <div class="virt-button" id="virt-button" role="button">
                             <img class="down" id="img-id" src="/media/icons/arrow-up.svg"></img>
@@ -185,87 +184,87 @@
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/finance.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Деньги и инвестиции</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Деньги и инвестиции</a>
                         </div>
                         <div class="category-item" id="cinema">
                             <img src="/media/categories/movies.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Кино</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Кино</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/creation.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Творчество</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Творчество</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/health.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Здоровье</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Здоровье</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/games.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Игры</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Игры</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/history.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">История</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">История</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/music.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Музыка</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Музыка</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/science.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Наука</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Наука</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/news.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Новости</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Новости</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/humor.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Юмор</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Юмор</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/career.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Карьера</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Карьера</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/development.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Разработка</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Разработка</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/intresting.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">А вы знали?</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">А вы знали?</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/food.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Еда</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Еда</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/android.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Android</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Android</a>
                         </div>
                         <div class="category-item" href="#">
                             <img src="/media/categories/apple.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Apple</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Apple</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/fashion.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Мода</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Мода</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/education.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Образование</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Образование</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/ai.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">AI</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">AI</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/thoughts.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Размышления</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Размышления</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/animal.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Животные</a> 
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Животные</a>
                         </div>
                 </div>
                 <div class="random-posts">
@@ -283,11 +282,11 @@
                             </div>
                             <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
                         </div>
-                    {% endfor %}    
+                    {% endfor %}
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
     <script>
         const csrfToken = '{{ csrf_token }}'
     </script>

@@ -29,7 +29,9 @@ async function sendComment(div) {
 		<div class="comment-item" id="comment-item-${data.id}">
             <div class="comment-head">
                 <img src="${data.image}" alt="">
-                <a href="">${data.username}</a>
+                ${currentUser == data.username ? `
+                <div class="username_wrapper">
+                    <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
                 <span class="comment_pub-date">только что</span>
             </div>
             <div class="comment-content">
@@ -273,7 +275,9 @@ async function replySendComment(div) {
 		<div class="reply_comment-item" id="comment-item-${data.id}">
             <div class="comment-head">
                 <img src="${data.image}" alt="">
-                <a href="">${data.username}</a>
+                ${currentUser == data.username ? `
+                <div class="username_wrapper">
+                    <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
                 <span class="comment_pub-date">только что</span>
             </div>
             <div class="comment-content">
@@ -337,3 +341,4 @@ async function commentDelete(span) {
 
     } else { console.log('error in delete process') }
 }
+

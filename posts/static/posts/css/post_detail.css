@@ -238,10 +238,6 @@ textarea.comment-input:focus {
     color: #ebebeb;
 }
 
-.ql-editor p span {
-    font-family: 'Roboto';
-    font-weight: 500;
-}
 
 .reply_comment-input {
     padding: 20px;
@@ -306,6 +302,17 @@ textarea.reply_comment-input:focus {
 
 .delete-comment {
     cursor: pointer;
-    color: red;
+    color: var(--main-color);
     font-size: 15px;
+}
+
+.username_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: 20px;
+    padding: 0 8px 0 8px;
+    border-radius: 2px;
+    background: #70737B;
 }

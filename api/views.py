@@ -35,8 +35,10 @@ class CommentApiView(APIView):
 
     def delete(self, request, comment_pk, post_pk):
         type = request.GET.get('type')
-        if type == 'common': comment = get_object_or_404(Comment, id=comment_pk)
-        else: comment = get_object_or_404(ReplyComment, id=comment_pk)
+        if type == 'common':
+            comment = get_object_or_404(Comment, id=comment_pk)
+        else:
+            comment = get_object_or_404(ReplyComment, id=comment_pk)
         comment.delete()
         post = get_object_or_404(Post, id=post_pk)
         post.update_comment_count()
@@ -44,13 +46,25 @@ class CommentApiView(APIView):
             comment.update_reply_count()
         return HttpResponse(status=204)
 
+    def update(self, request, comment_pk):
+        type = request.GET.get('type')
+        if type == 'common':
+            comment = get_object_or_404(Comment, id=comment_pk)
+        else:
+            comment = get_object_or_404(ReplyComment, id=comment_pk)
+
+
+
+
 
 class CommentToggleApiView(APIView):
     def post(self, request, post_pk, comment_pk):
         comment_type = request.GET.get('type')
         print('post')
-        if comment_type == 'common': comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
-        else: comment = get_object_or_404(ReplyComment, id=comment_pk)
+        if comment_type == 'common':
+            comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        else:
+            comment = get_object_or_404(ReplyComment, id=comment_pk)
 
         if comment.liked_by.filter(id=request.user.id).exists():
             comment.liked_by.remove(request.user)

@@ -132,7 +132,6 @@
 }
 
 .user a {
-    font-family: Roboto sans-serif;
     text-decoration: none;
     font-size: 15px;
     color: var(--text-color);
@@ -144,7 +143,6 @@
     font-weight: 600;
     text-decoration: none;
     font-size: 23px;
-    font-family: Roboto sans-serif;
 }
 
 .category-and-date {
@@ -454,7 +452,6 @@
 
 
 .category-item a {
-    font-family: 'Roboto' sans-serif;
     color: var(--text-color);
 }
 
@@ -474,16 +471,12 @@
 }
 
 .ql-editor p span {
-    font-family: 'Roboto';
     font-size: 16px;
-    font-weight: 550;
     line-height: 1.6;
 }
 
 .ql-editor p {
-    font-family: 'Roboto';
     font-size: 16px;
-    font-weight: 550;
     line-height: 1.6;
 }
 
@@ -536,7 +529,6 @@
     text-decoration: none;
     color: var(--text-color);
     font-weight: 500;
-    font-family: Roboto sans-serif;
     /* border-top: 1px solid lightgray; */
 }
 

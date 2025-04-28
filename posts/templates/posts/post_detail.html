@@ -4,7 +4,7 @@
 
     <title>{{ post.title }}</title>
     {% block link %}<link rel="stylesheet" href="{% static 'posts/css/post_detail.css' %}">
-    <link rel="stylesheet" href="{% static 'posts/css/index.css' %}?v=3"{% endblock %}
+    <link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3"{% endblock %}
 
 {% block body %}
     <div id="top"></div>
@@ -77,7 +77,13 @@
                             <div class="comment-item" id="comment-item-{{ comment.id }}">
                                 <div class="comment-head">
                                     <img src="{{ comment.user.image.url }}" alt="">
-                                    <a href="">{{ comment.user.username }}</a>
+                                    {% if request.user == comment.user %}
+                                        <div class="username_wrapper">
+                                            <a href="{% url 'profile' %}" style="color: white; font-weight: 500; font-size: 13px;">{{ comment.user.username }}</a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'profile' %}">{{ comment.user.username }}</a>
+                                    {% endif %}
                                     <span class="comment_pub-date">{{ comment.pub_date|smart_time }}</span>
                                 </div>
                                 <div class="comment-content">
@@ -104,7 +110,13 @@
                                             <div class="reply_comment-item" id="comment-item-{{ reply.id }}">
                                                 <div class="comment-head">
                                                     <img src="{{ reply.user.image.url }}" alt="">
-                                                    <a href="">{{ reply.user.username }}</a>
+                                                    {% if request.user == reply.user %}
+                                                        <div class="username_wrapper">
+                                                            <a href="{% url 'profile' %}" style="color: white; font-weight: 500; font-size: 13px;">{{ reply.user.username }}</a>
+                                                        </div>
+                                                    {% else %}
+                                                        <a href="{% url 'profile' %}">{{ reply.user.username }}</a>
+                                                    {% endif %}
                                                     <span class="comment_pub-date">{{ reply.pub_date|smart_time }}</span>
                                                 </div>
                                                 <div class="comment-content">

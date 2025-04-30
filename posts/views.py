@@ -103,23 +103,13 @@ def category_page(request):
                                                    "category": category,})
 
 def search(request):
-    user = request.user
-    datas = {"Горячее": "hot", "Все посты": "index", "Темы": "all_categories", "Мой профиль": "profile"}
-    popular_categories = Post.objects.filter(status__icontains="draft").values("category").annotate(count=Count("category")).order_by("-count")[:10]
-
     query = request.GET.get("q")
     if query:
-        all_posts = Post.objects.filter(title__icontains=query, status__icontains="draft")
-        count = all_posts.count()
+        posts = Post.objects.filter(title__icontains=query, status__icontains="draft")
     else:
-        count = 0
-        all_posts = Post.objects.none()
+        posts = Post.objects.none()
 
-    return render(request, "posts/search.html", {"all_posts": all_posts,
-                                                 "count": count,
-                                                 "datas": datas,
-                                                 "user": user,
-                                                 "popular_categories": popular_categories,})
+    return render(request, "posts/search.html", {"posts": posts})
 
 def post_detail(request, pk):
     user = request.user

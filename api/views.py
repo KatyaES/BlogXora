@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer
+from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
 from posts.models import Comment, Post, ReplyComment
 
 
@@ -122,4 +122,13 @@ class ReplyCommentApiView(APIView):
         print(f'user: {request.user.is_staff}')
 
         serializer = ReplyCommentSerializer(reply_comment, context={'request': request})
+        return Response(serializer.data)
+
+class SearchPostsApiView(APIView):
+    def get(self, request):
+        query = request.GET.get('query')
+        print(query)
+        posts = Post.objects.filter(status__icontains='draft', title__icontains=query)
+
+        serializer = SearchPostSerializer(posts, many=True)
         return Response(serializer.data)

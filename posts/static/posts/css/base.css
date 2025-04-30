@@ -83,8 +83,7 @@ li a:hover {
 }
 
 .search-img, .pencil-img {
-    background-color: transparent;
-    /* filter: brightness(0) invert(0.5); */
+    filter: brightness(0) saturate(100%) invert(57%) sepia(0%) saturate(3187%) hue-rotate(21deg) brightness(92%) contrast(92%);
     height: 20px;
     width: 20px;
 }

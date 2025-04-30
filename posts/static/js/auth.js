@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     function isTokenExpired(token) {
         const payload = JSON.parse(atob(token.split('.')[1]))
-
         const exp = payload.exp * 1000
         console.log((exp / 60000) - (Date.now() / 60000))
         return Date.now() > exp
@@ -12,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!token || isTokenExpired(token)) {
         const refreshToken = localStorage.getItem('refresh')
+        console.log(refreshToken)
         const response = await fetch(`http://127.0.0.1:8000/api/token/refresh/`, {
             method: 'POST',
             headers: {
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             body: JSON.stringify({ refresh: refreshToken })
         })
-
         if (response.ok) {
             const data = await response.json()
             localStorage.setItem('access', data.access)

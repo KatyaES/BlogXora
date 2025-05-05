@@ -3,7 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('profile/', views.profile_page, name='profile'),
+    path('profile/<str:username>/', views.profile_page, name='profile'),
     path('logout/', views.logout_page, name='logout'),
     path('login/', views.login, name='login'),
     path('register/', views.register, name='register'),

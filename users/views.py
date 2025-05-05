@@ -16,7 +16,7 @@ from users.forms import UserRegistrationForm, UserLoginForm,  UserUpdateForm, \
     CustomPasswordChangeForm
 from django.contrib.auth import logout, update_session_auth_hash, get_user_model
 # from django.contrib.auth.models import User
-from users.models import CustomUser
+from users.models import CustomUser, Subscription
 from django.core.files import File
 from io import BytesIO
 
@@ -42,6 +42,10 @@ def register(request):
             user = form.save()
             auth.login(request, user)
             refresh = RefreshToken.for_user(user)
+
+            subscription, created = Subscription.objects.get_or_create(
+                user=user,
+            )
             return JsonResponse({'status': 204,  'access': str(refresh.access_token), 'refresh': str(refresh)})
         else:
             return JsonResponse({'status': 400})
@@ -68,27 +72,11 @@ def login(request):
     return render(request, 'users/login.html', context)
 
 @login_required
-def profile_page(request):
-    user = request.user
-    datas = {"Горячее": "hot", "Все посты": "index", "Темы": "all_categories", "Мой профиль": "profile"}
-    popular_categories = Post.objects.filter(status__icontains="draft").values("category").annotate(
-        count=Count("category")).order_by("-count")[:10]
+def profile_page(request, username):
+    profile_user = User.objects.get(username=username)
+    return render(request, 'users/profile.html',
+                  {'profile_user': profile_user})
 
-    if request.method == "POST":
-        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Пароль успешно изменен")
-            return redirect("login")
-        else:
-            return render(request, 'users/login.html', {"form": form})
-    else:
-        form = CustomPasswordChangeForm(user=request.user)
-        user = CustomUser.objects.filter(username=request.user).first()
-        return render(request, 'users/profile.html', {'user': user,
-                                                      'form': form,
-                                                      'datas': datas,
-                                                      'popular_categories': popular_categories})
 
 def logout_page(request):
     logout(request)

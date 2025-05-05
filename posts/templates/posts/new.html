@@ -22,7 +22,7 @@
                                     <img src="{{ post.user.image.url }}">
                                         <div class="name-and-date-category">
                                             <div class="username">
-                                                <a href="#">{{ post.user.username }}</a>
+                                                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
                                             </div>
                                             <div class="category-and-date">
                                                 <a href="#">#{{ post.category }}</a>
@@ -78,7 +78,7 @@
                             <div class="user-data">
                                 <img src="{{ user.image.url }}" alt="" class="profile-user-img">
                                 <div class="logout-and-username">
-                                    <a href="{% url 'profile' %}">{{ user.username }}</a>
+                                    <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
                                     <a class="logout" onclick="logout()">выйти</a>
                                 </div>
                             </div>

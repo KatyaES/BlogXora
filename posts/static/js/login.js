@@ -260,6 +260,7 @@ async function registerHandler() {
         } else {
             console.log(400)
             console.log(data.errors)
+            console.log(data)
         }
     }
 }

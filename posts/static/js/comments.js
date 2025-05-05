@@ -67,17 +67,18 @@ async function setCommentLike(div) {
 	const likesCount = document.getElementById(`comment_likes-count-${id}`);
 	const commentType = div.getAttribute("data-type")
 
+
 	const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
 	console.log(commentType)
+	console.log('likesCount::', likesCount)
 
 	try {
-	console.log('Begin')
+	    console.log('Begin')
 		const request = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${commentType}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -87,7 +88,15 @@ async function setCommentLike(div) {
 
 		const data = await request.json()
 		console.log(`data.likes: ${data.likes}`)
-		document.getElementById(`comment_likes-count-${id}`).textContent = data.likes;
+		console.log('before: ', likesCount.textContent)
+		try {
+		    likesCount.textContent = data.likes;
+		    console.log('update element: ', likesCount)
+		    console.log('after: ', likesCount.textContent, likesCount)
+		} catch (e) {
+		    console.log('error: ', e.name, e.message)
+		}
+
 		let before = ''
         if (commentType === 'reply') {before = 'reply-'}
 		if (data.liked) {
@@ -107,6 +116,113 @@ async function setCommentLike(div) {
         console.log(document.getElementById(`comment_likes-count-${id}`));
     }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log(1)
+    const token = localStorage.getItem('access')
+    const refresh = localStorage.getItem('refresh')
+
+    // Убедимся, что весь HTML загружен и есть элементы с классом .heart-img
+    const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
+    const replyWrapper = document.querySelectorAll(".reply-comment_like-wrapper")
+
+    for (const img of imgWrapper) {
+        const id = img.getAttribute("data-id");
+        const type = img.getAttribute('data-type')
+        const likesCount = document.getElementById(`comment_likes-count-${id}`);
+
+
+        try {
+            // Запрос к серверу
+            console.log('request')
+            const response = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${type}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            console.log(data)
+
+            // Печатаем, что вернул сервер
+            // Проверяем, авторизован ли пользователь
+            if (data.is_authenticated) {
+                if (data.liked) {
+                    console.log('if')
+                    img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    void likesCount.offsetWidth; // Принудительная перерисовка
+                    likesCount.classList.add('dellikeanimate');
+                } else {
+                    console.log(' else')
+                    img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    void likesCount.offsetWidth; // Принудительная перерисовка
+                    likesCount.classList.add('setlikeanimate');
+                }
+            } else {
+                console.log('else 2')
+                img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('setlikeanimate');
+            }
+        } catch (error) {
+            console.error("Ошибка при запросе для id " + id + ":", error);
+        }
+    }
+    //reply below
+    for (const img of replyWrapper) {
+        const token = localStorage.getItem('access')
+        const refresh = localStorage.getItem('refresh')
+
+        const id = img.getAttribute("data-id");
+        const type = img.getAttribute('data-type')
+        const likesCount = document.getElementById(`comment_likes-count-${id}`);
+
+        try {
+            // Запрос к серверу
+            console.log('request')
+            const response = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${type}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            console.log(data)
+
+            // Печатаем, что вернул сервер
+            // Проверяем, авторизован ли пользователь
+            if (data.is_authenticated) {
+                if (data.liked) {
+                    console.log('if')
+                    img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    void likesCount.offsetWidth; // Принудительная перерисовка
+                    likesCount.classList.add('dellikeanimate');
+                } else {
+                    console.log(' else')
+                    img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    void likesCount.offsetWidth; // Принудительная перерисовка
+                    likesCount.classList.add('setlikeanimate');
+                }
+            } else {
+                console.log('else 2')
+                img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('setlikeanimate');
+            }
+        } catch (error) {
+            console.error("Ошибка при запросе для id " + id + ":", error);
+        }
+    }
+
+})
 
 
 async function commentReply(span) {

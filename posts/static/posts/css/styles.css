@@ -187,6 +187,29 @@
     font-size: 13px;
     color: var(--main-color);
 }
+
+.follow-btn {
+    border: 1px solid var(--main-border);
+    padding: 0 10px 0 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    height: 30px;
+    cursor: pointer;
+    background: var(--main-color);
+    color: white;
+}
+
+.follow-btn:hover {
+    background: #3f7ec6;
+    transition: 0.1s ease;
+}
+
+.user-photo-name {
+    display: flex;
+    justify-content: space-between;
+}
 /* Posts */
 
 
@@ -1067,3 +1090,96 @@ button:first-of-type:hover {
 }
 
 /* ===SEARCH=== */
+
+
+/* ===PROFILE=== */
+
+.main-profile {
+    display: flex;
+    flex-direction: column;
+    background: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    width: 680px;
+    height: 100px;
+    border-radius: 10px;
+    padding: 20px;
+    gap: 20px;
+}
+
+.profile_head-img {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+}
+
+.user-profile-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile_head-name {
+    font-size: 20px;
+}
+
+
+.profile_follows {
+    padding: 20px;
+    width: 680px;
+    border-radius: 10px;
+    height: auto;
+    background: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    display: flex;
+    justify-content: space-between;
+}
+
+.profile_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+.follower_image {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+}
+
+.following_image {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+}
+
+.follower {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.following {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.followers_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.followings_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 200px 0 0;
+}
+
+.subs {
+    display: flex;
+    gap: 20px;
+}
+/* ===PROFILE=== */

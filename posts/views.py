@@ -32,10 +32,8 @@ def index(request):
     one_day_ago = timezone.now() - timedelta(days=3)
     random_posts = Post.objects.filter(status__icontains="draft", pub_date__gte=one_day_ago).order_by('?')[:5]
     posts = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
-    user = request.user
     datas = {"Горячее": "hot", "Все посты":"index", "Темы": "all_categories", "Мой профиль": "profile"}
     return render(request, "posts/index.html", {"posts": posts,
-                                                "user": user,
                                                 "datas": datas,
                                                 "random_posts": random_posts,
                                                 })

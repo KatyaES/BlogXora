@@ -1,6 +1,8 @@
 import json
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import AbstractUser
 from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -11,6 +13,9 @@ from rest_framework.views import APIView
 
 from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
 from posts.models import Comment, Post, ReplyComment
+from users.models import Subscription, CustomUser
+
+User = get_user_model()
 
 
 class CommentApiView(APIView):
@@ -132,3 +137,43 @@ class SearchPostsApiView(APIView):
 
         serializer = SearchPostSerializer(posts, many=True)
         return Response(serializer.data)
+
+
+class FollowsApiView(APIView):
+    def post(self, request, id):
+        follower_on = User.objects.get(id=id)
+
+        subscription, created = Subscription.objects.get_or_create(
+            user=follower_on,
+        )
+
+        if request.user not in subscription.followers.all():
+            subscription.followers.add(request.user)
+
+            my_subscription, created = Subscription.objects.get_or_create(
+                user=request.user,
+            )
+            my_subscription.followings.add(follower_on)
+
+            return Response({'status': 'add'})
+
+        else:
+            subscription.followers.remove(request.user)
+
+            my_subscription, created = Subscription.objects.get_or_create(
+                user=request.user,
+            )
+            my_subscription.followings.remove(follower_on)
+
+            return Response({'status': 'remove'})
+
+    def get(self, request, id):
+        follower_on = User.objects.get(id=id)
+
+        subscription, created = Subscription.objects.get_or_create(
+            user=follower_on,
+        )
+
+        if request.user in subscription.followers.all():
+            return Response({'status': 'subscribed'})
+        return Response({'status': 'not subscribed'})

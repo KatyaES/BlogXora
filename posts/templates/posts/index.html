@@ -21,23 +21,26 @@
                             <div class="user-photo-name">
                                 <div class="user">
                                     <img src="{{ post.user.image.url }}">
-                                        <div class="name-and-date-category">
-                                            <div class="username">
-                                                <a href="#">{{ post.user.username }}</a>
+                                    <div class="name-and-date-category">
+                                            <div class="username-and-follows">
+                                                <div class="username">
+                                                    <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                                                </div>
                                             </div>
                                             <div class="category-and-date">
                                                 <a href="#">#{{ post.category }}</a>
                                                 <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                             </div>
                                         </div>
-                                    </div>
                                 </div>
+                                <div class="follow-btn" onclick="followFunc(this)" data-id="{{ post.user.id }}">Подписаться</div>
+                            </div>
                             <br>
                             <div class="title">
                                 <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
                             </div>
                             <br>
-                            <div class="ql-editor">                                
+                            <div class="ql-editor">
                                 <img src="{{ post.wrapp_img.url }}" alt="">
                                 <p>{{ post.content|split_content|safe }}</p>
                             </div>
@@ -69,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 {% endfor %}
             </div>
             <div class="popular-and-random">
@@ -77,9 +80,9 @@
                     <div class="profile-cont">
                         <div class="profile-data">
                             <div class="user-data">
-                                <img src="{{ user.image.url }}" alt="" class="profile-user-img">
+                                <img src="{{ user.image.url }}" class="profile-user-img">
                                 <div class="logout-and-username">
-                                    <a href="{% url 'profile' %}">{{ user.username }}</a>
+                                    <a href="{% url 'profile' user.username %}">{{ request.user }}</a>
                                     <a class="logout" onclick="logout()">выйти</a>
                                 </div>
                             </div>
@@ -88,7 +91,7 @@
                         <div class="profile-elements">
                             {% if request.user.is_staff %}
                             <div class="admin-cont" onclick="window.location.href = 'admin/'">
-                                <a href="{% url 'admin:login' %}">Администрация</a>
+                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
                             </div>
                             {% endif %}
                             <div class="notifications-cont" onclick="window.location.href = '/'">
@@ -294,4 +297,5 @@
     <script src="{% static 'js/likes.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/follows.js' %}"></script>
 {% endblock %}

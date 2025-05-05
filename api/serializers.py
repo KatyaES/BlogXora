@@ -26,6 +26,9 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_pub_date(self, obj):
         return obj.pub_date
 
+    def get_id(self, obj):
+        return obj.id
+
     def get_username(self, obj):
         return obj.user.username
 
@@ -34,9 +37,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_likes(self, obj):
         return obj.liked_by.count()
-
-    def get_id(self, obj):
-        return obj.id
 
     def get_liked_by(self, obj):
         return list(obj.liked_by.values('id', 'username'))
@@ -99,6 +99,9 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
     def get_pub_date(self, obj):
         return obj.pub_date
 
+    def get_id(self, obj):
+        return obj.id
+
     def get_username(self, obj):
         return obj.user.username
 
@@ -107,9 +110,6 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
 
     def get_likes(self, obj):
         return obj.liked_by.count()
-
-    def get_id(self, obj):
-        return obj.id
 
     def get_liked_by(self, obj):
         return list(obj.liked_by.values('id', 'username'))
@@ -145,17 +145,17 @@ class SearchPostSerializer(serializers.ModelSerializer):
     def get_title(self, obj):
         return obj.title
 
+    def get_views_count(self, obj):
+        return obj.views_count
+
     def get_content(self, obj):
         return obj.content
 
     def get_category(self, obj):
         return obj.category
 
-    def get_pub_date(self, obj):
-        return obj.pub_date
-
-    def get_views_count(self, obj):
-        return obj.views_count
+    def get_id(self, obj):
+        return obj.id
 
     def get_user(self, obj):
         return obj.user.username
@@ -171,6 +171,3 @@ class SearchPostSerializer(serializers.ModelSerializer):
 
     def get_wrapp_img(self, obj):
         return obj.wrapp_img.url
-
-    def get_id(self, obj):
-        return obj.id

@@ -26,7 +26,7 @@
                                             <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
                                         </div>
                                         <div class="category-and-date">
-                                            <a href="#">#{{ post.category }}</a>
+                                            <a href="#">Тема: {{ post.category }}</a>
                                             <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                         </div>
                                     </div>
@@ -125,7 +125,7 @@
                                                 <div class="comment-reactions">
                                                     <div class="reply-comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="{{ reply.id }}" data-type="reply">
                                                         <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                                                        <span class="comment_likes-count" id="comment_likes-count-{{ reply.id }}">{{ reply.liked_by.count }}</span>
+                                                        <span class="comment_likes-count" id="reply_comment_likes-count-{{ reply.id }}">{{ reply.liked_by.count }}</span>
                                                     </div>
                                                     <span class="reply" onclick="commentReply(this)" data-id="{{ reply.id }}">Ответить</span>
                                                     {% if request.user == reply.user %}

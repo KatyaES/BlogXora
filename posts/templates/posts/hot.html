@@ -26,7 +26,7 @@
                                                 <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
                                             </div>
                                             <div class="category-and-date">
-                                                <a href="#">#{{ post.category }}</a>
+                                                <a href="#">Тема: {{ post.category }}</a>
                                                 <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                             </div>
                                         </div>

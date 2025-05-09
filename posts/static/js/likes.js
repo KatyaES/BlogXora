@@ -7,8 +7,9 @@ async function func(div) {
 
         const likesCount = document.getElementById(`likes-count-${id}`);
 
-        // Логируем добавление класса        
-        const request = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+        // Логируем добавление класса
+        if (token) {
+            const request = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -16,31 +17,32 @@ async function func(div) {
                 'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({})
-        })
-        const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+            })
+            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                     }
                 })
-        const data = await response.json()
-        document.getElementById(`likes-count-${id}`).textContent = data.likes;
-        
-        if (data.liked) {
-            div.classList.replace("like-wrapper", "like-wrapper-liked")
-            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-            void likesCount.offsetWidth; // Принудительная перерисовка
-            likesCount.classList.add('dellikeanimate');
-        } else {
-            div.classList.replace("like-wrapper-liked", "like-wrapper")
-            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-            void likesCount.offsetWidth; // Принудительная перерисовка
-            likesCount.classList.add('setlikeanimate');
-        }
+            const data = await response.json()
+            document.getElementById(`likes-count-${id}`).textContent = data.likes;
 
-    }
-    catch (error) {
+            if (data.liked) {
+                div.classList.replace("like-wrapper", "like-wrapper-liked")
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('dellikeanimate');
+            } else {
+                div.classList.replace("like-wrapper-liked", "like-wrapper")
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('setlikeanimate');
+            }
+        } else { alert('Для этого действия нужно авторизоваться')}
+
+
+    } catch (error) {
         console.error(error);
     }
 

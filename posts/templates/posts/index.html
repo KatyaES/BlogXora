@@ -28,7 +28,7 @@
                                                 </div>
                                             </div>
                                             <div class="category-and-date">
-                                                <a href="#">#{{ post.category }}</a>
+                                                <a href="#">Тема: {{ post.category }}</a>
                                                 <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                             </div>
                                         </div>
@@ -94,26 +94,29 @@
                                 <a href="http://127.0.0.1:8000/admin/">Администрация</a>
                             </div>
                             {% endif %}
-                            <div class="notifications-cont" onclick="window.location.href = '/'">
-                                <a href="#">Уведомления</a>
+                            <script>
+                                const username = "{{ request.user }}"
+                            </script>
+                            <div class="notifications-cont" onclick="window.location.href = 'users/profile/' + username">
+                                <a href="{% url 'profile' request.user %}#notification-id">Уведомления</a>
                             </div>
-                            <div class="subscribes-cont" onclick="window.location.href = '/'">
-                                <a href="#">Подписки</a>
+                            <div class="subscribes-cont" onclick="window.location.href = 'users/profile/' + username">
+                                <a href="{% url 'profile' request.user %}#subs-id">Подписки</a>
                             </div>
                             <div class="bookmarks-cont" onclick="window.location.href = '/'">
-                                <a href="#">Закладки</a>
+                                <a href="{% url 'profile' request.user %}">Закладки</a>
                             </div>
                             <div class="posts-cont" onclick="window.location.href = '/'">
-                                <a href="#">Посты</a>
+                                <a href="{% url 'profile' request.user %}">Посты</a>
                             </div>
                             <div class="comment-cont" onclick="window.location.href = '/'">
-                                <a href="#">Комментарии</a>
+                                <a href="{% url 'profile' request.user %}">Комментарии</a>
                             </div>
                             <div class="answers-cont" onclick="window.location.href = '/'">
-                                <a href="#">Ответы</a>
+                                <a href="{% url 'profile' request.user %}">Ответы</a>
                             </div>
                             <div class="activity-cont" onclick="window.location.href = '/'">
-                                <a href="#">История активности</a>
+                                <a href="{% url 'profile' request.user %}">История активности</a>
                             </div>
                         </div>
                     </div>

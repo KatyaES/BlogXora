@@ -16,7 +16,7 @@ from users.forms import UserRegistrationForm, UserLoginForm,  UserUpdateForm, \
     CustomPasswordChangeForm
 from django.contrib.auth import logout, update_session_auth_hash, get_user_model
 # from django.contrib.auth.models import User
-from users.models import CustomUser, Subscription
+from users.models import CustomUser, Subscription, Notifications
 from django.core.files import File
 from io import BytesIO
 
@@ -71,11 +71,13 @@ def login(request):
     context = {'form': form}
     return render(request, 'users/login.html', context)
 
-@login_required
+
 def profile_page(request, username):
     profile_user = User.objects.get(username=username)
+    notifications = Notifications.objects.filter(user=profile_user)
     return render(request, 'users/profile.html',
-                  {'profile_user': profile_user})
+                  {'profile_user': profile_user,
+                          'notifications': notifications,})
 
 
 def logout_page(request):

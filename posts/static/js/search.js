@@ -3,17 +3,39 @@ import likesUpdate from './domloaded.js';
 window.searchPosts = searchPosts;
 
 
+function smart_time(date) {
+    const result = Date.now() - new Date(date).getTime()
+    const seconds = Math.floor(result / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(seconds / 3600)
+    const days = Math.floor( hours / 24)
+
+
+    if (days > 0) {
+        return new Date(date).toLocaleString('ru-Ru', {
+            day: 'numeric',
+            month: 'long',
+        })
+    }
+
+    if (hours > 0) {
+        return `${hours} ч назад`
+    } else {
+        if (minutes < 1) {
+            return `${seconds} с назад`
+        } else {
+            return `${minutes} мин назад`
+        }
+    }
+}
+
 async function searchPosts() {
     const post = document.querySelector('.search-input').value
-
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
 
     const request = await fetch(`http://127.0.0.1:8000/api/search/posts/?query=${post}`, {
         method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${token}`,
 		}
     })
 
@@ -42,11 +64,11 @@ async function searchPosts() {
                                 <img src="${data[i].image}">
                                     <div class="name-and-date-category">
                                         <div class="username">
-                                            <a href="#">${data[i].username}</a>
+                                            <a href="#">${data[i].user}</a>
                                         </div>
                                         <div class="category-and-date">
                                             <a href="#">#${data[i].category}</a>
-                                            <span style="color: gray;">${data[i].pub_date}</span>
+                                            <span style="color: gray;">${smart_time(data[i].pub_date)}</span>
                                         </div>
                                     </div>
                                 </div>

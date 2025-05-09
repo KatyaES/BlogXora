@@ -17,10 +17,10 @@
             <div class="profile_wrapper">
                 <div class="main-profile">
                     <div class="user-profile-head">
-                        <img src="{{ request.user.image.url }}" class="profile_head-img">
+                        <img src="{{ profile_user.image.url }}" class="profile_head-img">
                         <span class="profile_head-name">{{ profile_user.username }}</span>
                     </div>
-                    <div class="subs">
+                    <div class="subs" id="subs-id">
                         <span>Подписчики {{ profile_user.follower_count }}</span>
                         <span>Подписки {{ profile_user.following_count }}</span>
                     </div>
@@ -45,6 +45,19 @@
                         {% endfor %}
                     </div>
                 </div>
+                {% if request.user == profile_user.username %}
+                    <div class="notifications" id="notification-id">
+                        Уведомления
+                        <br>
+                        {% if not notifications %}
+                            <span>Здесь еще нет уведомлений</span>
+                        {% else %}
+                            {% for message in notifications %}
+                                <span>{{ message.message|safe }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
             <div class="popular-and-random">
                 {% if request.user.is_authenticated %}

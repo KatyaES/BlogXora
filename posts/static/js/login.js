@@ -88,6 +88,7 @@ document.getElementById("login-second-button").addEventListener('click', () => {
 async function logout() {
     const request = await fetch('http://127.0.0.1:8000/users/logout/')
     window.location.href = '/'
+    localStorage.clear()
 }
 
 document.addEventListener('DOMContentLoaded', () => {

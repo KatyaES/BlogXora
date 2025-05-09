@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import ForeignKey
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -26,7 +27,13 @@ class CustomUser(AbstractUser):
     def subscription(self):
         return Subscription.objects.get(user=self)
 
+
 class Subscription(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)
     followers = models.ManyToManyField(CustomUser, related_name="my_follows", blank=True)
     followings = models.ManyToManyField(CustomUser, related_name="my_followings", blank=True)
+
+
+class Notifications(models.Model):
+    user = ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField(max_length=500)

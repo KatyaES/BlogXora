@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AbstractUser
 from django.core.serializers import serialize
@@ -8,12 +9,13 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
 from posts.models import Comment, Post, ReplyComment
-from users.models import Subscription, CustomUser
+from users.models import Subscription, CustomUser, Notifications
 
 User = get_user_model()
 
@@ -34,6 +36,12 @@ class CommentApiView(APIView):
         result = post.update_comment_count()
         print('method:',result)
         post.save()
+
+        if request.user != post.user or request.user != last_comment.user:
+            notification = Notifications.objects.create(
+                user=post.user,
+                message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> оставил комментарий под вашим <a href="/home/post/{post.id}/">постом</a>'
+            )
 
         serializer = CommentSerializer(last_comment, context={'request': request})
         return Response(serializer.data)
@@ -75,7 +83,17 @@ class CommentToggleApiView(APIView):
             comment.liked_by.remove(request.user)
         else:
             comment.liked_by.add(request.user)
+
+            if request.user != comment.user:
+                post = get_object_or_404(Post, id=post_pk)
+
+                notification = Notifications.objects.create(
+                    user=comment.user,
+                    message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим <a href="/home/post/{post.id}/#comment-item-{comment.id}">комментарием</a>'
+                )
+
         comment.save()
+
 
         serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
@@ -106,6 +124,12 @@ class PostToggleApiView(APIView):
 
     def get(self, request, pk):
         post = get_object_or_404(Post, id=pk)
+
+        notification = Notifications.objects.create(
+            user=post.user,
+            message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим <a href="/home/post/{post.id}/">постом</a>'
+        )
+
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
@@ -130,6 +154,7 @@ class ReplyCommentApiView(APIView):
         return Response(serializer.data)
 
 class SearchPostsApiView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         query = request.GET.get('query')
         print(query)

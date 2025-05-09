@@ -142,6 +142,9 @@ class SearchPostSerializer(serializers.ModelSerializer):
                   'user', 'comment_count', 'liked_by', 'image', 'wrapp_img',
                   'id']
 
+    def get_pub_date(self, obj):
+        return obj.pub_date
+
     def get_title(self, obj):
         return obj.title
 

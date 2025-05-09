@@ -8,7 +8,8 @@ async function sendComment(div) {
 	const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
-	const request = await fetch(`http://127.0.0.1:8000/api/add_comment/${postID}/`, {
+    if (token) {
+        const request = await fetch(`http://127.0.0.1:8000/api/add_comment/${postID}/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -19,54 +20,59 @@ async function sendComment(div) {
 		body: JSON.stringify({
 			'comment':comment.value,
 		})
-	})
+        })
 
-	const data = await request.json()
-	console.log(data)
-	console.log(data.id)
+        const data = await request.json()
+        console.log(data)
+        console.log(data.id)
 
-	const newComment = `
-		<div class="comment-item" id="comment-item-${data.id}">
-            <div class="comment-head">
-                <img src="${data.image}" alt="">
-                ${currentUser == data.username ? `
-                <div class="username_wrapper">
-                    <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
-                <span class="comment_pub-date">только что</span>
-            </div>
-            <div class="comment-content">
-                ${data.description}
-            </div>
-            <div class="comment-reactions">
-                <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}" data-type="common">
-                    <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                    <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+        const newComment = `
+            <div class="comment-item" id="comment-item-${data.id}">
+                <div class="comment-head">
+                    <img src="${data.image}" alt="">
+                    ${currentUser == data.username ? `
+                    <div class="username_wrapper">
+                        <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
+                    <span class="comment_pub-date">только что</span>
                 </div>
-                <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
-                ${currentUser == data.username ? `
-                <span class="delete-comment" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${postId}">Удалить</span>
-            ` : ''}
+                <div class="comment-content">
+                    ${data.description}
+                </div>
+                <div class="comment-reactions">
+                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}" data-type="common">
+                        <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+                        <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+                    </div>
+                    <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
+                    ${currentUser == data.username ? `
+                    <span class="delete-comment" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${postId}">Удалить</span>
+                ` : ''}
+                </div>
+                <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
+                    <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
+                    <div class="reply_send-comment" id="reply_comment-${data.id}" onclick="replySendComment(this)" data-field-id="${postId}" data-key="${data.id}" data-id="${data.id}">Отправить</div>
+                </div>
+
             </div>
-            <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
-                <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
-                <div class="reply_send-comment" id="reply_comment-${data.id}" onclick="replySendComment(this)" data-field-id="${postId}" data-key="${data.id}" data-id="${data.id}">Отправить</div>
-            </div>
+        `
 
-        </div>
-	`
-
-	const commentsCont = document.querySelector('.comments')
-	commentsCont.insertAdjacentHTML('beforeend', newComment)
-
+        const commentsCont = document.querySelector('.comments')
+        commentsCont.insertAdjacentHTML('beforeend', newComment)
+    } else {alert('Что бы оставить комментарий нужно войти в аккаунт')}
 }
 
 
 async function setCommentLike(div) {
 	const id = div.getAttribute("data-id");
 	console.log('id:', id)
-	const likesCount = document.getElementById(`comment_likes-count-${id}`);
+	let likesCount = ''
 	const commentType = div.getAttribute("data-type")
 
+    if (commentType === 'common') {
+        likesCount = document.getElementById(`comment_likes-count-${id}`);
+    } else {
+        likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
+    }
 
 	const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
@@ -75,43 +81,40 @@ async function setCommentLike(div) {
 	console.log('likesCount::', likesCount)
 
 	try {
-	    console.log('Begin')
-		const request = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${commentType}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({})
-        })
+	    if (token) {
+	        console.log('Begin')
+            const request = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${commentType}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({})
+            })
 
-		const data = await request.json()
-		console.log(`data.likes: ${data.likes}`)
-		console.log('before: ', likesCount.textContent)
-		try {
-		    likesCount.textContent = data.likes;
-		    console.log('update element: ', likesCount)
-		    console.log('after: ', likesCount.textContent, likesCount)
-		} catch (e) {
-		    console.log('error: ', e.name, e.message)
-		}
+            const data = await request.json()
+            console.log(`data.likes: ${data.likes}`)
 
-		let before = ''
-        if (commentType === 'reply') {before = 'reply-'}
-		if (data.liked) {
-		    console.log('data liked')
-            div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
-            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-            void likesCount.offsetWidth; // Принудительная перерисовка
-            likesCount.classList.add('dellikeanimate');
-        } else {
-            console.log('data liked else')
-            div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
-            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-            void likesCount.offsetWidth; // Принудительная перерисовка
-            likesCount.classList.add('setlikeanimate');
-        }
+            likesCount.textContent = data.likes;
+
+            let before = ''
+            if (commentType === 'reply') {before = 'reply-'}
+            if (data.liked) {
+                console.log('data liked')
+                div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('dellikeanimate');
+            } else {
+                console.log('data liked else')
+                div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.add('setlikeanimate');
+            }
+	    } else { alert('Для этого действия нужно авторизоваться')}
+
 	} catch (error) {
         console.log(document.getElementById(`comment_likes-count-${id}`));
     }
@@ -179,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const id = img.getAttribute("data-id");
         const type = img.getAttribute('data-type')
-        const likesCount = document.getElementById(`comment_likes-count-${id}`);
+        const likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
 
         try {
             // Запрос к серверу
@@ -262,7 +265,8 @@ async function replySendComment(div) {
     const comment = document.getElementById(`reply_comment-input-${commentId}`)
     console.log('comment: ', comment, commentId)
 
-	const request = await fetch(`http://127.0.0.1:8000/api/reply_comment/`, {
+    if (token) {
+        const request = await fetch(`http://127.0.0.1:8000/api/reply_comment/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -273,43 +277,44 @@ async function replySendComment(div) {
 			'comment':comment.value,
 			'id':id,
 		})
-	})
+	    })
 
-	const data = await request.json()
-	const commentCont = document.getElementById(`reply_comment-wrapper-${id}`)
-	console.log(data)
+        const data = await request.json()
+        const commentCont = document.getElementById(`reply_comment-wrapper-${id}`)
+        console.log(data)
 
-	const newComment = `
-		<div class="reply_comment-item" id="comment-item-${data.id}">
-            <div class="comment-head">
-                <img src="${data.image}" alt="">
-                ${currentUser == data.username ? `
-                <div class="username_wrapper">
-                    <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
-                <span class="comment_pub-date">только что</span>
-            </div>
-            <div class="comment-content">
-                ${data.description}
-            </div>
-            <div class="comment-reactions">
-                <div class="reply-comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}" data-type="reply">
-                    <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                    <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+        const newComment = `
+            <div class="reply_comment-item" id="comment-item-${data.id}">
+                <div class="comment-head">
+                    <img src="${data.image}" alt="">
+                    ${currentUser == data.username ? `
+                    <div class="username_wrapper">
+                        <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
+                    <span class="comment_pub-date">только что</span>
                 </div>
-                <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
-                ${currentUser == data.username ? `
-                <span class="delete-comment" onclick="commentDelete(this)" data-field-id="${commentId}" id="${data.id}" data-key="${data.id}" data-type="reply" data-id="${postId}">Удалить</span>
-            ` : ''}
+                <div class="comment-content">
+                    ${data.description}
+                </div>
+                <div class="comment-reactions">
+                    <div class="reply-comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}" data-type="reply">
+                        <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+                        <span class="comment_likes-count" id="reply_comment_likes-count-${data.id}">${data.likes}</span>
+                    </div>
+                    <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
+                    ${currentUser == data.username ? `
+                    <span class="delete-comment" onclick="commentDelete(this)" data-field-id="${commentId}" id="${data.id}" data-key="${data.id}" data-type="reply" data-id="${postId}">Удалить</span>
+                ` : ''}
+                </div>
+                <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
+                    <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
+                    <div class="reply_send-comment" onclick="replySendComment(this)" data-field-id="${postId}" data-key="${commentId}" data-id="${id}">Отправить</div>
+                </div>
             </div>
-            <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.id}">
-                <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
-                <div class="reply_send-comment" onclick="replySendComment(this)" data-field-id="${postId}" data-key="${commentId}" data-id="${id}">Отправить</div>
-            </div>
-        </div>
-	`
+        `
 
-	commentCont.insertAdjacentHTML('beforeend', newComment)
+        commentCont.insertAdjacentHTML('beforeend', newComment)
 
+    } else {alert('Что бы оставить комментарий войдите в акканут')}
 }
 
 

@@ -4,6 +4,7 @@
 {% block link %}
     <title>Добавить пост</title>
     <link rel="stylesheet" href="{% static 'posts/css/add_post.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3">
     <!-- Quill стили -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
 {% block body %}
     <div class="main-cont">
         <div class="main-wrapper" id="main-wrapper-id">
-            <div class="user">
+            <div class="add-post_user">
                 <img src="{{ request.user.image.url }}" alt="">
                 <a>{{ request.user }}</a>
             </div>

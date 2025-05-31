@@ -79,10 +79,10 @@
                                     <img src="{{ comment.user.image.url }}" alt="">
                                     {% if request.user == comment.user %}
                                         <div class="username_wrapper">
-                                            <a href="{% url 'profile' %}" style="color: white; font-weight: 500; font-size: 13px;">{{ comment.user.username }}</a>
+                                            <a href="{% url 'profile' comment.user.username %}" style="color: white; font-weight: 500; font-size: 13px;">{{ comment.user.username }}</a>
                                         </div>
                                     {% else %}
-                                        <a href="{% url 'profile' %}">{{ comment.user.username }}</a>
+                                        <a href="{% url 'profile' comment.user.username %}">{{ comment.user.username }}</a>
                                     {% endif %}
                                     <span class="comment_pub-date">{{ comment.pub_date|smart_time }}</span>
                                 </div>
@@ -112,10 +112,10 @@
                                                     <img src="{{ reply.user.image.url }}" alt="">
                                                     {% if request.user == reply.user %}
                                                         <div class="username_wrapper">
-                                                            <a href="{% url 'profile' %}" style="color: white; font-weight: 500; font-size: 13px;">{{ reply.user.username }}</a>
+                                                            <a href="{% url 'profile' reply.user.username %}" style="color: white; font-weight: 500; font-size: 13px;">{{ reply.user.username }}</a>
                                                         </div>
                                                     {% else %}
-                                                        <a href="{% url 'profile' %}">{{ reply.user.username }}</a>
+                                                        <a href="{% url 'profile' reply.user.username %}">{{ reply.user.username }}</a>
                                                     {% endif %}
                                                     <span class="comment_pub-date">{{ reply.pub_date|smart_time }}</span>
                                                 </div>
@@ -134,7 +134,7 @@
                                                 </div>
                                                 <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ reply.id }}">
                                                     <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-{{ reply.id }}"></textarea>
-                                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-field-id="{{ post.id }}" data-key="{{ comment.id }}" data-id="{{ comment.id }}">Отправить</div>
+                                                    <div class="reply_send-comment" id="reply_comment-{{ comment.id }}" onclick="replySendComment(this)" data-field-id="{{ post.id }}" data-key="{{ reply.id }}" data-id="{{ comment.id }}">Отправить</div>
                                                 </div>
                                             </div>
                                         {% endif %}
@@ -150,40 +150,37 @@
                     <div class="profile-cont">
                         <div class="profile-data">
                             <div class="user-data">
-                                <img src="{{ user.image.url }}" alt="" class="profile-user-img">
+                                <img src="{{ user.image.url }}" class="profile-user-img">
                                 <div class="logout-and-username">
-                                    <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+                                    <a href="{% url 'profile' user.username %}">{{ request.user }}</a>
                                     <a class="logout" onclick="logout()">выйти</a>
                                 </div>
                             </div>
-                            <img class="settings-img" src="/media/icons/settings.svg" alt="">
+                            <img class="settings-img" src="/media/icons/settings.svg" onclick="settings(this)">
                         </div>
                         <div class="profile-elements">
                             {% if request.user.is_staff %}
-                            <div class="admin-cont">
-                                <a href="{% url 'admin:login' %}">Админка</a>
+                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
+                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
                             </div>
                             {% endif %}
-                            <div class="notifications-cont">
-                                <a>Уведомления</a>
+                            <script>
+                                const username = "{{ request.user }}"
+                            </script>
+                            <div class="notifications-cont" onclick="window.location.href = 'users/profile/' + username + '#notification-id'">
+                                <a href="{% url 'profile' request.user %}#notifications-id">Уведомления</a>
                             </div>
-                            <div class="subscribes-cont">
-                                <a>Подписки</a>
+                            <div class="subscribes-cont" onclick="window.location.href = 'users/profile/' + username + '#subs-id'">
+                                <a href="{% url 'profile' request.user %}#subscribes-id">Подписки</a>
                             </div>
-                            <div class="bookmarks-cont">
-                                <a>Закладки</a>
+                            <div class="bookmarks-cont" onclick="window.location.href = 'users/profile/' + username + '#bookmarks-id'">
+                                <a href="{% url 'profile' request.user %}#bookmarks-id">Закладки</a>
                             </div>
-                            <div class="posts-cont">
-                                <a>Посты</a>
+                            <div class="self-posts-cont" onclick="window.location.href = 'users/profile/' + username + '#self-posts-id'">
+                                <a href="{% url 'profile' request.user %}#self-posts-id">Посты</a>
                             </div>
-                            <div class="comment-cont">
-                                <a>Комментарии</a>
-                            </div>
-                            <div class="answers-cont">
-                                <a>Ответы</a>
-                            </div>
-                            <div class="activity-cont">
-                                <a>История активности</a>
+                            <div class="comment-cont" onclick="window.location.href = 'users/profile/' + username + '#comments'">
+                                <a href="{% url 'profile' request.user %}#comment">Комментарии</a>
                             </div>
                         </div>
                     </div>
@@ -203,8 +200,8 @@
                         <p class="error-message">Ошибка.Неправильный логин или пароль</p>
                     </div>
                     <div class="open-create">
-                        <button class="open-btn" onclick="loginHandler()">Войти</button>
-                        <button class="create_accoutn-btn" id="login-second-button">Создать аккаунт</button> 
+                        <button onclick="loginHandler()">Войти</button>
+                        <button id="login-second-button">Создать аккаунт</button>
                     </div>
                     <a href="{% url 'password_reset' %}" class="forget-password">Забыли пароль?</a>
                 </div>
@@ -225,8 +222,8 @@
                         <p class="reg-pass2-min-length-warning">Ошибка.Пароли не совпадают</p>
                     </div>
                     <div class="open-create">
-                        <button class="reg_create_account-btn" onclick="registerHandler()">Создать аккаунт</button>
-                        <button class="reg-open-btn" id="second-button">Есть аккаунт? Войти</button> 
+                        <button onclick="registerHandler()">Создать аккаунт</button>
+                        <button id="second-button">Есть аккаунт? Войти</button>
                     </div>
                 </div>
                 {% endif %}
@@ -234,111 +231,111 @@
                     <p class="popular-title">Темы</p>
                         <div class="category-item">
                             <img src="/media/categories/psychology.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Психология</a> 
+                            <a href="{% url 'category' %}?theme=Психология">Психология</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/technologies.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Технологии</a> 
+                            <a href="{% url 'category' %}?theme=Технологии">Технологии</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/offtop.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Офтоп</a> 
+                            <a href="{% url 'category' %}?theme=Офтоп">Офтоп</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/travel.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Путешествия</a> 
+                            <a href="{% url 'category' %}?theme=Путешествия">Путешествия</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/sport.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Спорт</a> 
+                            <a href="{% url 'category' %}?theme=Спорт">Спорт</a>
                         </div>
                         <div class="virt-button" id="virt-button" role="button">
-                            <img class="down" id="img-id" src="/media/icons/arrow-up.svg"></img>
+                            <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
                             <span>Показать все</span>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/finance.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Деньги и инвестиции</a> 
+                            <a href="{% url 'category' %}?theme=Деньги и инвестиции">Деньги и инвестиции</a>
                         </div>
                         <div class="category-item" id="cinema">
                             <img src="/media/categories/movies.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Кино</a> 
+                            <a href="{% url 'category' %}?theme=Кино">Кино</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/creation.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Творчество</a> 
+                            <a href="{% url 'category' %}?theme=Творчество">Творчество</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/health.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Здоровье</a> 
+                            <a href="{% url 'category' %}?theme=Здоровье">Здоровье</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/games.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Игры</a> 
+                            <a href="{% url 'category' %}?theme=Игры">Игры</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/history.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">История</a> 
+                            <a href="{% url 'category' %}?theme=История">История</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/music.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Музыка</a> 
+                            <a href="{% url 'category' %}?theme=Музыка">Музыка</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/science.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Наука</a> 
+                            <a href="{% url 'category' %}?theme=Наука">Наука</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/news.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Новости</a> 
+                            <a href="{% url 'category' %}?theme=Новости">Новости</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/humor.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Юмор</a> 
+                            <a href="{% url 'category' %}?theme=Юмор">Юмор</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/career.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Карьера</a> 
+                            <a href="{% url 'category' %}?theme=Карьера">Карьера</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/development.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Разработка</a> 
+                            <a href="{% url 'category' %}?theme=Разработка">Разработка</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/intresting.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">А вы знали?</a> 
+                            <a href="{% url 'category' %}?theme=А вы знали?">А вы знали?</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/food.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Еда</a> 
+                            <a href="{% url 'category' %}?theme=Еда">Еда</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/android.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Android</a> 
+                            <a href="{% url 'category' %}?theme=Android">Android</a>
                         </div>
                         <div class="category-item" href="#">
                             <img src="/media/categories/apple.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Apple</a> 
+                            <a href="{% url 'category' %}?theme=Apple">Apple</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/fashion.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Мода</a> 
+                            <a href="{% url 'category' %}?theme=Мода">Мода</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/education.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Образование</a> 
+                            <a href="{% url 'category' %}?theme=Образование">Образование</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/ai.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">AI</a> 
+                            <a href="{% url 'category' %}?theme=Ai">AI</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/thoughts.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Размышления</a> 
+                            <a href="{% url 'category' %}?theme=Размышления">Размышления</a>
                         </div>
                         <div class="category-item">
                             <img src="/media/categories/animal.png" alt="">
-                            <a href="{% url 'category' %}?filter={{ category.category }}">Животные</a> 
+                            <a href="{% url 'category' %}?theme=Животные">Животные</a>
                         </div>
                 </div>
                 <div class="random-posts">
@@ -350,7 +347,7 @@
                             <div class="date-and-name">
                                 <div class="side-img-name">
                                     <img src="{{ post.user.image.url }}">
-                                    <a>{{ post.user.username }}</a>
+                                    <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
                                 </div>
                                 <a style="color: gray">{{ post.pub_date|smart_time }}</a>
                             </div>

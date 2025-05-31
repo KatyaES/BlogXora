@@ -2,6 +2,7 @@ from django.template.context_processors import request
 from rest_framework import routers, serializers
 
 from posts.models import Comment, Post, ReplyComment
+from users.models import CustomUser
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -56,10 +57,20 @@ class PostSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
     is_authenticated = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
+    bookmark_count = serializers.SerializerMethodField()
+    set_bookmark = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['likes', 'liked', 'is_authenticated', 'user_id']
+        fields = ['likes', 'liked', 'is_authenticated', 'user_id', 'bookmark_count', 'set_bookmark']
+
+
+    def get_bookmark_count(self, obj):
+        return obj.bookmark_user.count()
+
+    def get_set_bookmark(self, obj):
+        request = self.context.get('request')
+        return obj.bookmark_user.filter(id=request.user.id).exists()
 
     def get_likes(self, obj):
         return obj.liked_by.count()
@@ -135,12 +146,16 @@ class SearchPostSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     wrapp_img = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = ['title', 'content', 'category', 'pub_date', 'views_count',
                   'user', 'comment_count', 'liked_by', 'image', 'wrapp_img',
-                  'id']
+                  'id', 'user_id']
+
+    def get_user_id(self, obj):
+        return obj.user.id
 
     def get_pub_date(self, obj):
         return obj.pub_date
@@ -155,7 +170,7 @@ class SearchPostSerializer(serializers.ModelSerializer):
         return obj.content
 
     def get_category(self, obj):
-        return obj.category
+        return obj.category.name
 
     def get_id(self, obj):
         return obj.id
@@ -174,3 +189,16 @@ class SearchPostSerializer(serializers.ModelSerializer):
 
     def get_wrapp_img(self, obj):
         return obj.wrapp_img.url
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    bio = serializers.CharField()
+
+
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+

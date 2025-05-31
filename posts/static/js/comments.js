@@ -7,9 +7,10 @@ async function sendComment(div) {
 
 	const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
+    console.log(token)
 
     if (token) {
-        const request = await fetch(`http://127.0.0.1:8000/api/add_comment/${postID}/`, {
+        const request = await fetch(`http://127.0.0.1:8000/api/comments/${postID}/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -79,11 +80,12 @@ async function setCommentLike(div) {
 
 	console.log(commentType)
 	console.log('likesCount::', likesCount)
+	console.log('const postID: ', postID)
 
 	try {
 	    if (token) {
 	        console.log('Begin')
-            const request = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${commentType}`, {
+            const request = await fetch(`http://127.0.0.1:8000/api/comments/${postID}/${id}/like/?type=${commentType}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -116,7 +118,7 @@ async function setCommentLike(div) {
 	    } else { alert('Для этого действия нужно авторизоваться')}
 
 	} catch (error) {
-        console.log(document.getElementById(`comment_likes-count-${id}`));
+        console.log(error);
     }
 }
 
@@ -138,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Запрос к серверу
             console.log('request')
-            const response = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${type}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/comments/${postID}/${id}/like/?type=${type}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Запрос к серверу
             console.log('request')
-            const response = await fetch(`http://127.0.0.1:8000/api/post/${postID}/comment/${id}/?type=${type}`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/comments/${postID}/${id}/like/?type=${type}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -266,17 +268,17 @@ async function replySendComment(div) {
     console.log('comment: ', comment, commentId)
 
     if (token) {
-        const request = await fetch(`http://127.0.0.1:8000/api/reply_comment/`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-CSRFToken': csrfToken,
-			'Authorization': `Bearer ${token}`,
-		},
-		body: JSON.stringify({
-			'comment':comment.value,
-			'id':id,
-		})
+        const request = await fetch(`http://127.0.0.1:8000/api/reply-comments/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                'comment':comment.value,
+                'id':id,
+            })
 	    })
 
         const data = await request.json()
@@ -333,7 +335,7 @@ async function commentDelete(span) {
     console.log('token refresh: ', refresh)
     console.log('comment id::', commentId)
 
-    const request = await fetch(`http://127.0.0.1:8000/api/delete_comment/${id}/post/${postId}/?type=${type}`, {
+    const request = await fetch(`http://127.0.0.1:8000/api/comments/${id}/${postId}/delete/?type=${type}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',

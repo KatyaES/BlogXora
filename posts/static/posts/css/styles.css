@@ -67,7 +67,9 @@
 .posts-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
 }
 
 .container {
@@ -381,6 +383,47 @@
 
 /* ===BOOKMARK=== */
 
+
+@keyframes set-slide-up {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+.bookmark-count.dellikeanimate {
+    animation: set-slide-up 0.8s ease-in-out;
+}
+
+
+@keyframes rem-bookmark-slide {
+    0% {
+        transform: translateY(-5px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(3px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.bookmark-count.setlikeanimate {
+    animation: rem-bookmark-slide 0.8s ease-in-out;
+}
+
 .bookmark-wrapper {
     display: inline-flex;
     justify-content: center;
@@ -398,9 +441,32 @@
     padding-left: 8px;
 }
 
+.bookmark-wrapper-set {
+    display: inline-flex;
+    justify-content: center;
+    gap: 5px;
+    margin-left: auto;
+    align-items: center;
+    background-color: var(--main-color);
+    cursor: pointer;
+    border-radius: 30px;
+    min-width: 30px;
+    width: auto;
+    height: 30px;
+    color: white;
+    padding-right: 8px;
+    padding-left: 8px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.bookmark-wrapper-set .bookmark-img {
+    filter: brightness(0) saturate(100%) invert(91%) sepia(74%) saturate(964%) hue-rotate(320deg) brightness(103%) contrast(102%);
+}
+
+
+
 .bookmark-wrapper:hover .bookmark-count{
     color: var(--main-color);
-    
 }
 
 .bookmark-wrapper:hover .bookmark-img {
@@ -408,7 +474,7 @@
 }
 
 .bookmark-wrapper:hover {
-    background-color: #fff6d1;
+    background-color: #d1ddff;
 }
 
 .bookmark-img {
@@ -485,8 +551,16 @@
 /* popular-cat */
 
 
-.ql-editor img {
+.wrapp_img {
     width: 780px;
+    height: 440px;
+    max-width: 680px;
+    /* display: block; */
+    border-radius: 10px;
+}
+
+.ql-editor img {
+    width: 680px;
     height: 440px;
     max-width: 680px;
     /* display: block; */
@@ -514,6 +588,8 @@
     width: 100%;
     font-size: 14px;
 }
+
+
 
 
 /*===RANDOM POSTS===*/
@@ -647,18 +723,13 @@
     flex-shrink: 0;
     align-items: flex-start;
     width: 296px;
-    min-height: 360px;
-    max-height: 390px;
     overflow: hidden;
+
     background: var(--main-element-background);
     border: 1px solid var(--main-border);
     border-radius: 10px;
-    --profile-cont-height: 410px;
 }
 
-.profile-cont:has(.admin-cont) {
-    height: 390px;
-}
 
 .profile-data {
     display: flex;
@@ -708,7 +779,6 @@
 
 .profile-elements {
     width: 100%;
-    height: 280px;
     cursor: pointer;
 }
 
@@ -721,7 +791,6 @@
     width: 100%;
     height: 50px;
     background-color: var(--main-element-background);
-
 }
 
 .exit img {
@@ -746,7 +815,7 @@
 .notifications-cont,
 .subscribes-cont,
 .bookmarks-cont,
-.posts-cont,
+.self-posts-cont,
 .comment-cont,
 .answers-cont,
 .activity-cont,
@@ -766,7 +835,7 @@
 .notifications-cont a,
 .subscribes-cont a,
 .bookmarks-cont a,
-.posts-cont a,
+.self-posts-cont a,
 .comment-cont a,
 .answers-cont a,
 .activity-cont a,
@@ -780,7 +849,7 @@
 .notifications-cont:hover ,
 .subscribes-cont:hover,
 .bookmarks-cont:hover,
-.posts-cont:hover,
+.self-posts-cont:hover,
 .comment-cont:hover,
 .answers-cont:hover,
 .activity-cont:hover,
@@ -793,7 +862,7 @@
 .notifications-cont:hover a ,
 .subscribes-cont:hover a,
 .bookmarks-cont:hover a,
-.posts-cont:hover a,
+.self-posts-cont:hover a,
 .comment-cont:hover a,
 .answers-cont:hover a,
 .activity-cont:hover a,
@@ -1029,11 +1098,16 @@ button:first-of-type:hover {
 /* ===SEARCH=== */
 
 .search-input {
-    width: 98%;
-    height: 40px;
-    border-color: var(--main-color);
-    border-radius: 8px;
+    width: 200px;
+    height: 30px;
+    border: 2px solid var(--main-color);
+    border-radius: 20px;
     padding-left: 10px;
+    padding-right: 50px;
+    display: flex;
+    outline: none;
+    box-shadow: none;
+    align-items: center;
 }
 
 .search-wrapper {
@@ -1056,29 +1130,19 @@ button:first-of-type:hover {
 }
 
 .search-cont {
-    width: 40px;
     display: flex;
-    justify-content: left;
     align-items: center;
-    height: 100%;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 25%;
+    right: 15px;
 }
 
 .input_wrapper {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
 }
 
-.full-search-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}
 
 .bad-search-img {
     width: 400px;
@@ -1099,8 +1163,8 @@ button:first-of-type:hover {
     flex-direction: column;
     background: var(--main-element-background);
     border: 1px solid var(--main-border);
-    width: 680px;
-    height: 100px;
+    width: 660px;
+    height: auto;
     border-radius: 10px;
     padding: 20px;
     gap: 20px;
@@ -1125,7 +1189,7 @@ button:first-of-type:hover {
 
 .profile_follows {
     padding: 20px;
-    width: 680px;
+    width: 660px;
     border-radius: 10px;
     height: auto;
     background: var(--main-element-background);
@@ -1138,6 +1202,7 @@ button:first-of-type:hover {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    padding-bottom: 20px;
 }
 
 
@@ -1185,7 +1250,7 @@ button:first-of-type:hover {
 
 .notifications {
     padding: 20px;
-    width: 680px;
+    width: 660px;
     border-radius: 10px;
     height: auto;
     background: var(--main-element-background);
@@ -1194,4 +1259,321 @@ button:first-of-type:hover {
     flex-direction: column;
     gap: 20px;
 }
+
+.notification-body {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.notification-date {
+    color: gray;
+}
+
+#self-posts-id {
+    width: 660px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.self-comments {
+    width: 660px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+
+.posts_profile {
+    width: 620px;
+    padding: 20px;
+    background-color: var(--main-element-background);
+    justify-content: space-between;
+    align-items: flex-start;
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+}
+
+.bookmarks {
+    width: 660px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.wrapp_img_profile {
+    width: 580px;
+    height: 440px;
+    max-width: 620px;
+    /* display: block; */
+    border-radius: 10px;
+}
+
+.profile-edit {
+    padding: 30px;
+    gap: 30px;
+    display: flex;
+    flex-direction: column;
+    width: 660px;
+    height: auto;
+    background: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.settings_username-wrapper,
+.settings_email-wrapper,
+.settings_about-wrapper,
+.settings_password-wrapper,
+.settings_old-password-wrapper,
+.settings_new-password-wrapper,
+.settings_new-password-2-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings_username,
+.settings_email,
+.settings_about,
+.settings_old-password,
+.settings_new-password,
+.settings_new-password-2 {
+    width: 500px;
+    height: 30px;
+}
+
+.send-settings_data,
+.change-password-url,
+.save-password {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    background: var(--main-color);
+    color: white;
+    min-height: 40px;
+    min-width: 100px;
+    max-width: 150px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.send-settings_data:hover,
+.change-password-url:hover,
+.save-password:hover {
+    background: #2c7cd8;
+    color: white;
+    border: none;
+}
+
+.settings_password-wrapper {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.forgot-password-message {
+    font-size: 13px;
+    color: var(--main-color);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.error-data-message {
+    display: none;
+    color: #e54848;
+}
+
+.error-password-message {
+    display: none;
+    color: #e54848;
+}
+
+.add-bio {
+    text-decoration: none;
+    color: var(--main-color);
+}
+
+.category-container {
+    width: 680px;
+    height: auto;
+    padding: 25px;
+    background: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+}
+
+.theme_img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--main-color);
+}
+
+.category-title {
+    font-size: 23px;
+}
+
+.theme-subs {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.category-and-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 /* ===PROFILE=== */
+
+.theme_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.theme_subscribe-btn {
+    background: var(--main-color);
+    width: auto;
+    height: auto;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+.theme_subscribe-btn:hover {
+    background: #2d75c8;
+}
+
+.subscribe_header {
+    width: 680px;
+    height: 100px;
+    background: var(--main-element-background);
+    border-radius: 10px;
+    border: 1px solid var(--main-border);
+    padding: 25px;
+}
+
+.filters-container {
+    width: 680px;
+    height: 20px;
+    overflow: hidden;
+    background: var(--main-element-background);
+    border-radius: 10px;
+    border: 1px solid var(--main-border);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.filter-btns span {
+    font-size: 13px;
+    width: auto;
+    height: auto;
+    padding: 5px;
+    border-radius: 2px;
+    color: var(--main-color);
+    cursor: pointer;
+    border: 1px solid var(--main-color);
+    transition: 0.3s ease;
+}
+
+.filter-btns {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.filter-btns span:hover {
+    background: var(--main-color);
+    color: white;
+}
+
+.set_filters-btn {
+    font-size: 13px;
+    width: 70px;
+    height: auto;
+    padding: 5px;
+    border-radius: 2px;
+    background: var(--main-color);
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.set_filters-btn:hover {
+    color: white;
+    background: #2d75c8;
+}
+
+.item_filter.active {
+    background: var(--main-color);
+    color: white;
+}
+
+.item_filter {
+    height: 16px;
+    width: 16px;
+}
+
+.my_lenta-title {
+    font-family: 'Arial';
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.filter_arrow.down {
+    height: 20px;
+    width: 20px;
+}
+
+.filter_arrow.up {
+    height: 20px;
+    width: 20px;
+    transform: rotate(180deg);
+}
+
+.lenta_settings_button_and_arrow {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    cursor: pointer;
+}
+.subs_username {
+    text-decoration: none;
+    color: #444850;
+}
+
+.lenta_base {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter_buttons_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lenta_settings_button {
+    font-size: 13px;
+
+}

@@ -1,16 +1,18 @@
-from django.contrib.auth import get_user_model
+from datetime import timedelta
+from os import remove
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import ForeignKey
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
+from django.utils import timezone
+from rest_framework.generics import get_object_or_404
 
 
 # User = get_user_model()
 
 class CustomUser(AbstractUser):
     image = models.ImageField(default='profile_pics/default_profile.jpg', upload_to='profile_pics')
-    bio = models.TextField(blank=True, null=True)
+    bio = models.TextField(blank=True, null=True , max_length=255)
 
     def __str__(self):
         return f'{self.username}'
@@ -37,3 +39,22 @@ class Subscription(models.Model):
 class Notifications(models.Model):
     user = ForeignKey(CustomUser, on_delete=models.CASCADE)
     message = models.TextField(max_length=500)
+    date = models.DateTimeField(default=timezone.now)
+
+    def is_active(self):
+        notify = (self.date + timezone.timedelta(days=1)) > timezone.now()
+        if not notify:
+            obj = get_object_or_404(Notifications, pk=self.id)
+            obj.delete()
+        return notify
+
+    @staticmethod
+    def notification_count(user):
+        if user.is_authenticated:
+            count = Notifications.objects.filter(user=user).count()
+            if count > 99:
+                return '99+'
+            return count
+
+
+

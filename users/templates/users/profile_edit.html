@@ -1,56 +1,268 @@
+{% extends 'posts/base.html' %}
 {% load static %}
+{% load custom_filters %}
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактировать профиль</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'users/css/profile_edit.css' %}">
-</head>
-<body>
+    <title>Профиль</title>
+    {% block link %}<link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3">{% endblock %}
 
-<div class="profile-container">
-    <div class="profile-header">
-        <h2>Редактировать профиль</h2>
 
-        {% if user.profile.image %}
-            <img src="{{ user.profile.image.url }}" alt="Аватар" class="profile-img">
-        {% else %}
-            <img src="https://via.placeholder.com/120" alt="Аватар" class="profile-img">
-        {% endif %}
+{% block body %}
+    <div class="main-container">
+        <div class="scroll-top" id="scroll-id">
+            <div class="wrapper-btn">
+                <img src="/media/icons/arrow-up.svg">
+            </div>
+        </div>
+        <div class="container">
+            <div class="profile-edit">
+                <div class="settings_title">Настройки</div>
+                <div class="settings_username-wrapper">
+                    <span>Имя пользователя</span>
+                    <input class="settings_username" value="{{ user.username }}">
+                </div>
+
+                <div class="settings_email-wrapper">
+                    <span>Почта</span>
+                    <input class="settings_email" value="{{ user.email }}">
+                </div>
+
+                <div class="settings_about-wrapper">
+                    <span>О себе</span>
+                    <input class="settings_about" value="{{ user.bio }}">
+                </div>
+                <div class="error-data-message">Некоректные данные</div>
+                <div class="send-settings_data" onclick="saveProfileData()">Сохранить</div>
+                <div class="change-password-url" onclick="showChangeWrapper()">Сменить пароль</div>
+                <div class="settings_password-wrapper">
+                    <div class="settings_old-password-wrapper">
+                        <span>Старый пароль</span>
+                        <input class="settings_old-password" type="password">
+                        <a href="{% url 'password_reset' %}" class="forgot-password-message">Я не помню старый пароль</a>
+                    </div>
+                    <div class="settings_new-password-wrapper">
+                        <span>Новый пароль</span>
+                        <input class="settings_new-password" type="password">
+                    </div>
+                    <div class="settings_new-password-2-wrapper">
+                        <span>Новый пароль еще раз</span>
+                        <input class="settings_new-password-2" type="password">
+                    </div>
+                    <div class="error-password-message">Некоректные данные</div>
+                    <div class="save-password" onclick="changePassword()">Сохранить</div>
+                </div>
+            </div>
+            <div class="popular-and-random">
+                {% if request.user.is_authenticated %}
+                    <div class="profile-cont">
+                        <div class="profile-data">
+                            <div class="user-data">
+                                <img src="{{ user.image.url }}" alt="" class="profile-user-img">
+                                <div class="logout-and-username">
+                                    <a href="{% url 'profile' request.user %}">{{ request.user }}</a>
+                                    <a class="logout" onclick="logout()">выйти</a>
+                                </div>
+                            </div>
+                            <img class="settings-img" src="/media/icons/settings.svg" onclick="settings(this)">
+                        </div>
+                        <div class="profile-elements">
+                            {% if request.user.is_staff %}
+                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
+                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
+                            </div>
+                            {% endif %}
+                            <script>
+                                const username = "{{ request.user }}"
+                            </script>
+                            <div class="notifications-cont" onclick="window.location.href = '#notification-id'">
+                                <a href="#notification-id">Уведомления</a>
+                            </div>
+                            <div class="subscribes-cont" onclick="window.location.href = '#subs-id'">
+                                <a href="#subs-id">Подписки</a>
+                            </div>
+                            <div class="bookmarks-cont" onclick="window.location.href = '#bookmarks-id'">
+                                <a href="#bookmarks-id">Закладки</a>
+                            </div>
+                            <div class="posts-cont" onclick="window.location.href = '#self-posts-id'">
+                                <a href="#self-posts-id">Посты</a>
+                            </div>
+                            <div class="comment-cont" onclick="window.location.href = '#comments'">
+                                <a href="#comments">Комментарии</a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                <div class="login-cont">
+                    <div class="auth-header">Войти</div>
+                    <div class="login-password">
+                        <input class="login-form" placeholder="Логин" minlength="3">
+                        <p class="login-warning">Обязательное поле</p>
+                        <p class="login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="password-form" type="password" placeholder="Пароль">
+                        <div class="password-warnings"></div>
+                        <p class="pass-warning">Обязательное поле</p>
+                        <p class="pass-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                    </div>
+                    <div class="error-data">
+                        <p class="error-message">Ошибка.Неправильный логин или пароль</p>
+                    </div>
+                    <div class="open-create">
+                        <button onclick="loginHandler()">Войти</button>
+                        <button id="login-second-button">Создать аккаунт</button>
+                    </div>
+                    <a href="{% url 'password_reset' %}" class="forget-password">Забыли пароль?</a>
+                </div>
+                <div class="register">
+                    <div class="auth-header-reg">Создать аккаунт</div>
+                    <div class="register-data">
+                        <input class="email-form" placeholder="Email">
+                        <p class="reg-email-warning">Обязательное поле</p>
+                        <p class="reg-email-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="reg-login-form" placeholder="Никнейм" maxlength="16">
+                        <p class="reg-login-warning">Обязательное поле</p>
+                        <p class="reg-login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="reg-password-form" type="password" placeholder="Пароль">
+                        <p class="reg-pass1-warning">Обязательное поле</p>
+                        <p class="reg-pass1-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="repeat-password-form" type="password" placeholder="Повторите пароль">
+                        <p class="reg-pass2-warning">Обязательное поле</p>
+                        <p class="reg-pass2-min-length-warning">Ошибка.Пароли не совпадают</p>
+                    </div>
+                    <div class="open-create">
+                        <button onclick="registerHandler()">Создать аккаунт</button>
+                        <button id="second-button">Есть аккаунт? Войти</button>
+                    </div>
+                </div>
+                {% endif %}
+                <div id="popular-id" class="popular-cat">
+                    <p class="popular-title">Темы</p>
+                        <div class="category-item">
+                            <img src="/media/categories/psychology.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Психология</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/technologies.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Технологии</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/offtop.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Офтоп</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/travel.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Путешествия</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/sport.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Спорт</a>
+                        </div>
+                        <div class="virt-button" id="virt-button" role="button">
+                            <img class="down" id="img-id" src="/media/icons/arrow-up.svg"></img>
+                            <span>Показать все</span>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/finance.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Деньги и инвестиции</a>
+                        </div>
+                        <div class="category-item" id="cinema">
+                            <img src="/media/categories/movies.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Кино</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/creation.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Творчество</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/health.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Здоровье</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/games.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Игры</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/history.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">История</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/music.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Музыка</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/science.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Наука</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/news.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Новости</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/humor.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Юмор</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/career.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Карьера</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/development.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Разработка</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/intresting.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">А вы знали?</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/food.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Еда</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/android.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Android</a>
+                        </div>
+                        <div class="category-item" href="#">
+                            <img src="/media/categories/apple.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Apple</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/fashion.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Мода</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/education.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Образование</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/ai.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">AI</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/thoughts.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Размышления</a>
+                        </div>
+                        <div class="category-item">
+                            <img src="/media/categories/animal.png" alt="">
+                            <a href="{% url 'category' %}?filter={{ category.category }}">Животные</a>
+                        </div>
+                </div>
+                <div class="random-posts">
+                    <div class="popular-post-p">
+                        <span>ЧИТАЮТ СЕЙЧАС</span>
+                    </div>
+                    {% for post in random_posts %}
+                        <div class="cicle-container">
+                            <div class="date-and-name">
+                                <div class="side-img-name">
+                                    <img src="{{ post.user.image.url }}">
+                                    <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                                </div>
+                                <a style="color: gray">{{ post.pub_date|smart_time }}</a>
+                            </div>
+                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="form-group">
-            <label for="username">Имя пользователя</label>
-            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Электронная почта</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="image">Изменить аватар</label>
-            <input type="file" class="form-control" id="image" name="image">
-        </div>
-        <div class="form-group">
-            <label for="bio">О себе</label>
-            <textarea class="form-control" id="bio" name="bio" rows="4">{{ user.profile.bio }}</textarea>
-        </div>
-
-        <button type="submit" class="btn-submit">Сохранить изменения</button>
-    </form>
-
-    <a href="{% url 'profile' %}" class="back-link">Вернуться в профиль</a>
-
-    <a href="{% url 'change_password' %}" class="btn-password-change">Сменить пароль</a>
-</div>
-
-</body>
-</html>
+    <script src="{% static 'js/edit_profile.js' %}"></script>
+{% endblock %}

@@ -1,16 +1,15 @@
-from ckeditor.fields import RichTextField
-from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
 from users.models import CustomUser
+
 User = get_user_model()
 
 class Post(models.Model):
     title = models.CharField(max_length=500)
     content = models.TextField()
-    category = models.CharField(max_length=100)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
     wrapp_img = models.ImageField(upload_to='post_img/', null=True)
     cut_img = models.CharField(max_length=255, default='Без темы')
     pub_date = models.DateTimeField(default=timezone.now)
@@ -21,10 +20,11 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment_count = models.IntegerField(default=0)
     liked_by = models.ManyToManyField(User, related_name="liked_by")
+    bookmark_user = models.ManyToManyField(User, related_name="bookmarks")
 
     def __str__(self):
         return self.title
-    
+
     class Meta:
         ordering = ['status']
 
@@ -56,3 +56,20 @@ class ReplyComment(models.Model):
     pub_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reply_user')
     liked_by = models.ManyToManyField(User, default='none', related_name='reply_liked_by')
+
+class Category(models.Model):
+    followers = models.ManyToManyField(CustomUser, related_name="category_follows", blank=True)
+    description = models.CharField(max_length=1000, default='Nothing', null=True, blank=True)
+    name = models.CharField(max_length=255, unique=True)
+    image = models.ImageField(upload_to='categories/')
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def category_follower_count(self):
+        return self.category.followers.count()
+
+    @property
+    def category(self):
+        return Category.objects.get(user=self)

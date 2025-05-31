@@ -1,24 +1,14 @@
 import json
-from django.contrib import auth, messages
-from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.db.models import Count
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-import random
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib import auth
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from posts.models import Post
-from users.forms import UserRegistrationForm, UserLoginForm,  UserUpdateForm, \
-    CustomPasswordChangeForm
-from django.contrib.auth import logout, update_session_auth_hash, get_user_model
-# from django.contrib.auth.models import User
-from users.models import CustomUser, Subscription, Notifications
-from django.core.files import File
-from io import BytesIO
+from posts.models import Post, Comment, ReplyComment
+from users.forms import UserRegistrationForm, UserLoginForm
+from django.contrib.auth import logout, get_user_model
+from users.models import Subscription, Notifications
+
 
 from users.services import auth_and_login
 
@@ -74,12 +64,31 @@ def login(request):
 
 def profile_page(request, username):
     profile_user = User.objects.get(username=username)
+    posts = Post.objects.filter(user=profile_user)
+    bookmarks = Post.objects.filter(bookmark_user=profile_user)
     notifications = Notifications.objects.filter(user=profile_user)
+    notification_count = Notifications.notification_count(request.user)
+    comments = Comment.objects.filter(user=profile_user)
+    reply_comments = ReplyComment.objects.all()
+    random_posts = Post.objects.all().order_by('?')[:5]
     return render(request, 'users/profile.html',
                   {'profile_user': profile_user,
-                          'notifications': notifications,})
+                          'notifications': notifications,
+                          'posts': posts,
+                          'comments': comments,
+                          'reply_comments': reply_comments,
+                          'bookmarks': bookmarks,
+                          'random_posts': random_posts,
+                          'notification_count': notification_count})
 
 
 def logout_page(request):
     logout(request)
     return redirect('/')
+
+def settings(request):
+    user = get_object_or_404(User, username=request.user.username)
+    random_posts = Post.objects.all().order_by('?')[:5]
+    return render(request, 'users/profile_edit.html',
+                  {'user': user,
+                          'random_posts': random_posts})

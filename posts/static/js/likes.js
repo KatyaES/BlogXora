@@ -9,7 +9,7 @@ async function func(div) {
 
         // Логируем добавление класса
         if (token) {
-            const request = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+            const request = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ async function func(div) {
             },
             body: JSON.stringify({})
             })
-            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Запрос к серверу
-            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

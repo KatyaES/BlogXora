@@ -125,6 +125,8 @@
     background-color: #ffffff;
     padding: 30px;
     padding-top: 10px;
+    margin-bottom: 20px;
+    margin-top: 5px;
     border: 1px solid lightgray;
     border-radius: 10px;
     width: 600px;
@@ -237,7 +239,7 @@
 }
 
 
-.user {
+.add-post_user {
     display: inline-flex;
     justify-content: left;
     align-items: center;
@@ -246,7 +248,7 @@
     margin: 0 0 -20px 0;
 }
 
-.user img {
+.add-post_user img {
     border-radius: 50%;
     height: 30px;
     width: 30px;

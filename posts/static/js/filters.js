@@ -1,7 +1,9 @@
 import likesUpdate from './domloaded.js';
+window.setFilter = setFilter
+window.getFilterPosts = getFilterPosts
+window.moveArrow = moveArrow
 
-window.searchPosts = searchPosts;
-
+let activeElement = null
 
 function splitContent(value) {
     const paragraphs = value.split('</p>');
@@ -15,6 +17,7 @@ function splitContent(value) {
         return '';
     }
 }
+
 
 function smart_time(date) {
     const result = Date.now() - new Date(date).getTime()
@@ -42,35 +45,55 @@ function smart_time(date) {
     }
 }
 
-async function searchPosts(element) {
-    const user = element.getAttribute('datatype')
-    console.log('user', user)
-    const post = document.querySelector('.search-input').value
 
-    const request = await fetch(`http://127.0.0.1:8000/api/search/posts/?query=${post}`, {
+
+async function setFilter(element) {
+    const elements = document.querySelectorAll('.item_filter')
+    if (element === activeElement) {
+        element.checked = false
+        activeElement = null
+    } else {
+        elements.forEach(el => {
+            if (el !== element) {
+                el.checked = false
+            }
+        })
+        activeElement = element
+    }
+}
+
+async function getFilterPosts(element) {
+    const user = element.getAttribute('datatype')
+    const id = element.getAttribute('data-id')
+    console.log('user', user)
+    const BASE_URL = window.location.origin
+    const token = localStorage.getItem('access')
+    console.log(token)
+    const refresh = localStorage.getItem('refresh')
+    const request = await fetch(`${BASE_URL}/api/filters/?filter=${activeElement.value}`, {
         method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
     })
 
     const data = await request.json()
-    console.log(data[0].user, user)
+    console.log('data', data)
+    const oldPosts = document.querySelectorAll('.post-wrapper')
 
     const postsContainer = document.querySelector('.posts-container')
-
-    const oldPosts = document.querySelectorAll('.post-wrapper')
 
     if (oldPosts) {
         oldPosts.forEach(post => post.remove())
     }
+
     const badImg = document.querySelector('.bad-search-img')
 
-    if (data.length === 0) {
-        badImg.style.display = 'flex'
-    } else {
+    if (badImg) {
         badImg.style.display = 'none'
-        for (let i = 0; i < data.length; i++) {
+    }
+    for (let i = 0; i < data.length; i++) {
         const posts = `
             <div class="post-wrapper">
                 <div class="posts">
@@ -133,7 +156,24 @@ async function searchPosts(element) {
         `
         postsContainer.insertAdjacentHTML('beforeend', posts)
     }
-    }
     likesUpdate()
 }
 
+function moveArrow() {
+    const lentaButton = document.querySelector('.filter_arrow')
+    const filtersContainer = document.querySelector('.filters-container')
+    if (lentaButton.classList.contains('down')) {
+        lentaButton.classList.remove('down')
+        lentaButton.classList.add('up')
+        filtersContainer.style.height = 'auto'
+        filtersContainer.style.padding = '25px 25px 15px 25px'
+    } else {
+        lentaButton.classList.remove('up')
+        lentaButton.classList.add('down')
+        filtersContainer.style.height = '20px'
+        filtersContainer.style.overflow = 'hidden'
+        filtersContainer.style.padding = '25px 25px 25px 25px'
+    }
+    console.log(lentaButton)
+//    lentaButton.classList.add('up')
+}

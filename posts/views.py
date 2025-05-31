@@ -13,8 +13,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from users.models import Notifications
 from .forms import PostForm, CommentForm
-from .models import Post, Comment, User, ReplyComment
+from .models import Post, Comment, User, ReplyComment, Category
 
 
 def all_categories(request):
@@ -30,13 +31,13 @@ def all_categories(request):
 
 def index(request):
     one_day_ago = timezone.now() - timedelta(days=3)
-    random_posts = Post.objects.filter(status__icontains="draft", pub_date__gte=one_day_ago).order_by('?')[:5]
+    random_posts = Post.objects.all().order_by('?')[:5]
+    notification_count = Notifications.notification_count(request.user)
     posts = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
-    datas = {"Горячее": "hot", "Все посты":"index", "Темы": "all_categories", "Мой профиль": "profile"}
     return render(request, "posts/index.html", {"posts": posts,
-                                                "datas": datas,
                                                 "random_posts": random_posts,
-                                                })
+                                                "title": "Главная",
+                                                "notification_count": notification_count})
 
 @login_required
 def add_post(request):
@@ -46,7 +47,10 @@ def add_post(request):
         print(request.POST)
         title = request.POST.get('title')
         content = request.POST.get('content')
-        category = request.POST.get('theme')
+        cat = request.POST.get('theme').strip()
+        print('cat', cat, len(cat))
+        category = Category.objects.filter(name=cat).first()
+        print('category', category)
         wrapp_img = request.FILES.get('wrapp_img')
         pub_date = timezone.now()
         cut_img = request.POST.get('cut_img')
@@ -58,7 +62,7 @@ def add_post(request):
             data= {
             'title': title,
             'content': content,
-            'category': category,
+            'category': category.id if category else None,
             'pub_date': pub_date,
             'cut_img': cut_img,
             },
@@ -66,6 +70,7 @@ def add_post(request):
                 'wrapp_img': wrapp_img,
             }
             )
+        print(form.data)
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
@@ -83,31 +88,14 @@ def add_post(request):
 
 def category_page(request):
     user = request.user
-    datas = {"Горячее": "hot", "Все посты": "index", "Темы": "all_categories", "Мой профиль": "profile"}
-    popular_categories = Post.objects.filter(status__icontains="draft").values("category").annotate(
-        count=Count("category")).order_by("-count")[:10]
-
-
-    category = request.GET.get("filter")
-    print(category)
-    if category:
-        categories = Post.objects.filter(category__iexact=category, status__icontains="draft")
-    else:
-        categories = _get_queryset(Post)
-    return render(request, "posts/category.html", {"categories": categories,
-                                                "datas": datas,
+    cat = request.GET.get("theme")
+    print(cat)
+    category = Category.objects.filter(name=cat).first()
+    posts = Post.objects.filter(category=category, status__icontains="draft")
+    print('posts::', posts)
+    return render(request, "posts/category.html", {"posts": posts,
                                                  "user": user,
-                                                 "popular_categories": popular_categories,
-                                                   "category": category,})
-
-def search(request):
-    query = request.GET.get("q")
-    if query:
-        posts = Post.objects.filter(title__icontains=query, status__icontains="draft")
-    else:
-        posts = Post.objects.none()
-
-    return render(request, "posts/search.html", {"posts": posts})
+                                                   "category": category})
 
 def post_detail(request, pk):
     user = request.user
@@ -160,13 +148,20 @@ def post_detail(request, pk):
 
 def hot(request):
     posts = Post.objects.filter(status__icontains="draft").order_by("-views_count")
-    return render(request, "posts/hot.html", {"posts": posts})
+    return render(request, "posts/index.html", {"posts": posts,
+                                                'title': 'Популярное'})
 
 
 def discussion(request):
     posts = Post.objects.filter(status__icontains="draft").order_by("-comment_count")
-    return render(request, "posts/discussion.html", {"posts": posts})
+    return render(request, "posts/index.html", {"posts": posts,
+                                                'title': 'Обсуждаемое'})
 
 def new(request):
     posts = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
-    return render(request, "posts/new.html", {"posts": posts})
+    return render(request, "posts/index.html", {"posts": posts,
+                                                'title': 'Свежее'})
+
+
+def subscribes_page(request):
+    return render(request, "posts/subscribes.html")

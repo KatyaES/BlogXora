@@ -1,3 +1,8 @@
+if (window.location.href.endsWith('add_post/')) {
+    document.querySelector('.input_wrapper').style.display = 'none'
+}
+
+
 let selectedFile = null;
 
 document.getElementById('send-moder').addEventListener('click', async () => {

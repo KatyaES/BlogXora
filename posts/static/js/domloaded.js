@@ -1,10 +1,10 @@
 export default async function likesUpdate() {
-    console.log('likesUpdate is begin')
 
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
     const imgWrapper = document.querySelectorAll(".like-wrapper");
+    const BASE_URL = window.location.origin
 
     for (const img of imgWrapper) {
         const id = img.getAttribute("data-id");
@@ -12,7 +12,7 @@ export default async function likesUpdate() {
 
         try {
             // Запрос к серверу
-            const response = await fetch(`http://127.0.0.1:8000/api/likes_response/${id}/`, {
+            const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,8 +42,6 @@ export default async function likesUpdate() {
                 likesCount.classList.add('setlikeanimate');
             }
         } catch (error) {
-            console.error("Ошибка при запросе для id " + id + ":", error);
         }
     }
-    console.log('finally')
 }

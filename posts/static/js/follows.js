@@ -1,24 +1,23 @@
 async function followFunc(div) {
     const userId = div.getAttribute('data-id')
-    console.log(userId)
 
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
+    const BASE_URL = window.location.origin
 
     if (token) {
-        const request = await fetch(`http://127.0.0.1:8000/api/follows/${userId}/`, {
+        const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
         method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-CSRFToken': csrfToken,
 			'Authorization': `Bearer ${token}`,
 		},
 		body: JSON.stringify({})
         })
-        console.log('request', request)
 
         const response = await request.json()
 
-        console.log('response', response)
 
         if (response.status === 'add') {
             div.style.background = '#E7E8EA'
@@ -39,14 +38,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
+    const BASE_URL = window.location.origin
 
     for (const btn of followBtn) {
         const userId = btn.getAttribute('data-id')
 
-        const request = await fetch(`http://127.0.0.1:8000/api/follows/${userId}/`, {
+        const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
                 'Authorization': `Bearer ${token}`,
             }
         })

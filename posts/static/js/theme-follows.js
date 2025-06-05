@@ -1,26 +1,24 @@
 async function themeFollowFunc(span) {
     const userId = span.getAttribute('data-id')
     const theme = span.getAttribute('datatype')
-    console.log('userId', userId)
-    console.log(theme)
 
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
+    const BASE_URL = window.location.origin
 
     if (token) {
-        const request = await fetch(`http://127.0.0.1:8000/api/theme_follows/${userId}/?theme=${theme}`, {
+        const request = await fetch(`${BASE_URL}/users/theme_follows/?theme=${theme}`, {
         method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-CSRFToken': csrfToken,
 			'Authorization': `Bearer ${token}`,
 		},
 		body: JSON.stringify({})
         })
-        console.log('request', request)
 
         const response = await request.json()
 
-        console.log('response', response)
 
         if (response.status === 'add') {
             span.style.background = '#E7E8EA'
@@ -39,13 +37,14 @@ async function themeFollowFunc(span) {
 document.addEventListener('DOMContentLoaded', async () => {
     const followBtn = document.querySelector('.theme_subscribe-btn')
     const theme = followBtn.getAttribute('datatype')
-    console.log(theme)
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
     const userId = followBtn.getAttribute('data-id')
 
-    const request = await fetch(`http://127.0.0.1:8000/api/theme_follows/${userId}/?theme=${theme}`, {
+    const BASE_URL = window.location.origin
+
+    const request = await fetch(`${BASE_URL}/users/theme_follows/?theme=${theme}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -89,7 +89,7 @@
                 {% endfor %}
             </div>
             </div>
-            <div class="popular-and-random">
+             <div class="popular-and-random">
                 {% if request.user.is_authenticated %}
                     <div class="profile-cont">
                         <div class="profile-data">
@@ -104,8 +104,8 @@
                         </div>
                         <div class="profile-elements">
                             {% if request.user.is_staff %}
-                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
-                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
+                            <div class="admin-cont" onclick="adminRedirect()">
+                                <a>Администрация</a>
                             </div>
                             {% endif %}
                             <script>

@@ -14,13 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import profile
 
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
-from api.views import CommentApiView, CommentApiView
+from api.v1.views import CommentApiView
 from blog import settings
 from posts.views import index
 
@@ -31,7 +30,7 @@ urlpatterns = [
     path('home/', include("posts.urls")),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('api-auth/', CommentApiView.as_view()),
-    path('api/', include('api.urls')),
+    path('api/v1/', include('api.v1.urls')),
 ]
 
 if settings.DEBUG:

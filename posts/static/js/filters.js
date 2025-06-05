@@ -65,12 +65,10 @@ async function setFilter(element) {
 async function getFilterPosts(element) {
     const user = element.getAttribute('datatype')
     const id = element.getAttribute('data-id')
-    console.log('user', user)
     const BASE_URL = window.location.origin
     const token = localStorage.getItem('access')
-    console.log(token)
     const refresh = localStorage.getItem('refresh')
-    const request = await fetch(`${BASE_URL}/api/filters/?filter=${activeElement.value}`, {
+    const request = await fetch(`${BASE_URL}/api/v1/filters/?filter=${activeElement.value}`, {
         method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +77,6 @@ async function getFilterPosts(element) {
     })
 
     const data = await request.json()
-    console.log('data', data)
     const oldPosts = document.querySelectorAll('.post-wrapper')
 
     const postsContainer = document.querySelector('.posts-container')
@@ -102,10 +99,10 @@ async function getFilterPosts(element) {
                             <img src="${data[i].image}">
                                 <div class="name-and-date-category">
                                     <div class="username">
-                                        <a href="#">${data[i].user}</a>
+                                        <a href="${BASE_URL}/users/profile/${data[i].user}">${data[i].user}</a>
                                     </div>
                                     <div class="category-and-date">
-                                        <a href="#">#${data[i].category}</a>
+                                        <a href="#">Тема: ${data[i].category}</a>
                                         <span style="color: gray;">${smart_time(data[i].pub_date)}</span>
                                     </div>
                                 </div>
@@ -174,6 +171,5 @@ function moveArrow() {
         filtersContainer.style.overflow = 'hidden'
         filtersContainer.style.padding = '25px 25px 25px 25px'
     }
-    console.log(lentaButton)
 //    lentaButton.classList.add('up')
 }

@@ -1,5 +1,6 @@
 async function settings(img) {
-    window.location.href = 'http://127.0.0.1:8000/users/settings/'
+    const BASE_URL = window.location.origin
+    window.location.href = `${BASE_URL}/users/profile_settings/`
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,8 +23,9 @@ async function saveProfileData() {
     const username = document.querySelector('.settings_username').value
     const email = document.querySelector('.settings_email').value
     const about = document.querySelector('.settings_about').value
+    const BASE_URL = window.location.origin
 
-    const request = await fetch(`http://127.0.0.1:8000/api/change-settings-data/`, {
+    const request = await fetch(`${BASE_URL}/users/change-settings-data/`, {
         method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,25 +39,29 @@ async function saveProfileData() {
             })
     })
     if (request.status === 204) {
-        console.log('success')
         location.reload()
     } else {
-        console.log(400)
         const errorElem = document.querySelector('.error-data-message')
         errorElem.style.display = 'flex'
     }
 }
 
 
-async function changePassword() {
+async function changePassword(element) {
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
+
+    const username = element.getAttribute('data-key')
+
+    const BASE_URL = window.location.origin
 
     const oldPassword = document.querySelector('.settings_old-password').value
     const newPassword = document.querySelector('.settings_new-password').value
     const newPassword2 = document.querySelector('.settings_new-password-2').value
 
-    const request = await fetch(`http://127.0.0.1:8000/api/change-settings-password/`, {
+
+
+    const request = await fetch(`${BASE_URL}/users/change-settings-password/`, {
         method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,11 +74,26 @@ async function changePassword() {
                 'new_password2':newPassword2,
             })
     })
+    const data = await request.json()
     if (request.status === 204) {
-        console.log('success')
-        location.reload()
+
+         const request = await fetch(`${BASE_URL}/users/login/`, {
+            method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    'login': username,
+                    'password': newPassword
+                })
+        })
+        const data = await request.json()
+        localStorage.setItem('access', data.access)
+        localStorage.setItem('refresh', data.refresh)
+        const successElem = document.querySelector('.success-message')
+        successElem.style.display = 'flex'
     } else {
-        console.log(400)
         const errorElem = document.querySelector('.error-password-message')
         errorElem.style.display = 'flex'
     }
@@ -102,4 +123,9 @@ function notificationFunc() {
 }
 
 
+
+function adminRedirect() {
+    const BASE_URL = window.location.origin
+    window.location.href = `${BASE_URL}/admin`
+}
 

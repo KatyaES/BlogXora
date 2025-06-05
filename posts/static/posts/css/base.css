@@ -157,6 +157,12 @@ li a:hover {
     position: relative;
 }
 
+.header_user-img {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+}
+
 .pencil_wrapper {
     display: flex;
     text-decoration: none;
@@ -171,19 +177,6 @@ li a:hover {
     background: var(--main-element-background);
 }
 
-.head-links-cont img:first-of-type {
-    height: 35px;
-    width: 35px;
-    border-radius: 50%;
-}
-
-.head-links-cont img:last-of-type {
-    height: 25px;
-    width: 25px;
-    /* filter: brightness(0) saturate(100%) invert(42%) sepia(37%) saturate(26%) hue-rotate(335deg) brightness(93%) contrast(78%); */
-
-
-}
 
 .hidden_profile_data {
     display: flex;

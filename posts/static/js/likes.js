@@ -7,9 +7,8 @@ async function func(div) {
 
         const likesCount = document.getElementById(`likes-count-${id}`);
 
-        // Логируем добавление класса
         if (token) {
-            const request = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
+            const request = await fetch(`http://127.0.0.1:8000/api/v1/posts/${id}/like/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,7 +17,7 @@ async function func(div) {
             },
             body: JSON.stringify({})
             })
-            const response = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,20 +48,19 @@ async function func(div) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log(1)
 
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
     const imgWrapper = document.querySelectorAll(".like-wrapper");
+    const BASE_URL = window.location.origin
 
     for (const img of imgWrapper) {
         const id = img.getAttribute("data-id");
         const likesCount = document.getElementById(`likes-count-${id}`);
 
         try {
-            // Запрос к серверу
-            const response = await fetch(`http://127.0.0.1:8000/api/posts/${id}/like/`, {
+            const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,8 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             const data = await response.json();
 
-            // Печатаем, что вернул сервер
-            // Проверяем, авторизован ли пользователь
             if (data.is_authenticated) {
                 if (data.liked) {
                     img.classList.replace("like-wrapper", "like-wrapper-liked")
@@ -92,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 likesCount.classList.add('setlikeanimate');
             }
         } catch (error) {
-            console.error("Ошибка при запросе для id " + id + ":", error);
+            console.error( error);
         }
     }
 })

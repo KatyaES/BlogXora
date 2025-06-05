@@ -18,8 +18,13 @@
             <div class="profile_wrapper">
                 <div class="main-profile">
                     <div class="user-profile-head">
-                        <img src="{{ profile_user.image.url }}" class="profile_head-img">
-                        <span class="profile_head-name">{{ profile_user.username }}</span>
+                        <div class="profile_username-img">
+                            <img src="{{ profile_user.image.url }}" class="profile_head-img">
+                            <span class="profile_head-name">{{ profile_user.username }}</span>
+                        </div>
+                        {% if request.user != profile_user %}
+                            <div class="follow-btn" onclick="followFunc(this)" data-id="{{ profile_user.id }}">Подписаться</div>
+                        {% endif %}
                     </div>
                     <div class="bio-wrapper">
                         {% if not profile_user.bio or profile_user.bio == 'None' %}

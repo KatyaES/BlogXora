@@ -28,13 +28,14 @@ class Post(models.Model):
     class Meta:
         ordering = ['status']
 
+    @property
     def update_comment_count(self):
         total_reply_count = 0
         for comment in self.comments.all():
             total_reply_count += comment.replies.count()
         self.comment_count = self.comments.count() + total_reply_count
         self.save()
-        return total_reply_count, self.comments.count()
+        return total_reply_count + self.comments.count()
 
 
 class Comment(models.Model):

@@ -54,13 +54,13 @@
                                     <a href="{% url 'post_detail' post.id %}">
                                         <img src="/media/icons/comment.svg" class="comment-img">
                                     </a>
-                                    <span class="comment-count">{{ post.comment_count }}</span>
+                                    <span class="comment-count">{{ post.update_comment_count }}</span>
                                 </div>
-                                <div class="bookmark-wrapper">
+                                <div class="bookmark-wrapper" onclick="setBookmark(this)" data-id="{{ post.id }}" data-section="bookmarks">
                                     <a>
                                         <img src="/media/icons/bookmark.svg" class="bookmark-img">
                                     </a>
-                                    <span class="bookmark-count">0</span>
+                                    <span class="bookmark-count" id="bookmark-count-{{ post.id }}">{{ post.bookmark_user.count }}</span>
                                 </div>
                             </div>
                             <div class="view-wrapper">
@@ -129,7 +129,7 @@
                                                     </div>
                                                     <span class="reply" onclick="commentReply(this)" data-id="{{ reply.id }}">Ответить</span>
                                                     {% if request.user == reply.user %}
-                                                        <span class="delete-comment" onclick="commentDelete(this)" data-field-id="{{ comment.id }}" id="{{ reply.id }}" data-key="{{ reply.id }}" data-type="reply" data-id="{{ post.id }}">Удалить</span>
+                                                        <span class="delete-comment" onclick="ReplyCommentDelete(this)" data-field-id="{{ comment.id }}" id="{{ reply.id }}" data-key="{{ reply.id }}" data-type="reply" data-id="{{ post.id }}">Удалить</span>
                                                     {% endif %}
                                                 </div>
                                                 <div class="reply_comment-wrapper" id="reply_comment-wrapper-{{ reply.id }}">
@@ -145,7 +145,7 @@
                     </div>
                 </div>    
             </div>
-            <div class="popular-and-random">
+             <div class="popular-and-random">
                 {% if request.user.is_authenticated %}
                     <div class="profile-cont">
                         <div class="profile-data">
@@ -160,8 +160,8 @@
                         </div>
                         <div class="profile-elements">
                             {% if request.user.is_staff %}
-                            <div class="admin-cont" onclick="window.location.href = 'admin/'">
-                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
+                            <div class="admin-cont" onclick="adminRedirect()">
+                                <a>Администрация</a>
                             </div>
                             {% endif %}
                             <script>
@@ -353,7 +353,7 @@
                             </div>
                             <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
                         </div>
-                    {% endfor %}    
+                    {% endfor %}
                 </div>
             </div>
         </div>

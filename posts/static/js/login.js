@@ -5,8 +5,7 @@ async function loginHandler() {
     const passWarning = document.querySelector('.pass-warning')
     const loginMinWarning = document.querySelector('.login-min-length-warning')
     const passMinWarning = document.querySelector('.pass-min-length-warning')
-    console.log(login.value)
-    console.log(password.value)
+    const BASE_URL = window.location.origin
 
     if (login.value.length === 0) {
         loginWarning.style.display = 'flex'
@@ -33,7 +32,7 @@ async function loginHandler() {
         loginMinWarning.style.display = 'none'
         loginWarning.style.display = 'none'
     } else {
-        const request = await fetch('http://127.0.0.1:8000/users/login/', {
+        const request = await fetch(`${BASE_URL}/users/login/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,18 +44,12 @@ async function loginHandler() {
             })
         })
         const data = await request.json()
-        console.log('data responsed')
-        
-        if (data.status === 204) {
-            console.log(204)
-            console.log(data)
-            console.log(data.access)
+
+        if (request.status === 200) {
             localStorage.setItem('access', data.access)
             localStorage.setItem('refresh', data.refresh)
-            console.log(localStorage.getItem('access'))
             window.location.href = '/'
         } else {
-            console.log(400)
             errorData = document.querySelector('.error-data')
             errorData.style.display = 'flex'
             loginMinWarning.style.display = 'none'
@@ -115,6 +108,8 @@ async function registerHandler() {
     const regLoginMin = document.querySelector('.reg-login-min-length-warning')
     const regPass1Min = document.querySelector('.reg-pass1-min-length-warning')
     const regPass2Min = document.querySelector('.reg-pass2-min-length-warning')
+
+    const BASE_URL = window.location.origin
 
     if (email.value.length === 0) {
         email.style.border = '1px solid #c52828'
@@ -236,7 +231,7 @@ async function registerHandler() {
         regEmailWarning.style.display = 'none'
         regPass1Warning.style.display = 'none'
     } else if (password1.value === password2.value) {
-        const request = await fetch('http://127.0.0.1:8000/users/register/', {
+        const request = await fetch(`${BASE_URL}/users/register/`, {
             method: 'POST',
             headers: {
                 'Content-Type':'application/json',
@@ -251,17 +246,11 @@ async function registerHandler() {
         })
         const data = await request.json()
         
-        if (data.status === 204) {
-            console.log(204)
-            console.log(data.access)
+        if (request.status === 200) {
             localStorage.setItem('access', data.access)
             localStorage.setItem('refresh', data.refresh)
-            console.log(localStorage.getItem('access'))
             window.location.href = '/'
         } else {
-            console.log(400)
-            console.log(data.errors)
-            console.log(data)
         }
     }
 }

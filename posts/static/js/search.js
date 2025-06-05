@@ -44,10 +44,11 @@ function smart_time(date) {
 
 async function searchPosts(element) {
     const user = element.getAttribute('datatype')
-    console.log('user', user)
+    const BASE_URL = window.location.origin
     const post = document.querySelector('.search-input').value
 
-    const request = await fetch(`http://127.0.0.1:8000/api/search/posts/?query=${post}`, {
+
+    const request = await fetch(`${BASE_URL}/api/v1/search/posts/?query=${post}`, {
         method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -55,7 +56,6 @@ async function searchPosts(element) {
     })
 
     const data = await request.json()
-    console.log(data[0].user, user)
 
     const postsContainer = document.querySelector('.posts-container')
 
@@ -71,68 +71,68 @@ async function searchPosts(element) {
     } else {
         badImg.style.display = 'none'
         for (let i = 0; i < data.length; i++) {
-        const posts = `
-            <div class="post-wrapper">
-                <div class="posts">
-                    <div class="user-photo-name">
-                        <div class="user">
-                            <img src="${data[i].image}">
-                                <div class="name-and-date-category">
-                                    <div class="username">
-                                        <a href="#">${data[i].user}</a>
-                                    </div>
-                                    <div class="category-and-date">
-                                        <a href="#">#${data[i].category}</a>
-                                        <span style="color: gray;">${smart_time(data[i].pub_date)}</span>
+            const posts = `
+                <div class="post-wrapper">
+                    <div class="posts">
+                        <div class="user-photo-name">
+                            <div class="user">
+                                <img src="${data[i].image}">
+                                    <div class="name-and-date-category">
+                                        <div class="username">
+                                            <a href="${BASE_URL}/users/profile/${data[i].user}">${data[i].user}</a>
+                                        </div>
+                                        <div class="category-and-date">
+                                            <a href="#">Тема: ${data[i].category}</a>
+                                            <span style="color: gray;">${smart_time(data[i].pub_date)}</span>
+                                        </div>
                                     </div>
                                 </div>
+                                ${user !== data[i].user
+                                    ? `<div class="follow-btn" onclick="followFunc(this)" data-id="${data[i].user_id}" datatype="${user}">Подписаться</div>`
+                                    : ''
+                                }
                             </div>
-                            ${user !== data[i].user
-                                ? `<div class="follow-btn" onclick="followFunc(this)" data-id="${data[i].user_id}" datatype="${user}">Подписаться</div>`
-                                : ''
-                            }
+                        <br>
+                        <div class="title">
+                            <a href="/home/post/${data[i].id}/#top">${data[i].title}</a>
                         </div>
-                    <br>
-                    <div class="title">
-                        <a href="/home/post/${data[i].id}/#top">${data[i].title}</a>
-                    </div>
-                    <br>
-                    <div class="ql-editor">
-                        <img src="${data[i].wrapp_img}" alt="">
-                        <p>${splitContent(data[i].content)}</p>
-                    </div>
-                    <div class="detail-button">
-                        <a href="/home/post/${data[i].id}/#top">Читать далее</a>
-                    </div>
-                    <div class="icon-cont">
-                        <div class="post-reactions">
-                            <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="${data[i].id}">
-                                <img src="/media/icons/hart.png" class="heart-img" id="like-button">
-                                <span class="likes-count" id="likes-count-${data[i].id}">${data[i].liked_by.length}</span>
-                            </div>
-                            <div class="comment-wrapper">
-                                <a href="/home/post/${data[i].id}/">
-                                    <img src="/media/icons/comment.svg" class="comment-img">
-                                </a>
-                                <span class="comment-count">${data[i].comment_count}</span>
-                            </div>
-                            <div class="bookmark-wrapper">
-                                <a>
-                                    <img src="/media/icons/bookmark.svg" class="bookmark-img">
-                                </a>
-                                <span class="bookmark-count">0</span>
-                            </div>
+                        <br>
+                        <div class="ql-editor">
+                            <img src="${data[i].wrapp_img}" alt="">
+                            <p>${splitContent(data[i].content)}</p>
                         </div>
-                        <div class="view-wrapper">
-                            <img src="/media/icons/view.svg" class="views-img">
-                            <span class="views-count">${data[i].views_count}</span>
+                        <div class="detail-button">
+                            <a href="/home/post/${data[i].id}/#top">Читать далее</a>
+                        </div>
+                        <div class="icon-cont">
+                            <div class="post-reactions">
+                                <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="${data[i].id}">
+                                    <img src="/media/icons/hart.png" class="heart-img" id="like-button">
+                                    <span class="likes-count" id="likes-count-${data[i].id}">${data[i].liked_by.length}</span>
+                                </div>
+                                <div class="comment-wrapper">
+                                    <a href="/home/post/${data[i].id}/">
+                                        <img src="/media/icons/comment.svg" class="comment-img">
+                                    </a>
+                                    <span class="comment-count">${data[i].comment_count}</span>
+                                </div>
+                                <div class="bookmark-wrapper">
+                                    <a>
+                                        <img src="/media/icons/bookmark.svg" class="bookmark-img">
+                                    </a>
+                                    <span class="bookmark-count">0</span>
+                                </div>
+                            </div>
+                            <div class="view-wrapper">
+                                <img src="/media/icons/view.svg" class="views-img">
+                                <span class="views-count">${data[i].views_count}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `
-        postsContainer.insertAdjacentHTML('beforeend', posts)
-    }
+            `
+            postsContainer.insertAdjacentHTML('beforeend', posts)
+        }
     }
     likesUpdate()
 }

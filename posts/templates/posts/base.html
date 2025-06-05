@@ -33,8 +33,7 @@
             {% endif %}
             <div class="head-links-cont">
                 {% if user.is_authenticated %}
-                <img src="{{ user.image.url }}">
-                <img class="head-arrow" src="/media/icons/arrow-up.svg">
+                <img class="header_user-img" src="{{ user.image.url }}" onclick="window.location.href = 'users/profile/' + username">
             {% else %}
                 <a class="login-logout" href="{% url 'login' %}">Войти</a>
             {% endif %}
@@ -55,6 +54,8 @@
     <script src="{% static 'js/profile.js' %}"></script>
     <script src="{% static 'js/search.js' %}"></script>
     <script src="{% static 'js/follows.js' %}"></script>
-
+    <script>
+        const username = "{{ request.user }}"
+    </script>
 </body>
 </html>

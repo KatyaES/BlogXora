@@ -6,6 +6,9 @@ from users.models import CustomUser, Subscription, Notifications
 
 User = get_user_model()
 admin.site.register(Subscription)
-admin.site.register(CustomUser)
+
+@admin.register(User)
+class ReplyCommentAdmin(admin.ModelAdmin):
+	list_display = ['id', 'username']
 
 admin.site.register(Notifications)

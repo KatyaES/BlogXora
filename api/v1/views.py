@@ -200,6 +200,7 @@ class BookmarkApiView(APIView):
 
 
 class GetFilterPostsApiView(APIView):
+    permission_classes = [AllowAny]
     def get_renderers(self):
         accept = self.request.META.get('HTTP_ACCEPT', '')
         if ('text/html' in accept and

@@ -1,36 +1,13 @@
 async function loginHandler() {
-    const login = document.querySelector('.login-form')
+    const login = document.querySelector('.username-form')
     const password = document.querySelector('.password-form')
-    const loginWarning = document.querySelector('.login-warning')
-    const passWarning = document.querySelector('.pass-warning')
-    const loginMinWarning = document.querySelector('.login-min-length-warning')
-    const passMinWarning = document.querySelector('.pass-min-length-warning')
-    const BASE_URL = window.location.origin
 
-    if (login.value.length === 0) {
-        loginWarning.style.display = 'flex'
-        passWarning.style.display = 'none'
-        login.style.border = '1px solid #c52828'
-        password.style.border = '1px solid var(--main-border)'
-    } else if (password.value.length === 0) {
-        passWarning.style.display = 'flex'
-        loginWarning.style.display = 'none'
-        password.style.border = '1px solid #c52828'
-        login.style.border = '1px solid var(--main-border)'
-    } else if (login.value.length < 3) {
-        login.style.border = '1px solid #c52828'
-        password.style.border = '1px solid var(--main-border)'
-        loginMinWarning.style.display = 'flex'
-        loginWarning.style.display = 'none'
-        passMinWarning.style.display = 'none'
-        passWarning.style.display = 'none'
-    } else if (password.value.length < 3) {
-        password.style.border = '1px solid #c52828'
-        login.style.border = '1px solid var(--main-border)'
-        passMinWarning.style.display = 'flex'
-        passWarning.style.display = 'none'
-        loginMinWarning.style.display = 'none'
-        loginWarning.style.display = 'none'
+    const BASE_URL = window.location.origin
+    if (login.value === '' || password.value === '') {
+        const error = document.querySelector('.error-message')
+        const errorData = document.querySelector('.error-data')
+        error.textContent = 'Заполните все поля.'
+        errorData.style.display = 'flex'
     } else {
         const request = await fetch(`${BASE_URL}/users/login/`, {
             method: 'POST',
@@ -44,20 +21,15 @@ async function loginHandler() {
             })
         })
         const data = await request.json()
-
         if (request.status === 200) {
             localStorage.setItem('access', data.access)
             localStorage.setItem('refresh', data.refresh)
             window.location.href = '/'
         } else {
-            errorData = document.querySelector('.error-data')
+            const error = document.querySelector('.error-message')
+            const errorData = document.querySelector('.error-data')
+            error.textContent = data.error
             errorData.style.display = 'flex'
-            loginMinWarning.style.display = 'none'
-            loginWarning.style.display = 'none'
-            passMinWarning.style.display = 'none'
-            passWarning.style.display = 'none'
-            password.style.border = '1px solid var(--main-border)'
-            login.style.border = '1px solid var(--main-border)'
         }
     }
 }
@@ -94,143 +66,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 async function registerHandler() {
-    const email = document.querySelector('.email-form')
-    const login = document.querySelector('.reg-login-form')
+    const email = document.querySelector('.reg-email-form')
+    const login = document.querySelector('.reg-username-form')
     const password1 = document.querySelector('.reg-password-form')
-    const password2 = document.querySelector('.repeat-password-form')
-
-    const regEmailWarning = document.querySelector('.reg-email-warning')
-    const regLoginWarning = document.querySelector('.reg-login-warning')
-    const regPass1Warning = document.querySelector('.reg-pass1-warning')
-    const regPass2Warning = document.querySelector('.reg-pass2-warning')
-
-    const regEmailMin = document.querySelector('.reg-email-min-length-warning')
-    const regLoginMin = document.querySelector('.reg-login-min-length-warning')
-    const regPass1Min = document.querySelector('.reg-pass1-min-length-warning')
-    const regPass2Min = document.querySelector('.reg-pass2-min-length-warning')
+    const password2 = document.querySelector('.reg-password2-form')
+    const data = [email.value, login.value, password1.value, password2.value]
+    document.querySelector('.reg-username-error').textContent = ''
+    document.querySelector('.reg-email-error').textContent = ''
+    document.querySelector('.reg-password-error').textContent = ''
+    document.querySelector('.reg-password2-error').textContent = ''
 
     const BASE_URL = window.location.origin
-
-    if (email.value.length === 0) {
-        email.style.border = '1px solid #c52828'
-        password2.style.border = '1px solid var(--main-border)'
-        password1.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-
-        regEmailWarning.style.display = 'flex'
-        regLoginWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-        regPass2Warning.style.display = 'none'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-    } else if (email.value.length < 3) {
-        email.style.border = '1px solid #c52828'
-        password2.style.border = '1px solid var(--main-border)'
-        password1.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-        
-        regEmailMin.style.display = 'flex'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-
-        regPass2Warning.style.display = 'none'
-        regLoginWarning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-    } else if (login.value.length === 0) {
-        login.style.border = '1px solid #c52828'
-        password1.style.border = '1px solid var(--main-border)'
-        password2.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-
-        regLoginWarning.style.display = 'flex'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-        regPass2Warning.style.display = 'none'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-    } else if (login.value.length < 3) {
-        login.style.border = '1px solid #c52828'
-        password1.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'flex'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-
-        regPass2Warning.style.display = 'none'
-        regLoginWarning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-    } else if (password1.value.length === 0) {
-        password1.style.border = '1px solid #c52828'
-        password2.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-
-        regPass1Warning.style.display = 'flex'
-        regPass2Warning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regLoginWarning.style.display = 'none'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-    } else if (password1.value.length < 3) {
-        password1.style.border = '1px solid #c52828'
-        password2.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'flex'
-        regPass2Min.style.display = 'none'
-
-        regPass2Warning.style.display = 'none'
-        regLoginWarning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-    } else if (password2.value.length === 0) {
-        password2.style.border = '1px solid #c52828'
-        password1.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-
-        regPass2Warning.style.display = 'flex'
-        regLoginWarning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'none'
-    } else if (!(password2.value === password1.value)) {
-        password2.style.border = '1px solid #c52828'
-        password1.style.border = '1px solid var(--main-border)'
-        login.style.border = '1px solid var(--main-border)'
-        email.style.border = '1px solid var(--main-border)'
-        regEmailMin.style.display = 'none'
-        regLoginMin.style.display = 'none'
-        regPass1Min.style.display = 'none'
-        regPass2Min.style.display = 'flex'
-
-        regPass2Warning.style.display = 'none'
-        regLoginWarning.style.display = 'none'
-        regEmailWarning.style.display = 'none'
-        regPass1Warning.style.display = 'none'
-    } else if (password1.value === password2.value) {
+    console.log(data)
+    if (data.includes('')) {
+        const error = document.querySelector('.reg_error-message')
+        const errorData = document.querySelector('.reg_error-data')
+        error.textContent = 'Заполните все поля.'
+        errorData.style.display = 'flex'
+    } else {
         const request = await fetch(`${BASE_URL}/users/register/`, {
             method: 'POST',
             headers: {
@@ -245,12 +98,17 @@ async function registerHandler() {
             })
         })
         const data = await request.json()
-        
         if (request.status === 200) {
             localStorage.setItem('access', data.access)
             localStorage.setItem('refresh', data.refresh)
             window.location.href = '/'
         } else {
+            for (let i in data.error) {
+                const error = document.querySelector(`.reg-${i}-error`)
+                error.textContent = data.error[i]
+            }
+            const error = document.querySelector('.reg_error-data')
+            error.style.display = 'none'
         }
     }
 }

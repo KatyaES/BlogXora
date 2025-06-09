@@ -1,7 +1,9 @@
 import json
+from http.client import HTTPResponse
 
 from django.contrib.auth.password_validation import validate_password
-from django.http import JsonResponse
+from django.db import IntegrityError
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -13,18 +15,6 @@ from django.contrib import auth, messages
 
 from users.models import Notifications, Subscription
 from users.serializers import UserSerializer
-
-
-def auth_and_login(username, password):
-    form = UserLoginForm ({
-        'username': username,
-        'password': password,
-    })
-    if form.is_valid():
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password')
-        user = auth.authenticate(username=username, password=password)
-        return user
 
 
 def register_user(request, email, login, password1, password2):
@@ -44,19 +34,39 @@ def register_user(request, email, login, password1, password2):
         )
         return JsonResponse({'access': str(refresh.access_token), 'refresh': str(refresh)}, status=200)
     else:
-        return JsonResponse({'status': 'bad'}, status=400)
+        return JsonResponse({'error': form.errors}, status=400)
+
+
+def auth_and_login(username, password):
+    form = UserLoginForm ({
+        'username': username,
+        'password': password,
+    })
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = auth.authenticate(username=username, password=password)
+        if user:
+            return user
+        return {'error': 'Неправильный логин или пароль.'}
+
+    else:
+        return {'error': form.errors}
+
 
 def login_user(request):
     data = json.loads(request.body)
     username = data.get('login')
     password = data.get('password')
     user = auth_and_login(username, password)
-    if user:
+    print(user)
+    if isinstance(user, User):
         auth.login(request, user)
         refresh = RefreshToken.for_user(user)
         return JsonResponse({'access': str(refresh.access_token), 'refresh': str(refresh)}, status=200)
-    else:
-        return JsonResponse({'status': 'ok'}, status=400)
+    elif isinstance(user, dict):
+        return JsonResponse(user, status=400)
+    return HttpResponse(status=204)
 
 
 def get_profile_user_data(profile_user):
@@ -102,9 +112,13 @@ def change_data(request, username, email, bio):
     serializer = UserSerializer(user_model, data=data, partial=True)
 
     if serializer.is_valid():
-        serializer.save()
-        return Response(status=204)
-    return Response(status=400)
+        try:
+            serializer.save()
+            return Response(status=204)
+        except IntegrityError as e:
+            return Response({"error": "Данный username или email уже занят."}, status=400)
+    return Response({"error": "Данный username или email уже занят."}, status=400)
+
 
 
 def add_or_remove_followers(request, theme):

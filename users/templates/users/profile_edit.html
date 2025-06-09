@@ -19,6 +19,7 @@
                 <div class="settings_username-wrapper">
                     <span>Имя пользователя</span>
                     <input class="settings_username" value="{{ user.username }}">
+                    <div class="username_error"></div>
                 </div>
 
                 <div class="settings_email-wrapper">
@@ -30,7 +31,7 @@
                     <span>О себе</span>
                     <input class="settings_about" value="{{ user.bio }}">
                 </div>
-                <div class="error-data-message">Некоректные данные</div>
+                <div class="data_error"></div>
                 <div class="send-settings_data" onclick="saveProfileData()">Сохранить</div>
                 <div class="change-password-url" onclick="showChangeWrapper()">Сменить пароль</div>
                 <div class="settings_password-wrapper">

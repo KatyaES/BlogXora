@@ -43,27 +43,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const btn of followBtn) {
         const userId = btn.getAttribute('data-id')
 
-        const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-                'Authorization': `Bearer ${token}`,
+        if (token) {
+            const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+
+            const response = await request.json()
+
+            if (response.status === 'subscribed') {
+                btn.style.background = '#E7E8EA'
+                btn.style.color = '#70737B'
+                btn.style.fontWeight = '600'
+                btn.textContent = 'Отписаться'
+            } else {
+                btn.style.background = '#4a90e2'
+                btn.style.color = 'white'
+                btn.style.fontWeight = ''
+                btn.textContent = 'Подписаться'
             }
-        })
-
-        const response = await request.json()
-
-        if (response.status === 'subscribed') {
-            btn.style.background = '#E7E8EA'
-            btn.style.color = '#70737B'
-            btn.style.fontWeight = '600'
-            btn.textContent = 'Отписаться'
-        } else {
-            btn.style.background = '#4a90e2'
-            btn.style.color = 'white'
-            btn.style.fontWeight = ''
-            btn.textContent = 'Подписаться'
         }
     }
 })

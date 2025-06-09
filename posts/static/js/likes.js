@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const id = img.getAttribute("data-id");
         const likesCount = document.getElementById(`likes-count-${id}`);
 
-        try {
+        if (token) {
             const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
@@ -87,8 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 void likesCount.offsetWidth; // Принудительная перерисовка
                 likesCount.classList.add('setlikeanimate');
             }
-        } catch (error) {
-            console.error( error);
         }
     }
 })

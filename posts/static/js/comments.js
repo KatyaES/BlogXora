@@ -97,13 +97,13 @@ async function setCommentLike(div) {
             if (commentType === 'reply') {before = 'reply-'}
             if (data.liked) {
                 div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
+                void likesCount.offsetWidth
                 likesCount.classList.add('dellikeanimate');
             } else {
                 div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
+                void likesCount.offsetWidth
                 likesCount.classList.add('setlikeanimate');
             }
 	    } else { alert('Для этого действия нужно авторизоваться')}
@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
 
-    // Убедимся, что весь HTML загружен и есть элементы с классом .heart-img
     const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
     const replyWrapper = document.querySelectorAll(".reply-comment_like-wrapper")
     const BASE_URL = window.location.origin
@@ -171,32 +170,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const BASE_URL = window.location.origin
 
         try {
-            const response = await fetch(`${BASE_URL}/api/v1/comments/${postID}/${id}/like/?type=${type}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
+            if (token) {
+                const response = await fetch(`${BASE_URL}/api/v1/comments/${postID}/${id}/like/?type=${type}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
 
-            if (data.is_authenticated) {
-                if (data.liked) {
-                    img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                    void likesCount.offsetWidth; // Принудительная перерисовка
-                    likesCount.classList.add('dellikeanimate');
+                if (data.is_authenticated) {
+                    if (data.liked) {
+                        img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('dellikeanimate');
+                    } else {
+                        img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('setlikeanimate');
+                    }
                 } else {
                     img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
                     likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                     void likesCount.offsetWidth; // Принудительная перерисовка
                     likesCount.classList.add('setlikeanimate');
                 }
-            } else {
-                img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
-                likesCount.classList.add('setlikeanimate');
             }
         } catch (error) {
             console.error(error);
@@ -305,24 +306,26 @@ async function commentDelete(span) {
     const refresh = localStorage.getItem('refresh')
     const BASE_URL = window.location.origin
 
-    const request = await fetch(`${BASE_URL}/api/v1/comments/${id}/delete/`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-            'Authorization': `Bearer ${token}`
+    if (token) {
+        const request = await fetch(`${BASE_URL}/api/v1/comments/${id}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'Authorization': `Bearer ${token}`
+            }
+        })
+
+        if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
+        } else { commentsCont = document.querySelector('.comments') }
+        if (request.status === 204) {
+            const successMessage = document.createElement('div')
+            successMessage.innerText = 'Комментарий удален'
+            successMessage.style.color = 'var(--main-color)'
+            const delComment = document.getElementById(`comment-item-${id}`)
+            commentsCont.replaceChild(successMessage, delComment)
+
         }
-    })
-
-    if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
-    } else { commentsCont = document.querySelector('.comments') }
-    if (request.status === 204) {
-        const successMessage = document.createElement('div')
-        successMessage.innerText = 'Комментарий удален'
-        successMessage.style.color = 'var(--main-color)'
-        const delComment = document.getElementById(`comment-item-${id}`)
-        commentsCont.replaceChild(successMessage, delComment)
-
     }
 }
 
@@ -338,24 +341,26 @@ async function ReplyCommentDelete(span) {
     const BASE_URL = window.location.origin
 
 
-    const request = await fetch(`${BASE_URL}/api/v1/reply-comments/${id}/delete/`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+    if (token) {
+        const request = await fetch(`${BASE_URL}/api/v1/reply-comments/${id}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+
+        if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
+        } else { commentsCont = document.querySelector('.comments') }
+        if (request.status === 204) {
+            const successMessage = document.createElement('div')
+            successMessage.innerText = 'Комментарий удален'
+            successMessage.style.color = 'var(--main-color)'
+            const delComment = document.getElementById(`comment-item-${id}`)
+            console.log('del comment: ', delComment, id)
+            commentsCont.replaceChild(successMessage, delComment)
+
         }
-    })
-
-    if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
-    } else { commentsCont = document.querySelector('.comments') }
-    if (request.status === 204) {
-        const successMessage = document.createElement('div')
-        successMessage.innerText = 'Комментарий удален'
-        successMessage.style.color = 'var(--main-color)'
-        const delComment = document.getElementById(`comment-item-${id}`)
-        console.log('del comment: ', delComment, id)
-        commentsCont.replaceChild(successMessage, delComment)
-
     }
 }
 

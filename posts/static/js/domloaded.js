@@ -9,9 +9,7 @@ export default async function likesUpdate() {
     for (const img of imgWrapper) {
         const id = img.getAttribute("data-id");
         const likesCount = document.getElementById(`likes-count-${id}`);
-
-        try {
-            // Запрос к серверу
+        if (token) {
             const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
@@ -20,28 +18,24 @@ export default async function likesUpdate() {
                     }
                 });
             const data = await response.json();
-
-            // Печатаем, что вернул сервер
-            // Проверяем, авторизован ли пользователь
             if (data.is_authenticated) {
                 if (data.liked) {
                     img.classList.replace("like-wrapper", "like-wrapper-liked")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
                     void likesCount.offsetWidth; // Принудительная перерисовка
                     likesCount.classList.add('dellikeanimate');
                 } else {
                     img.classList.replace("like-wrapper-liked", "like-wrapper")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
                     void likesCount.offsetWidth; // Принудительная перерисовка
                     likesCount.classList.add('setlikeanimate');
                 }
             } else {
                 img.classList.replace("like-wrapper-liked", "like-wrapper")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
+                void likesCount.offsetWidth;
                 likesCount.classList.add('setlikeanimate');
             }
-        } catch (error) {
         }
     }
 }

@@ -25,24 +25,37 @@ async function saveProfileData() {
     const about = document.querySelector('.settings_about').value
     const BASE_URL = window.location.origin
 
-    const request = await fetch(`${BASE_URL}/users/change-settings-data/`, {
-        method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                'username':username,
-                'email':email,
-                'about':about,
-            })
-    })
-    if (request.status === 204) {
-        location.reload()
+    if (username.trim().length < 4) {
+        const usernameError = document.querySelector('.username_error')
+        usernameError.textContent = 'Имя пользователя слишком короткое.'
+        usernameError.style.color = '#e54848'
     } else {
-        const errorElem = document.querySelector('.error-data-message')
-        errorElem.style.display = 'flex'
+        const request = await fetch(`${BASE_URL}/users/change-settings-data/`, {
+            method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    'username':username,
+                    'email':email,
+                    'about':about,
+                })
+        })
+
+
+        if (request.status === 204) {
+            location.reload()
+        } else {
+            const data = await request.json()
+            const dataError = document.querySelector('.data_error')
+            const usernameError = document.querySelector('.username_error')
+            dataError.textContent = data.error
+            dataError.style.color = '#e54848'
+
+            usernameError.textContent = ''
+        }
     }
 }
 
@@ -114,9 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 function notificationFunc() {
-    const notificationCont = document.querySelector('.notification-count')
+    const notificationCount = document.querySelector('.notification-count')
     const notificationWrapper = document.querySelector('.notification_wrapper')
-    notificationCont.style.display = 'none'
+    notificationCount.style.display = 'none'
     notificationWrapper.style.width = '20px'
 
     localStorage.setItem('last_click', 'notification')

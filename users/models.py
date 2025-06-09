@@ -11,8 +11,10 @@ from rest_framework.generics import get_object_or_404
 # User = get_user_model()
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
     image = models.ImageField(default='profile_pics/default_profile.jpg', upload_to='profile_pics')
     bio = models.TextField(blank=True, null=True , max_length=255)
+
 
     def __str__(self):
         return f'{self.username}'

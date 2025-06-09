@@ -70,32 +70,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bookmarkCount = document.getElementById(`bookmark-count-${id}`);
 
         try {
-            const response = await fetch(`${BASE_URL}/api/v1/bookmarks/?id=${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                    }
-                });
-            const data = await response.json();
+            if (token) {
+                const response = await fetch(`${BASE_URL}/api/v1/bookmarks/?id=${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                        }
+                    });
+                const data = await response.json();
 
-            if (data.is_authenticated) {
-                if (data.set_bookmark) {
-                    img.classList.replace("bookmark-wrapper", "bookmark-wrapper-set")
-                    bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                    void bookmarkCount.offsetWidth; // Принудительная перерисовка
-                    bookmarkCount.classList.add('dellikeanimate');
+                if (data.is_authenticated) {
+                    if (data.set_bookmark) {
+                        img.classList.replace("bookmark-wrapper", "bookmark-wrapper-set")
+                        bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void bookmarkCount.offsetWidth; // Принудительная перерисовка
+                        bookmarkCount.classList.add('dellikeanimate');
+                    } else {
+                        img.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                        bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void bookmarkCount.offsetWidth; // Принудительная перерисовка
+                        bookmarkCount.classList.add('setlikeanimate');
+                    }
                 } else {
-                    img.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                    img.classList.replace("bookmark-wrapper-et", "bookmark-wrapper")
                     bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                     void bookmarkCount.offsetWidth; // Принудительная перерисовка
                     bookmarkCount.classList.add('setlikeanimate');
                 }
-            } else {
-                img.classList.replace("bookmark-wrapper-et", "bookmark-wrapper")
-                bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void bookmarkCount.offsetWidth; // Принудительная перерисовка
-                bookmarkCount.classList.add('setlikeanimate');
             }
         } catch (error) {
             console.error(error);

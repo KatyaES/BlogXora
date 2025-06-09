@@ -145,7 +145,7 @@
                     </div>
                 </div>    
             </div>
-             <div class="popular-and-random">
+            <div class="popular-and-random">
                 {% if request.user.is_authenticated %}
                     <div class="profile-cont">
                         <div class="profile-data">
@@ -164,9 +164,6 @@
                                 <a>Администрация</a>
                             </div>
                             {% endif %}
-                            <script>
-                                const username = "{{ request.user }}"
-                            </script>
                             <div class="notifications-cont" onclick="window.location.href = 'users/profile/' + username + '#notification-id'">
                                 <a href="{% url 'profile' request.user %}#notifications-id">Уведомления</a>
                             </div>
@@ -188,16 +185,13 @@
                 <div class="login-cont">
                     <div class="auth-header">Войти</div>
                     <div class="login-password">
-                        <input class="login-form" placeholder="Логин" minlength="3">
-                        <p class="login-warning">Обязательное поле</p>
-                        <p class="login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="username-form" placeholder="Логин" minlength="3">
+                        <div class="username-error"></div>
                         <input class="password-form" type="password" placeholder="Пароль">
-                        <div class="password-warnings"></div>
-                        <p class="pass-warning">Обязательное поле</p>
-                        <p class="pass-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <div class="password-error"></div>
                     </div>
                     <div class="error-data">
-                        <p class="error-message">Ошибка.Неправильный логин или пароль</p>
+                        <p class="error-message"></p>
                     </div>
                     <div class="open-create">
                         <button onclick="loginHandler()">Войти</button>
@@ -208,18 +202,17 @@
                 <div class="register">
                     <div class="auth-header-reg">Создать аккаунт</div>
                     <div class="register-data">
-                        <input class="email-form" placeholder="Email">
-                        <p class="reg-email-warning">Обязательное поле</p>
-                        <p class="reg-email-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="reg-login-form" placeholder="Никнейм" maxlength="16">
-                        <p class="reg-login-warning">Обязательное поле</p>
-                        <p class="reg-login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
+                        <input class="reg-email-form" placeholder="Email">
+                        <div class="reg-email-error"></div>
+                        <input class="reg-username-form" placeholder="Никнейм" maxlength="16">
+                        <div class="reg-username-error"></div>
                         <input class="reg-password-form" type="password" placeholder="Пароль">
-                        <p class="reg-pass1-warning">Обязательное поле</p>
-                        <p class="reg-pass1-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="repeat-password-form" type="password" placeholder="Повторите пароль">
-                        <p class="reg-pass2-warning">Обязательное поле</p>
-                        <p class="reg-pass2-min-length-warning">Ошибка.Пароли не совпадают</p>
+                        <div class="reg-password-error"></div>
+                        <input class="reg-password2-form" type="password" placeholder="Повторите пароль">
+                        <div class="reg-password2-error"></div>
+                    </div>
+                    <div class="reg_error-data">
+                        <p class="reg_error-message"></p>
                     </div>
                     <div class="open-create">
                         <button onclick="registerHandler()">Создать аккаунт</button>

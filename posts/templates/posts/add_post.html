@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="{% static 'posts/css/add_post.css' %}">
     <link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3">
     <!-- Quill стили -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 {% endblock %}
 
@@ -157,9 +156,9 @@
                 <input id="title-id" type="text" name="content" placeholder="Введите название">
             </div>
             <div class="editor-cont">
-                    <p>Описание</p>
-                    <div id="editor">
-                    </div>  
+                <p>Описание</p>
+                <div id="editor">
+                </div>
                 <div class="category-and-send">
                     <div class="send-moder-button" id="send-moder" role="button" tabindex="0">
                         <a>Отправить на модерацию</a>
@@ -186,5 +185,6 @@
           theme: 'snow'
         });
     </script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <script src="{% static 'js/add_post.js' %}"></script>
 {% endblock %}

@@ -906,7 +906,7 @@
     flex-shrink: 0;
 }
 
-.login-form,
+.username-form,
 .password-form {
     height: 40px;
     width: 90%;
@@ -916,7 +916,7 @@
     padding-left: 20px;
 }
 
-.login-form::placeholder,
+.username-form::placeholder,
 .password-form::placeholder {
     font-family: 'SF Pro Text';
 }
@@ -952,9 +952,16 @@ button:last-of-type {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 8px;
     justify-content: center;
     align-items: center;
+}
+
+.open-create {
+    gap: 8px
+}
+
+.login-password {
+    gap: 5px
 }
 
 button:last-of-type:hover {
@@ -970,7 +977,7 @@ button:first-of-type:hover {
     outline: none;
 }
 
-.login-form:focus {
+.username-form:focus {
     border-color: #4fc827!important;
     outline: none;
 }
@@ -986,13 +993,15 @@ button:first-of-type:hover {
     text-decoration: none;
 }
 
-.error-message {
+.error-message,
+.reg_error-message {
     font-size: 13px;
     color: #c52828;
 }
 
-.error-data {
-    height: 30px;
+.error-data,
+.reg_error-data {
+    height: 10px;
     display: none;
     width: 80%;
     align-items: center;
@@ -1007,7 +1016,8 @@ button:first-of-type:hover {
     justify-content: center;
     gap: 15px;
     width: 100%;
-    height: 380px;
+    overflow-wrap: break-word;
+    height: auto;
     border: 1px solid var(--main-border);
     border-radius: 10px;
     background-color: var(--main-element-background);
@@ -1019,15 +1029,15 @@ button:first-of-type:hover {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 8px;
+    gap: 5px;
     justify-content: center;
     align-items: center;
 }
 
-.reg-login-form,
+.reg-username-form,
 .reg-password-form,
-.email-form,
-.repeat-password-form {
+.reg-email-form,
+.reg-password2-form {
     height: 40px;
     width: 90%;
     box-sizing: border-box;
@@ -1036,9 +1046,9 @@ button:first-of-type:hover {
     padding-left: 20px;
 }
 
-.reg-login-form::placeholder,
+.reg-username-form::placeholder,
 .reg-password-form::placeholder,
-.reg-repeat-password-form::placeholder,
+.reg-password2-form::placeholder,
 .reg-email-form::placeholder {
     font-family: 'SF Pro Text';
 }
@@ -1047,48 +1057,27 @@ button:first-of-type:hover {
     cursor: pointer;
 }
 
-.login-warning,
-.pass-warning {
-    display: none;
-    font-size: 13px;
-    margin: 0;
-    width: 80%;
-    color: #c52828;
-    justify-content: left;
-}
-
-.login-min-length-warning,
-.pass-min-length-warning {
-    display: none;
-    font-size: 13px;
-    margin: 0;
-    width: 80%;
-    color: #c52828;
-    justify-content: left;
-}
-
-.reg-login-form:focus,
+.reg-username-form:focus,
 .reg-email-form:focus,
 .reg-password-form:focus ,
-.repeat-password-form:focus,
-.email-form:focus {
+.reg-password2-form:focus,
+.reg-email-form:focus {
     border-color: #4fc827!important;
     outline: none;
 }
 
-.reg-email-warning,
-.reg-login-warning,
-.reg-login-min-length-warning,
-.reg-pass1-warning,
-.reg-pass2-warning,
-.reg-email-min-length-warning,
-.reg-login-min-length-warning,
-.reg-pass1-min-length-warning,
-.reg-pass2-min-length-warning {
-    display: none;
+.reg-email-error,
+.reg-username-error,
+.reg-password-error,
+.reg-password2-error,
+.email-error,
+.password-error {
+    display: flex;
+    flex-direction: column;
     font-size: 13px;
     margin: 0;
     width: 80%;
+    max-width: 290px;
     color: #c52828;
     justify-content: left;
 }

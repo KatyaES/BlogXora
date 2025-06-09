@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 
@@ -28,12 +29,12 @@ def register(request):
 def login(request):
     if request.method == 'POST':
         return login_user(request)
+    return HttpResponse('')
 
 
 def profile_page(request, username):
     profile_user = get_object_or_404(User, username=username)
     context = get_profile_user_data(profile_user)
-
     return render(request, 'users/profile.html', context)
 
 

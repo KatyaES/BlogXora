@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('access')
     const BASE_URL = window.location.origin
 
-    if (!token || isTokenExpired(token)) {
+    if (isTokenExpired(token)) {
         const refreshToken = localStorage.getItem('refresh')
         const response = await fetch(`${BASE_URL}/api/v1/token/refresh/`, {
             method: 'POST',

@@ -31,7 +31,7 @@ document.getElementById('send-moder').addEventListener('click', async () => {
 		body: formData
 	})
 	const response = await request.json()
-	if (response.status === 'ok') {
+	if (request.status === 204) {
 		window.location.href = '/'
 	}
 })

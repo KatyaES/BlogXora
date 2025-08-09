@@ -57,11 +57,20 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'default_limit': 2,
+    'DEFAULT_PAGINATION_CLASS': 'apps.api.utils.pagination.LargeResultsSetPagination',
     # 'DEFAULT_RENDERER_CLASSES': [
     #     'rest_framework.renderers.BrowsableAPIRenderer'
     # ],
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
 }
 
 SIMPLE_JWT = {

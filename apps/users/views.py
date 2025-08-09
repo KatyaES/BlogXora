@@ -28,11 +28,12 @@ def register(request):
 
         return register_user(request, email, login, password1, password2)
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 def login(request):
     if request.method == 'POST':
         return login_user(request)
-    return HttpResponse('')
+    return redirect('index')
 
 
 def profile_page(request, username):
@@ -44,6 +45,7 @@ def profile_page(request, username):
 def logout_page(request):
     logout(request)
     return redirect('/')
+
 
 def profile_settings(request):
     user = get_object_or_404(User, username=request.user.username)
@@ -60,7 +62,7 @@ class ThemeFollows(APIView):
 
     def get(self, request):
         theme = request.GET.get('theme')
-        category = get_object_or_404(Category, name=theme)
+        category = get_object_or_404(Category, cat_title=theme)
 
         if request.user in category.followers.all():
             return Response({'status': 'subscribed'})

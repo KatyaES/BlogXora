@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (isTokenExpired(token)) {
         const refreshToken = localStorage.getItem('refresh')
-        const response = await fetch(`${BASE_URL}/api/v1/token/refresh/`, {
+        const response = await fetch(`${BASE_URL}/frontend_api/v1/token/refresh/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

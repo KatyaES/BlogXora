@@ -48,7 +48,7 @@ async function searchPosts(element) {
     const post = document.querySelector('.search-input').value
 
 
-    const request = await fetch(`${BASE_URL}/api/v1/search/posts/?query=${post}`, {
+    const request = await fetch(`${BASE_URL}/frontend_api/v1/search/posts/?query=${post}`, {
         method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',

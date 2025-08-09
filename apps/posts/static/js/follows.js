@@ -6,7 +6,7 @@ async function followFunc(div) {
     const BASE_URL = window.location.origin
 
     if (token) {
-        const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
         method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userId = btn.getAttribute('data-id')
 
         if (token) {
-            const request = await fetch(`${BASE_URL}/api/v1/follows/${userId}/`, {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

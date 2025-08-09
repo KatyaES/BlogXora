@@ -10,7 +10,7 @@ export default async function likesUpdate() {
         const id = img.getAttribute("data-id");
         const likesCount = document.getElementById(`likes-count-${id}`);
         if (token) {
-            const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
+            const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

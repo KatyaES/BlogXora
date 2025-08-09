@@ -1,5 +1,6 @@
 {% extends 'posts/base.html' %}
 {% load static %}
+{% load cache %}
 {% load custom_filters %}
 
 {% block link %}
@@ -171,7 +172,8 @@
                     </div>
                 </div>
                 {% endif %}
-                <div id="popular-id" class="popular-cat">
+                {% cache 600 popular-cat %}
+                    <div id="popular-id" class="popular-cat">
                     <p class="popular-title">Темы</p>
                         <div class="category-item">
                             <img src="/media/categories/psychology.png" alt="">
@@ -282,7 +284,10 @@
                             <a href="{% url 'category' %}?theme=Животные">Животные</a>
                         </div>
                 </div>
-                <div class="random-posts">
+                {% endcache %}
+
+                {% cache 600 random-posts %}
+                    <div class="random-posts">
                     <div class="popular-post-p">
                         <span>ЧИТАЮТ СЕЙЧАС</span>
                     </div>
@@ -299,6 +304,7 @@
                         </div>
                     {% endfor %}
                 </div>
+                {% endcache %}
             </div>
         </div>
     </div>    

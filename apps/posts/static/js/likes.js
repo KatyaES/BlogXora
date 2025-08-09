@@ -1,6 +1,5 @@
 async function func(div) {
     try {
-
         const token = localStorage.getItem('access')
         const refresh = localStorage.getItem('refresh')
         const id = div.getAttribute("data-id")
@@ -8,7 +7,7 @@ async function func(div) {
         const likesCount = document.getElementById(`likes-count-${id}`);
 
         if (token) {
-            const request = await fetch(`http://127.0.0.1:8000/api/v1/posts/${id}/like/`, {
+            const request = await fetch(`http://127.0.0.1:8000/frontend_api/v1/posts/${id}/like/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -17,7 +16,7 @@ async function func(div) {
             },
             body: JSON.stringify({})
             })
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/posts/${id}/like/`, {
+            const response = await fetch(`http://127.0.0.1:8000/frontend_api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const likesCount = document.getElementById(`likes-count-${id}`);
 
         if (token) {
-            const response = await fetch(`${BASE_URL}/api/v1/posts/${id}/like/`, {
+            const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/like/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

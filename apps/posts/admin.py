@@ -20,7 +20,7 @@ class ReplyCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-	list_display = ['name', 'image']
+	list_display = ['cat_title', 'image']
 
 
 

@@ -1,15 +1,22 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
-
-from apps.api.services import *
+from apps.api.services.comments import create_comment, delete_comment, set_comment_like, get_comments, \
+    create_reply_comment, delete_reply_comment
+from apps.api.services.others import add_user_subscription, add_bookmark
+from apps.api.services.posts import set_post_like, get_filter_posts
+from apps.posts.models import Comment, Post, ReplyComment
+from apps.users.models import Subscription
 
 User = get_user_model()
-
 
 class CommentApiView(APIView):
     def get_renderers(self):
@@ -68,10 +75,18 @@ class CommentToggleApiView(APIView):
         return Response(serializer.data)
 
     def get(self, request, post_pk, comment_pk):
-        comment = get_comments(request, post_pk, comment_pk)
-
-        serializer = CommentSerializer(comment, context={'request': request})
-        return Response(serializer.data)
+        cache_key = f'comment_{comment_pk}'
+        cached_comment = cache.get(cache_key)
+        if cached_comment:
+            data = cached_comment
+            print('get comment from cache')
+        else:
+            comment = get_comments(request, post_pk, comment_pk)
+            serializer = CommentSerializer(comment, context={'request': request})
+            data = serializer.data
+            cache.set(cache_key, data, 60 * 5)
+            print('get comment from db')
+        return Response(data)
 
 
 class PostToggleApiView(APIView):
@@ -94,10 +109,16 @@ class PostToggleApiView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get(self, request, pk):
-        post = get_object_or_404(Post, id=pk)
-
-        serializer = PostSerializer(post, context={'request': request})
-        return Response(serializer.data)
+        cache_key = f'like_{pk}'
+        cached_post = cache.get(cache_key)
+        if cached_post:
+            data = cached_post
+        else:
+            post = get_object_or_404(Post, id=pk)
+            serializer = PostSerializer(post, context={'request': request})
+            data = serializer.data
+            cache.set(cache_key, data, 60 * 5)
+        return Response(data)
 
 class ReplyCommentApiView(APIView):
     def get_renderers(self):
@@ -183,17 +204,22 @@ class BookmarkApiView(APIView):
             return [BrowsableAPIRenderer()]
         return [JSONRenderer()]
 
-    def post(self, request):
-        add_bookmark(request)
+    def post(self, request, pk):
+        add_bookmark(request, pk)
 
         return HttpResponse(status=204)
 
-    def get(self, request):
-        post_id = request.GET.get('id')
-        post = get_object_or_404(Post, id=post_id)
-
-        serializer = PostSerializer(post, context={'request': request})
-        return Response(serializer.data)
+    def get(self, request, pk):
+        cache_key = f'mark_{pk}'
+        cached_mark = cache.get(cache_key)
+        if cached_mark:
+            data = cached_mark
+        else:
+            post = get_object_or_404(Post, id=pk)
+            serializer = PostSerializer(post, context={'request': request})
+            data = serializer.data
+            cache.set(cache_key, data, 60 * 5)
+        return Response(data)
 
 
 class GetFilterPostsApiView(APIView):

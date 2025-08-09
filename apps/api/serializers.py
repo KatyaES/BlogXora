@@ -128,7 +128,7 @@ class SearchPostSerializer(serializers.ModelSerializer):
         return obj.user.id
 
     def get_category(self, obj):
-        return obj.category.name
+        return obj.category.cat_title
 
     def get_user(self, obj):
         return obj.user.username
@@ -151,8 +151,14 @@ class PublicPostsSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PublicCommentsSerializer(serializers.HyperlinkedModelSerializer):
+    replies = ReplyCommentSerializer(many=True, read_only=True)
     class Meta:
         model = Comment
+        fields = ['id', 'user', 'description', 'pub_date', 'liked_by', 'replies']
+
+class PublicReplyCommentsSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ReplyComment
         fields = '__all__'
 
 class PublicCategorySerializer(serializers.HyperlinkedModelSerializer):

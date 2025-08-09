@@ -1,37 +1,33 @@
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import BasePermission
+from rest_framework.response import Response
 
-from apps.api.serializers import PublicPostsSerializer, PublicCommentsSerializer, PublicCategorySerializer, PublicUserSerializer
+from apps.api.utils.permissions import IsAdminOrReadOnly, IsAuthor
+from apps.api.serializers import PublicPostsSerializer, PublicCommentsSerializer, PublicCategorySerializer, \
+    PublicUserSerializer
+from apps.api.services.others import get_cached_data
+from apps.api.utils.cache_utils import redis_client
 from apps.posts.models import Post, Comment, Category
 from apps.users.models import CustomUser
-
-class IsAuthor(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        else:
-            if request.user.is_staff:
-                return True
-            return request.user == obj.user
-
-
-class IsAdminOrReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return True if request.method in permissions.SAFE_METHODS else request.user.is_staff
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = PublicCategorySerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = [
-        'followers', 'name'
+        'followers', 'cat_title'
     ]
-    search_fields = ['=name']
+    search_fields = ['=cat_title']
+
+    @method_decorator(cache_page(60 * 2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,6 +39,17 @@ class UserViewSet(viewsets.ModelViewSet):
     ordering = ['username']
     filterset_fields = ['username']
     search_fields = ['username', 'email']
+
+    @method_decorator(cache_page(60 * 2, key_prefix='list_users'))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        for key in redis_client.scan_iter('list_users*'):
+            cache.unlink(key)
+        instance.delete()
+
+
 
 
 class PostsViewSet(viewsets.ModelViewSet):
@@ -56,7 +63,36 @@ class PostsViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = ['status', 'views_count', 'comment_count']
     ordering = ['status']
-    search_filter = ['status', 'user', 'category', 'title']
+    search_fields = ['status', 'title']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        data = get_cached_data(request, 'posts',
+                               queryset,
+                               page,
+                               self.get_serializer_class(),
+                               self.get_paginated_response)
+        return Response(data)
+
+    def clear_posts_cache(self):
+        keys = cache.get('posts_cache_keys') or set()
+        for key in keys:
+            cache.delete(key)
+        cache.delete('posts_cache_keys')
+
+    def perform_update(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        self.clear_posts_cache()
+        instance.delete()
+
+    def perform_create(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
@@ -69,7 +105,36 @@ class CommentsViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = ['pub_date']
     ordering = ['pub_date']
-    search_filter = ['user', 'description']
+    search_fields = ['description']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        data = get_cached_data(request, 'comments',
+                               queryset,
+                               page,
+                               self.get_serializer_class(),
+                               self.get_paginated_response)
+        return Response(data)
+
+    def clear_comments_cache(self):
+        keys = cache.get('comments_cache_keys') or set()
+        for key in keys:
+            cache.delete(key)
+        cache.delete('comments_cache_keys')
+
+    def perform_update(self, serializer):
+        self.clear_comments_cache()
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        self.clear_comments_cache()
+        instance.delete()
+
+    def perform_create(self, serializer):
+        self.clear_comments_cache()
+        serializer.save()
 
 
 class PostsList(generics.ListAPIView):
@@ -83,15 +148,70 @@ class PostsList(generics.ListAPIView):
     ]
     ordering_fields = ['status', 'views_count', 'comment_count']
     ordering = ['status']
-    search_filter = ['status', 'user', 'category', 'title']
+    search_fields = ['status', 'title']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        data = get_cached_data(request, 'posts',
+                               queryset,
+                               page,
+                               self.get_serializer_class(),
+                               self.get_paginated_response)
+        return Response(data)
+
+    def clear_posts_cache(self):
+        keys = cache.get('posts_cache_keys') or set()
+        for key in keys:
+            cache.delete(key)
+        cache.delete('posts_cache_keys')
+
+    def perform_update(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        self.clear_posts_cache()
+        instance.delete()
+
+    def perform_create(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()
+
+
+
 
 class PostApiView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthor,)
     queryset = Post.objects.all()
     serializer_class = PublicPostsSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
 
+        data = get_cached_data(request, 'posts',
+                               queryset,
+                               page,
+                               self.get_serializer_class(),
+                               self.get_paginated_response)
+        return Response(data)
 
+    def clear_posts_cache(self):
+        keys = cache.get('posts_cache_keys') or set()
+        for key in keys:
+            cache.delete(key)
+        cache.delete('posts_cache_keys')
 
+    def perform_update(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()
 
+    def perform_destroy(self, instance):
+        self.clear_posts_cache()
+        instance.delete()
 
+    def perform_create(self, serializer):
+        self.clear_posts_cache()
+        serializer.save()

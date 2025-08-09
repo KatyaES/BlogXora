@@ -8,7 +8,7 @@ async function sendComment(div) {
 
     if (comment.value) {
         if (token) {
-            const request = await fetch(`${BASE_URL}/api/v1/comments/${postID}/`, {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ async function setCommentLike(div) {
 
 	try {
 	    if (token) {
-            const request = await fetch(`${BASE_URL}/api/v1/comments/${postID}/${id}/like/?type=${commentType}`, {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${commentType}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken,
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
         try {
-            const response = await fetch(`${BASE_URL}/api/v1/comments/${postID}/${id}/like/?type=${type}`, {
+            const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${type}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             if (token) {
-                const response = await fetch(`${BASE_URL}/api/v1/comments/${postID}/${id}/like/?type=${type}`, {
+                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${type}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -245,7 +245,7 @@ async function replySendComment(div) {
 
     if (comment.value) {
         if (token) {
-            const request = await fetch(`${BASE_URL}/api/v1/reply-comments/`, {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/reply-comments/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -307,7 +307,7 @@ async function commentDelete(span) {
     const BASE_URL = window.location.origin
 
     if (token) {
-        const request = await fetch(`${BASE_URL}/api/v1/comments/${id}/delete/`, {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/delete/`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -342,7 +342,7 @@ async function ReplyCommentDelete(span) {
 
 
     if (token) {
-        const request = await fetch(`${BASE_URL}/api/v1/reply-comments/${id}/delete/`, {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/reply-comments/${id}/delete/`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

@@ -58,7 +58,6 @@ def login_user(request):
     username = data.get('login')
     password = data.get('password')
     user = auth_and_login(username, password)
-    print(user)
     if isinstance(user, User):
         auth.login(request, user)
         refresh = RefreshToken.for_user(user)

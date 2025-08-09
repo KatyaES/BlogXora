@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 
 import config
-from apps.api.v1.views import CommentApiView
+from apps.api.v1.frontend_api import CommentApiView
 from config import settings
 from apps.posts.views import index
 
@@ -31,8 +31,8 @@ urlpatterns = [
     path('home/', include("apps.posts.urls")),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('api-auth/', CommentApiView.as_view()),
-    path('api/v1/', include('apps.api.v1.urls')),
-    path('public_api/v1/', include('apps.api.v1.public_urls')),
+    path('frontend_api/v1/', include('apps.api.v1.frontend_urls')),
+    path('api/v1/', include('apps.api.v1.public_urls')),
 ]
 
 if config.settings.dev.DEBUG:

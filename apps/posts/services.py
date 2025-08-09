@@ -21,15 +21,15 @@ def create_post(request):
 
         form = PostForm(
             data= {
-            'title': title,
-            'content': content,
-            'category': category.id if category else None,
-            'pub_date': pub_date,
-            'cut_img': cut_img,
-            },
-            files= {
-                'wrapp_img': wrapp_img,
-            }
+                'title': title,
+                'content': content,
+                'category': category.id if category else None,
+                'pub_date': pub_date,
+                'cut_img': cut_img,
+                },
+                files= {
+                    'wrapp_img': wrapp_img,
+                }
             )
         if form.is_valid():
             post = form.save(commit=False)

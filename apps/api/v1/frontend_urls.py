@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.api.v1.views import CommentApiView, CommentToggleApiView, PostToggleApiView, ReplyCommentApiView, SearchPostsApiView, \
+from apps.api.v1.frontend_api import CommentApiView, CommentToggleApiView, PostToggleApiView, ReplyCommentApiView, SearchPostsApiView, \
     FollowsApiView, BookmarkApiView, GetFilterPostsApiView
 
 
@@ -18,6 +18,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('search/posts/', SearchPostsApiView.as_view()),
     path('follows/<int:pk>/', FollowsApiView.as_view()),
-    path('bookmarks/', BookmarkApiView.as_view()),
+    path('bookmarks/<int:pk>/', BookmarkApiView.as_view()),
     path('filters/', GetFilterPostsApiView.as_view()),
 ]

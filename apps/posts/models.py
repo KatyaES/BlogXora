@@ -61,11 +61,11 @@ class ReplyComment(models.Model):
 class Category(models.Model):
     followers = models.ManyToManyField(CustomUser, related_name="category_follows", blank=True)
     description = models.CharField(max_length=1000, default='Nothing', null=True, blank=True)
-    name = models.CharField(max_length=255, unique=True)
+    cat_title = models.CharField(max_length=255, unique=True)
     image = models.ImageField(upload_to='categories/')
 
     def __str__(self):
-        return self.name
+        return self.cat_title
 
     @property
     def category_follower_count(self):

@@ -12,7 +12,7 @@ async function setBookmark(div) {
             const elem = bookmarksCount[i]
             const elemCount = elem.querySelector('.bookmark-count')
             if (token) {
-                const request = await fetch(`${BASE_URL}/api/v1/bookmarks/?id=${post_id}`, {
+                const request = await fetch(`${BASE_URL}/frontend_api/v1/bookmarks/${post_id}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ async function setBookmark(div) {
                 },
                 body: JSON.stringify({})
                 })
-                const response = await fetch(`${BASE_URL}/api/v1/bookmarks/?id=${post_id}`, {
+                const response = await fetch(`${BASE_URL}/frontend_api/v1/bookmarks/${post_id}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             if (token) {
-                const response = await fetch(`${BASE_URL}/api/v1/bookmarks/?id=${id}`, {
+                const response = await fetch(`${BASE_URL}/frontend_api/v1/bookmarks/${id}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

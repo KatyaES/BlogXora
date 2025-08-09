@@ -68,7 +68,7 @@ async function getFilterPosts(element) {
     const BASE_URL = window.location.origin
     const token = localStorage.getItem('access')
     const refresh = localStorage.getItem('refresh')
-    const request = await fetch(`${BASE_URL}/api/v1/filters/?filter=${activeElement.value}`, {
+    const request = await fetch(`${BASE_URL}/frontend_api/v1/filters/?filter=${activeElement.value}`, {
         method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

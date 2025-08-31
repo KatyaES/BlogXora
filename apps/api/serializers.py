@@ -113,16 +113,18 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
 class SearchPostSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
-    liked_by = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     wrapp_img = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Post
         fields = ['title', 'content', 'category', 'pub_date', 'views_count',
                   'user', 'comment_count', 'liked_by', 'image', 'wrapp_img',
-                  'id', 'user_id']
+                  'id', 'user_id', 'bookmark_user']
+
+
 
     def get_user_id(self, obj):
         return obj.user.id
@@ -133,15 +135,13 @@ class SearchPostSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         return obj.user.username
 
-    def get_liked_by(self, obj):
-        return list(obj.liked_by.values('id', 'username'))
-
     def get_image(self, obj):
         return obj.user.image.url
 
     def get_wrapp_img(self, obj):
-        return obj.wrapp_img.url
-
+        if obj.wrapp_img and hasattr(obj.wrapp_img, 'url'):
+            return obj.wrapp_img.url
+        return None
 
 
 class PublicPostsSerializer(serializers.HyperlinkedModelSerializer):

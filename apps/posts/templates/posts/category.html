@@ -33,28 +33,30 @@
                                 <div class="user">
                                     <img src="{{ post.user.image.url }}">
                                     <div class="name-and-date-category">
-                                            <div class="username-and-follows">
-                                                <div class="username">
-                                                    <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
-                                                </div>
-                                            </div>
-                                            <div class="category-and-date">
-                                                <a href="#">Тема: {{ post.category }}</a>
+                                        <div class="username-and-follows">
+                                            <div class="username">
+                                                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
                                                 <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
                                 {% if request.user != post.user %}
                                     <div class="follow-btn" onclick="followFunc(this)" data-id="{{ post.user.id }}">Подписаться</div>
                                 {% endif %}
                             </div>
                             <br>
+                                <a href="/category/?theme={{ post.category }}" class="post_category">{{ post.category }}</a>
+                            <br>
+                            <br>
                             <div class="title">
                                 <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
                             </div>
                             <br>
                             <div class="ql-editor">
-                                <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
+                                {% if post.wrapp_img %}
+                                   <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
+                                {% endif %}
                                 <p>{{ post.content|split_content|safe }}</p>
                             </div>
                             <div class="detail-button">
@@ -295,13 +297,4 @@
             </div>
         </div>
     </div>
-    <script>
-        const csrfToken = '{{ csrf_token }}'
-    </script>
-    <script src="{% static 'js/likes.js' %}"></script>
-    <script src="{% static 'js/login.js' %}"></script>
-    <script src="{% static 'js/auth.js' %}"></script>
-    <script src="{% static 'js/follows.js' %}"></script>
-    <script src="{% static 'js/bookmarks.js' %}"></script>
-    <script src="{% static 'js/theme-follows.js' %}"></script>
 {% endblock %}

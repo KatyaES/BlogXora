@@ -11,8 +11,7 @@ document.getElementById('send-moder').addEventListener('click', async () => {
 	const content = document.querySelector('.ql-editor')
 	const theme = document.querySelector('.theme-cont')
 	const cut_img = document.getElementById('cut-img')
-
-	
+	const status = await window.checkToken()
 
 	const formData = new FormData()
 	formData.append('wrapp_img', selectedFile)
@@ -23,16 +22,19 @@ document.getElementById('send-moder').addEventListener('click', async () => {
 
 	const BASE_URL = window.location.origin
 
-	const request = await fetch(`${BASE_URL}/home/add_post/`, {
-		method: 'POST',
-		headers: {
-			'X-CSRFToken': csrfToken,
-		},
-		body: formData
-	})
-	if (request.status === 204) {
-		window.location.href = '/'
-	}
+    if (status) {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/posts/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-CSRFToken': window.csrfToken,
+            },
+            body: formData
+        })
+        if (request.status === 201) {
+            window.location.href = '/'
+        }
+    }
 })
 
 document.addEventListener('DOMContentLoaded', () => {

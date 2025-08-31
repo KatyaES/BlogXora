@@ -36,7 +36,7 @@
                 </div>
                 <img src="/media/icons/bad-search-img.png" alt="" class="bad-search-img">
                 {% for post in posts %}
-                    <div class="post-wrapper">
+                    <div class="post-wrapper" id="post-{{ post.id }}">
                         <div class="posts">
                             <div class="user-photo-name">
                                 <div class="user">
@@ -45,11 +45,8 @@
                                         <div class="username-and-follows">
                                             <div class="username">
                                                 <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                                                <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                             </div>
-                                        </div>
-                                        <div class="category-and-date">
-                                            <a href="#">Тема: {{ post.category }}</a>
-                                            <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -58,12 +55,16 @@
                                 {% endif %}
                             </div>
                             <br>
-                            <div class="title">
-                                <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
-                            </div>
+                            <a href="{% url 'category' %}?theme={{ post.category }}" class="post_category">{{ post.category }}</a>
                             <br>
+                            <br>
+                            <div class="title">
+                                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                            </div>
                             <div class="ql-editor">
-                                <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
+                                {% if post.wrapp_img %}
+                                   <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
+                                {% endif %}
                                 <p>{{ post.content|split_content|safe }}</p>
                             </div>
                             <div class="detail-button">
@@ -307,15 +308,6 @@
                 {% endcache %}
             </div>
         </div>
-    </div>    
-    <script>
-        const csrfToken = '{{ csrf_token }}'
-    </script>
-    <script src="{% static 'js/likes.js' %}"></script>
-    <script src="{% static 'js/login.js' %}"></script>
-    <script src="{% static 'js/auth.js' %}"></script>
-    <script src="{% static 'js/follows.js' %}"></script>
-    <script src="{% static 'js/bookmarks.js' %}"></script>
-    <script src="{% static 'js/filters.js' %}" type="module"></script>
-    <script src="{% static 'js/search.js' %}" type="module"></script>
+    </div>
+    <script src="{% static 'js/domloaded.js' %}"></script>
 {% endblock %}

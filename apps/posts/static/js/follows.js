@@ -1,20 +1,19 @@
 async function followFunc(div) {
     const userId = div.getAttribute('data-id')
 
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken()
     const BASE_URL = window.location.origin
 
-    if (token) {
+    if (status) {
         const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
-        method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-CSRFToken': csrfToken,
-			'Authorization': `Bearer ${token}`,
-		},
-		body: JSON.stringify({})
-        })
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({})
+            })
 
         const response = await request.json()
 
@@ -30,26 +29,25 @@ async function followFunc(div) {
             div.style.fontWeight = ''
             div.textContent = 'Подписаться'
         }
-    } else {alert('Для этого действия требуется войти в аккаунт')}
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const followBtn = document.querySelectorAll('.follow-btn')
 
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken(false)
     const BASE_URL = window.location.origin
 
-    for (const btn of followBtn) {
-        const userId = btn.getAttribute('data-id')
+    if (status) {
+        for (const btn of followBtn) {
+            const userId = btn.getAttribute('data-id')
 
-        if (token) {
             const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken,
-                    'Authorization': `Bearer ${token}`,
                 }
             })
 

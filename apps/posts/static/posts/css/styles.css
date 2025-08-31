@@ -148,6 +148,23 @@
     font-size: 23px;
 }
 
+.username {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.post_category {
+    border: 1px solid #ff66b0;
+    border-radius: 3px;
+    padding: 7px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #ff66b0;
+}
+
 .category-and-date {
     display: inline-flex;
     justify-content: center;
@@ -212,6 +229,7 @@
 .user-photo-name {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 /* Posts */
 
@@ -1443,6 +1461,22 @@ button:first-of-type:hover {
 }
 /* ===PROFILE=== */
 
+.profile-header-nav {
+    display: flex;
+    gap: 30px;
+}
+
+.profile-header-nav span {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.bio-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .theme_header {
     display: flex;
     justify-content: space-between;

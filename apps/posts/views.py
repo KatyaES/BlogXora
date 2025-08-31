@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.shortcuts import render
 
 from apps.users.models import Notifications
@@ -9,7 +10,10 @@ from .services import create_post, add_comment
 
 def index(request):
     notification_count = Notifications.notification_count(request.user)
-    posts = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
+    queryset = Post.objects.filter(status__icontains="draft").order_by("-pub_date")
+    paginator = Paginator(queryset, 2)
+    posts = paginator.get_page(1)
+    print([i.title for i in posts])
 
     cache_key = f'random_posts_ids'
     cached_ids = cache.get(cache_key)
@@ -25,7 +29,7 @@ def index(request):
 
 @login_required
 def add_post(request):
-    return create_post(request)
+    return render(request, "posts/add_post.html")
 
 def category_page(request):
     cat = request.GET.get("theme")

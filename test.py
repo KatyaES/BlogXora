@@ -1,4 +1,9 @@
-def solution(number):
-    return sum(i for i in range(number) if i % 3 or i % 5)
+first = [1, 2, 3, 4, 4, 4]
+second = [2, 4]
 
-print(solution(6))
+def func(a, b):
+    return [i for i in a if i not in second]
+
+
+if __name__ == '__main__':
+    print(func(first, second))

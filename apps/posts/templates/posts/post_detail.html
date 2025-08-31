@@ -21,32 +21,36 @@
                         <div class="user-photo-name">
                             <div class="user">
                                 <img src="{{ post.user.image.url }}">
-                                    <div class="name-and-date-category">
+                                <div class="name-and-date-category">
+                                    <div class="username-and-follows">
                                         <div class="username">
                                             <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
-                                        </div>
-                                        <div class="category-and-date">
-                                            <a href="#">Тема: {{ post.category }}</a>
                                             <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            {% if request.user != post.user %}
+                                <div class="follow-btn" onclick="followFunc(this)" data-id="{{ post.user.id }}">Подписаться</div>
+                            {% endif %}
+                        </div>
+                        <br>
+                            <a href="{% url 'category' %}?theme={{ post.category }}" class="post_category">{{ post.category }}</a>
+                        <br>
                         <br>
                         <div class="title">
-                            <a href="{% url 'post_detail' post.id %}#top">{{ post.title }}</a>
+                            <a>{{ post.title }}</a>
                         </div>
                         <br>
                         <div class="ql-editor">                                
-                            <img src="{{ post.wrapp_img.url }}" alt="">
+                            {% if post.wrapp_img %}
+                               <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
+                            {% endif %}
                             <p>{{ post.content|safe }}</p>
-                        </div>
-                        <div class="detail-button">
-                            <a href="{% url 'post_detail' post.id %}#top">Читать далее</a>
                         </div>
                         <div class="icon-cont">
                             <div class="post-reactions">
-                                <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="{{ post.id }}">                                                
+                                <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="{{ post.id }}">
                                     <img src="/media/icons/hart.png" class="heart-img" id="like-button">
                                     <span class="likes-count" id="likes-count-{{ post.id }}">{{ post.liked_by.count }}</span>
                                 </div>
@@ -352,12 +356,7 @@
         </div>
     </div>    
     </div>
-    <script src="{% static 'js/comments.js' %}"></script>
-    <script src="{% static 'js/likes.js' %}"></script>
-    <script src="{% static 'js/login.js' %}"></script>
-    <script src="{% static 'js/auth.js' %}"></script>
     <script>
-        const csrfToken = '{{ csrf_token }}'
         const postID = '{{ post.id }}'
         const currentUser = '{{ request.user }}'
     </script>    

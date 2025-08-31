@@ -16,6 +16,7 @@ def set_post_like(request, pk):
         )
     cache.delete(f'like_{pk}')
     post.save()
+    return post
 
 
 def get_filter_posts(request):

@@ -1,11 +1,15 @@
+from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.defaulttags import csrf_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from django.contrib.auth import logout, get_user_model
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.users.services import *
 
@@ -42,9 +46,24 @@ def profile_page(request, username):
     return render(request, 'users/profile.html', context)
 
 
-def logout_page(request):
-    logout(request)
-    return redirect('/')
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        response = Response({'detail': 'Successfully logged out.'})
+        response.set_cookie(
+            'refresh_token',
+            path='/',
+            secure=True,
+            httponly=True,
+            samesite='Strict'
+        )
+        response.set_cookie(
+            'access_token',
+            path='/',
+            httponly=True,
+            samesite='Strict'
+        )
+        return response
 
 
 def profile_settings(request):
@@ -70,12 +89,25 @@ class ThemeFollows(APIView):
 
 
 class ChangePasswordView(APIView):
+
     def post(self, request):
         return change_password(request)
 
 class ChangeDataView(APIView):
+
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         bio = request.data.get('about')
         return change_data(request, username, email, bio)
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({'detail': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data={'refresh': refresh_token})
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)

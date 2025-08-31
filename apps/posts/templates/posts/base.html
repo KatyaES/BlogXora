@@ -44,8 +44,8 @@
     {% endblock %}
     <script>
         const postID = '{{ post.id }}'
-        const csrfToken = '{{ csrf_token }}'
     </script>
+    <script> window.csrfToken = "{{ csrf_token }}"</script>
     <script src="{% static 'js/likes.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/auth.js' %}"></script>
@@ -53,9 +53,14 @@
     <script src="{% static 'js/bookmarks.js' %}"></script>
     <script src="{% static 'js/profile.js' %}"></script>
     <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/theme-follows.js' %}"></script>
     <script src="{% static 'js/follows.js' %}"></script>
+    <script src="{% static 'js/filters.js' %}"></script>
+    <script src="{% static 'js/domloaded.js' %}"></script>
     <script>
+        const currentUser = '{{ request.user }}'
         const username = "{{ request.user }}"
+        const BASE_URL = window.location.origin
     </script>
 </body>
 </html>

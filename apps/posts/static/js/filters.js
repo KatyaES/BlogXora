@@ -1,8 +1,3 @@
-import likesUpdate from './domloaded.js';
-window.setFilter = setFilter
-window.getFilterPosts = getFilterPosts
-window.moveArrow = moveArrow
-
 let activeElement = null
 
 function splitContent(value) {
@@ -66,13 +61,12 @@ async function getFilterPosts(element) {
     const user = element.getAttribute('datatype')
     const id = element.getAttribute('data-id')
     const BASE_URL = window.location.origin
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+
     const request = await fetch(`${BASE_URL}/frontend_api/v1/filters/?filter=${activeElement.value}`, {
         method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+        headers: {
+            'Content-Type': 'application/json',
+        }
     })
 
     const data = await request.json()
@@ -125,7 +119,7 @@ async function getFilterPosts(element) {
                     </div>
                     <div class="icon-cont">
                         <div class="post-reactions">
-                            <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="${data[i].id}">
+                            <div class="like-wrapper-${data[i].id}" id="wrapper-id" onclick="func(this)" data-id="${data[i].id}">
                                 <img src="/media/icons/hart.png" class="heart-img" id="like-button">
                                 <span class="likes-count" id="likes-count-${data[i].id}">${data[i].liked_by.length}</span>
                             </div>
@@ -135,11 +129,11 @@ async function getFilterPosts(element) {
                                 </a>
                                 <span class="comment-count">${data[i].comment_count}</span>
                             </div>
-                            <div class="bookmark-wrapper">
+                            <div class="bookmark-wrapper" onclick="setBookmark(this)" data-id="${data[i].id}" data-section="bookmarks">
                                 <a>
                                     <img src="/media/icons/bookmark.svg" class="bookmark-img">
                                 </a>
-                                <span class="bookmark-count">0</span>
+                                <span class="bookmark-count" id="bookmark-count-${data[i].id}">${data[i].bookmark_user.length}</span>
                             </div>
                         </div>
                         <div class="view-wrapper">
@@ -152,7 +146,8 @@ async function getFilterPosts(element) {
         `
         postsContainer.insertAdjacentHTML('beforeend', posts)
     }
-    likesUpdate()
+    window.bookmarksUpdate()
+    window.likesUpdate()
 }
 
 function moveArrow() {
@@ -170,5 +165,4 @@ function moveArrow() {
         filtersContainer.style.overflow = 'hidden'
         filtersContainer.style.padding = '25px 25px 25px 25px'
     }
-//    lentaButton.classList.add('up')
 }

@@ -10,7 +10,7 @@ class Post(models.Model):
     title = models.CharField(max_length=500)
     content = models.TextField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    wrapp_img = models.ImageField(upload_to='post_img/', null=True)
+    wrapp_img = models.ImageField(upload_to='post_img/', null=True, blank=True)
     cut_img = models.CharField(max_length=255, default='Без темы')
     pub_date = models.DateTimeField(default=timezone.now)
     status = models.TextField(default="published", choices=[("draft","Одобрено"),
@@ -19,8 +19,8 @@ class Post(models.Model):
     views_count = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment_count = models.IntegerField(default=0)
-    liked_by = models.ManyToManyField(User, related_name="liked_by")
-    bookmark_user = models.ManyToManyField(User, related_name="bookmarks")
+    liked_by = models.ManyToManyField(User, related_name="liked_by", blank=True)
+    bookmark_user = models.ManyToManyField(User, related_name="bookmarks", blank=True)
 
     def __str__(self):
         return self.title
@@ -43,8 +43,11 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(default=timezone.now)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    liked_by = models.ManyToManyField(User, related_name="likedBy", default='none')
+    liked_by = models.ManyToManyField(User, related_name="likedBy", blank=True)
     reply_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.description
 
     def update_reply_count(self):
         self.reply_count = self.replies.count()
@@ -56,7 +59,7 @@ class ReplyComment(models.Model):
     description = models.CharField(max_length=2000)
     pub_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reply_user')
-    liked_by = models.ManyToManyField(User, default='none', related_name='reply_liked_by')
+    liked_by = models.ManyToManyField(User, related_name='reply_liked_by', blank=True)
 
 class Category(models.Model):
     followers = models.ManyToManyField(CustomUser, related_name="category_follows", blank=True)

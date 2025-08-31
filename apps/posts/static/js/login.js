@@ -1,8 +1,8 @@
 async function loginHandler() {
     const login = document.querySelector('.username-form')
     const password = document.querySelector('.password-form')
-
     const BASE_URL = window.location.origin
+
     if (login.value === '' || password.value === '') {
         const error = document.querySelector('.error-message')
         const errorData = document.querySelector('.error-data')
@@ -21,8 +21,7 @@ async function loginHandler() {
         })
         const data = await request.json()
         if (request.status === 200) {
-            localStorage.setItem('access', data.access)
-            localStorage.setItem('refresh', data.refresh)
+            localStorage.setItem('isLoggingOut', false)
             window.location.href = '/'
         } else {
             const error = document.querySelector('.error-message')
@@ -50,9 +49,19 @@ document.getElementById("login-second-button").addEventListener('click', () => {
 })
 
 async function logout() {
-    const request = await fetch('http://127.0.0.1:8000/users/logout/')
-    window.location.href = '/'
+    const BASE_URL = window.location.origin
+
+    const request = await fetch(`${BASE_URL}/users/logout/`, {
+        method: 'POST',
+        credentials: 'include',
+        cache: 'reload',
+        headers: {
+            'X-CSRFToken': window.csrfToken,
+        }
+    })
     localStorage.clear()
+    localStorage.setItem('isLoggingOut', true)
+    window.location.href = '/'
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,7 +85,6 @@ async function registerHandler() {
     document.querySelector('.reg-password2-error').textContent = ''
 
     const BASE_URL = window.location.origin
-    console.log(data)
     if (data.includes('')) {
         const error = document.querySelector('.reg_error-message')
         const errorData = document.querySelector('.reg_error-data')
@@ -96,10 +104,11 @@ async function registerHandler() {
                 'password2': password2.value,
             })
         })
+
         const data = await request.json()
+
         if (request.status === 200) {
-            localStorage.setItem('access', data.access)
-            localStorage.setItem('refresh', data.refresh)
+            localStorage.setItem('isLoggingOut', false)
             window.location.href = '/'
         } else {
             for (let i in data.error) {

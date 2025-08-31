@@ -7,9 +7,9 @@ from apps.posts.models import Post, Comment, ReplyComment
 from apps.users.models import Notifications
 
 
-def create_comment(request, pk):
+def create_comment(request, post_pk):
     request_comment = request.data.get('comment')
-    post = get_object_or_404(Post, id=pk)
+    post = get_object_or_404(Post, id=post_pk)
     comment = Comment.objects.create(
         post=post,
         description=request_comment,
@@ -34,10 +34,10 @@ def delete_comment(request, comment_pk):
                         status=status.HTTP_403_FORBIDDEN)
     comment.delete()
 
-def set_comment_like(request, post_pk, comment_pk):
+def set_comment_like(request, comment_pk):
     comment_type = request.GET.get('type')
     if comment_type == 'common':
-        comment = get_object_or_404(Comment, post=post_pk, id=comment_pk)
+        comment = get_object_or_404(Comment, id=comment_pk)
     else:
         comment = get_object_or_404(ReplyComment, id=comment_pk)
 
@@ -46,17 +46,8 @@ def set_comment_like(request, post_pk, comment_pk):
     else:
         comment.liked_by.add(request.user)
 
-        if request.user != comment.user:
-            post = get_object_or_404(Post, id=post_pk)
-
-            notification = Notifications.objects.create(
-                user=comment.user,
-                message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим <a href="/home/post/{post.id}/#comment-item-{comment.id}">комментарием</a>'
-            )
-
     cache.delete(f'comment_{comment_pk}')
     comment.save()
-
     return comment
 
 
@@ -80,6 +71,7 @@ def create_reply_comment(request):
         user=request.user,
     )
     reply_comment.save()
+    parent.update_reply_count()
 
     notification = Notifications.objects.create(
         user=parent.user,
@@ -88,9 +80,11 @@ def create_reply_comment(request):
 
     return reply_comment
 
-def delete_reply_comment(request, comment_pk):
+def delete_reply_comment(request, comment_pk, parent_pk):
+    parent = get_object_or_404(Comment, id=parent_pk)
     comment = get_object_or_404(ReplyComment, id=comment_pk)
     if request.user != comment.user:
         return Response({'detail': 'Вы не являетесь автором комментария.'},
                         status=status.HTTP_403_FORBIDDEN)
     comment.delete()
+    parent.update_reply_count()

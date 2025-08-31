@@ -47,15 +47,15 @@ def add_bookmark(request, pk):
     post.save()
 
 
-def get_cached_data(request, model, queryset, page, serializer_class, paginated_response):
-    cache_key = f'{model}{request.get_full_path().replace('/', '_')
+def get_cached_data(request, prefix, queryset, page, serializer_class, paginated_response):
+    cache_key = f'{prefix}{request.get_full_path().replace('/', '_')
                 .replace('?', '_')
                 .replace('&', '_')
                 .replace('=', '_')}'
 
-    keys = cache.get(f'{model}_cache_keys') or set()
+    keys = cache.get(f'{prefix}_cache_keys') or set()
     keys.add(cache_key)
-    cache.set(f'{model}_cache_keys', keys, None)
+    cache.set(f'{prefix}_cache_keys', keys, None)
     data = cache.get(cache_key)
     if data:
         print(cache_key)
@@ -68,5 +68,11 @@ def get_cached_data(request, model, queryset, page, serializer_class, paginated_
         serializer = serializer_class(instance=queryset, many=True, context={'request': request})
         data = serializer.data
     cache.set(cache_key, data, 60 * 2)
-    print('db')
-    return serializer.data
+    return data
+
+
+def clear_cache(prefix):
+    keys = cache.get(f'{prefix}_cache_keys') or set()
+    for key in keys:
+        cache.delete(key)
+    cache.delete(f'{prefix}_cache_keys')

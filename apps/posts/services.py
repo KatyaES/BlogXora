@@ -4,42 +4,41 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
+from rest_framework import status
 
 from apps.posts.forms import PostForm, CommentForm
 from apps.posts.models import Category, Comment, ReplyComment, Post
 
 
 def create_post(request):
-    if request.method == "POST":
-        title = request.POST.get('title')
-        content = request.POST.get('content')
-        cat = request.POST.get('theme').strip()
-        category = Category.objects.filter(name=cat).first()
-        wrapp_img = request.FILES.get('wrapp_img')
-        pub_date = timezone.now()
-        cut_img = request.POST.get('cut_img')
+    title = request.POST.get('title')
+    content = request.POST.get('content')
+    cat = request.POST.get('theme').strip()
+    category = Category.objects.filter(cat_title=cat).first()
+    wrapp_img = request.FILES.get('wrapp_img')
+    pub_date = timezone.now()
+    cut_img = request.POST.get('cut_img')
+    print(wrapp_img)
 
-        form = PostForm(
-            data= {
-                'title': title,
-                'content': content,
-                'category': category.id if category else None,
-                'pub_date': pub_date,
-                'cut_img': cut_img,
-                },
-                files= {
-                    'wrapp_img': wrapp_img,
-                }
-            )
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.save()
-            return HttpResponse(status=204)
-        else:
-            return HttpResponse(status=400)
+    form = PostForm(
+        data= {
+            'title': title,
+            'content': content,
+            'category': category.id if category else None,
+            'pub_date': pub_date,
+            'cut_img': cut_img,
+            },
+            files= {
+                'wrapp_img': wrapp_img,
+            }
+        )
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.user = request.user
+        post.save()
+        return HttpResponse(status=status.HTTP_201_CREATED)
     else:
-        return render(request, "posts/add_post.html")
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
 def add_comment(request, pk):

@@ -20,17 +20,22 @@ from django.urls import path, include
 from django.conf.urls.static import static
 
 import config
-from apps.api.v1.frontend_api import CommentApiView
+from apps.users import views
 from config import settings
-from apps.posts.views import index
+from apps.posts.views import index, add_post, category_page, post_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('users/', include('apps.users.urls')),
-    path('home/', include("apps.posts.urls")),
+
+    path("add_post/", add_post, name="add_post"),
+    path("category/", category_page, name="category"),
+    path("post/<int:pk>/", post_detail, name="post_detail"),
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('api-auth/', CommentApiView.as_view()),
+
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    # path('api-auth/', CommentViewSet.as_view({'get': 'retrieve', ''})),
     path('frontend_api/v1/', include('apps.api.v1.frontend_urls')),
     path('api/v1/', include('apps.api.v1.public_urls')),
 ]

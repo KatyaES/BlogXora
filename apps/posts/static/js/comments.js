@@ -2,23 +2,22 @@ async function sendComment(div) {
 	const comment = document.querySelector('.comment-input')
 	const postId = div.getAttribute('data-id')
 
-	const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+	const status = await window.checkToken()
     const BASE_URL = window.location.origin
 
     if (comment.value) {
-        if (token) {
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                'comment':comment.value,
-            })
+        if (status) {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    'comment': comment.value,
+                    'post': postId,
+                })
             })
 
             const data = await request.json()
@@ -55,155 +54,98 @@ async function sendComment(div) {
 
             const commentsCont = document.querySelector('.comments')
             commentsCont.insertAdjacentHTML('beforeend', newComment)
-        } else {alert('Что бы оставить комментарий нужно войти в аккаунт')}
+        }
     }
 }
 
 
-async function setCommentLike(div) {
-	const id = div.getAttribute("data-id");
-	let likesCount = ''
-	const commentType = div.getAttribute("data-type")
-
-    if (commentType === 'common') {
-        likesCount = document.getElementById(`comment_likes-count-${id}`);
-    } else {
-        likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
-    }
-
-	const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
-
-	const BASE_URL = window.location.origin
-
-
-	try {
-	    if (token) {
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${commentType}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({})
-            })
-
-            const data = await request.json()
-
-            likesCount.textContent = data.likes;
-
-            let before = ''
-            if (commentType === 'reply') {before = 'reply-'}
-            if (data.liked) {
-                div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
-                void likesCount.offsetWidth
-                likesCount.classList.add('dellikeanimate');
-            } else {
-                div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
-                void likesCount.offsetWidth
-                likesCount.classList.add('setlikeanimate');
-            }
-	    } else { alert('Для этого действия нужно авторизоваться')}
-
-	} catch (error) {
-        console.log(error);
-    }
-}
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken(false)
 
     const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
     const replyWrapper = document.querySelectorAll(".reply-comment_like-wrapper")
     const BASE_URL = window.location.origin
 
-    for (const img of imgWrapper) {
-        const id = img.getAttribute("data-id");
-        const type = img.getAttribute('data-type')
-        const likesCount = document.getElementById(`comment_likes-count-${id}`);
+    if (status) {
+        for (const img of imgWrapper) {
+            const id = img.getAttribute("data-id");
+            const type = img.getAttribute('data-type')
+            const likesCount = document.getElementById(`comment_likes-count-${id}`);
 
+            try {
+                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
 
-        try {
-            const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${type}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
-
-            if (data.is_authenticated) {
-                if (data.liked) {
-                    img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                    void likesCount.offsetWidth; // Принудительная перерисовка
-                    likesCount.classList.add('dellikeanimate');
+                if (data.is_authenticated) {
+                    if (data.liked) {
+                        img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('dellikeanimate');
+                    } else {
+                        img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('setlikeanimate');
+                    }
                 } else {
                     img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
                     likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                     void likesCount.offsetWidth; // Принудительная перерисовка
                     likesCount.classList.add('setlikeanimate');
                 }
-            } else {
-                img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
-                likesCount.classList.add('setlikeanimate');
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
         }
-    }
-    //reply below
-    for (const img of replyWrapper) {
-        const token = localStorage.getItem('access')
-        const refresh = localStorage.getItem('refresh')
+        //reply below
+        for (const img of replyWrapper) {
+            const id = img.getAttribute("data-id");
+            const type = img.getAttribute('data-type')
+            const likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
 
-        const id = img.getAttribute("data-id");
-        const type = img.getAttribute('data-type')
-        const likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
-        const BASE_URL = window.location.origin
+            try {
+                if (status) {
+                    const response = await fetch(`${BASE_URL}/frontend_api/v1/reply_comments/${id}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    const data = await response.json();
 
-        try {
-            if (token) {
-                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${postID}/${id}/like/?type=${type}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-
-                if (data.is_authenticated) {
-                    if (data.liked) {
-                        img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
-                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                        void likesCount.offsetWidth; // Принудительная перерисовка
-                        likesCount.classList.add('dellikeanimate');
+                    if (data.is_authenticated) {
+                        if (data.liked) {
+                            img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
+                            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                            void likesCount.offsetWidth; // Принудительная перерисовка
+                            likesCount.classList.add('dellikeanimate');
+                        } else {
+                            img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                            void likesCount.offsetWidth; // Принудительная перерисовка
+                            likesCount.classList.add('setlikeanimate');
+                        }
                     } else {
                         img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
                         likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                         void likesCount.offsetWidth; // Принудительная перерисовка
                         likesCount.classList.add('setlikeanimate');
                     }
-                } else {
-                    img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                    void likesCount.offsetWidth; // Принудительная перерисовка
-                    likesCount.classList.add('setlikeanimate');
                 }
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
         }
     }
-
 })
 
 
@@ -236,21 +178,20 @@ async function commentReply(span) {
 
 async function replySendComment(div) {
     const postId = div.getAttribute('data-field-id')
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken()
     const id = div.getAttribute('data-id')
     const commentId = div.getAttribute('data-key')
     const comment = document.getElementById(`reply_comment-input-${commentId}`)
     const BASE_URL = window.location.origin
 
     if (comment.value) {
-        if (token) {
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/reply-comments/`, {
+        if (status) {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/reply_comments/`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'Authorization': `Bearer ${token}`,
+                    'X-CSRFToken': window.csrfToken,
                 },
                 body: JSON.stringify({
                     'comment':comment.value,
@@ -292,7 +233,7 @@ async function replySendComment(div) {
 
             commentCont.insertAdjacentHTML('beforeend', newComment)
 
-        } else {alert('Что бы оставить комментарий войдите в акканут')}
+        }
     }
 }
 
@@ -302,29 +243,33 @@ async function commentDelete(span) {
     const postId = span.getAttribute('data-id')
     const id = span.getAttribute('data-key')
     let commentsCont = document.querySelector('.comments')
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken()
     const BASE_URL = window.location.origin
 
-    if (token) {
-        const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/delete/`, {
+    if (status) {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/`, {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-                'Authorization': `Bearer ${token}`
-            }
+                'X-CSRFToken': window.csrfToken,
+            },
+            body: JSON.stringify({
+                'pk': id
+            })
         })
 
-        if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
-        } else { commentsCont = document.querySelector('.comments') }
+        if (type === 'reply') {
+            commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
+        } else {
+            commentsCont = document.querySelector('.comments')
+        }
         if (request.status === 204) {
             const successMessage = document.createElement('div')
             successMessage.innerText = 'Комментарий удален'
             successMessage.style.color = 'var(--main-color)'
             const delComment = document.getElementById(`comment-item-${id}`)
             commentsCont.replaceChild(successMessage, delComment)
-
         }
     }
 }
@@ -336,32 +281,36 @@ async function ReplyCommentDelete(span) {
     const postId = span.getAttribute('data-id')
     const id = span.getAttribute('data-key')
     let commentsCont = document.querySelector('.comments')
-    const token = localStorage.getItem('access')
-    const refresh = localStorage.getItem('refresh')
+    const status = await window.checkToken()
     const BASE_URL = window.location.origin
 
 
-    if (token) {
-        const request = await fetch(`${BASE_URL}/frontend_api/v1/reply-comments/${id}/delete/`, {
+    if (status) {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/reply_comments/${id}`, {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-                'Authorization': `Bearer ${token}`
-            }
+                'X-CSRFToken': window.csrfToken,
+            },
+            body: JSON.stringify({
+                'parent_pk': commentId
+            })
         })
 
-        if (type === 'reply') { commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
-        } else { commentsCont = document.querySelector('.comments') }
+        if (type === 'reply') {
+            commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
+        } else {
+            commentsCont = document.querySelector('.comments')
+        }
         if (request.status === 204) {
             const successMessage = document.createElement('div')
             successMessage.innerText = 'Комментарий удален'
             successMessage.style.color = 'var(--main-color)'
             const delComment = document.getElementById(`comment-item-${id}`)
-            console.log('del comment: ', delComment, id)
             commentsCont.replaceChild(successMessage, delComment)
-
         }
     }
 }
+
 

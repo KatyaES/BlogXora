@@ -1,4 +1,5 @@
 import json
+from http.client import responses
 
 from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
@@ -31,7 +32,10 @@ def register_user(request, email, login, password1, password2):
         subscription, created = Subscription.objects.get_or_create(
             user=user,
         )
-        return JsonResponse({'access': str(refresh.access_token), 'refresh': str(refresh)}, status=200)
+        response = JsonResponse({'detail': 'Logged in'})
+        response.set_cookie('access_token', str(refresh.access_token), httponly=True, secure=True)
+        response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+        return response
     else:
         return JsonResponse({'error': form.errors}, status=400)
 
@@ -61,7 +65,10 @@ def login_user(request):
     if isinstance(user, User):
         auth.login(request, user)
         refresh = RefreshToken.for_user(user)
-        return JsonResponse({'access': str(refresh.access_token), 'refresh': str(refresh)}, status=200)
+        response = JsonResponse({'detail':'Logged in'})
+        response.set_cookie('access_token', str(refresh.access_token), httponly=True, secure=True)
+        response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+        return response
     elif isinstance(user, dict):
         return JsonResponse(user, status=400)
     return HttpResponse(status=204)
@@ -120,7 +127,7 @@ def change_data(request, username, email, bio):
 
 
 def add_or_remove_followers(request, theme):
-    category = get_object_or_404(Category, name=theme)
+    category = get_object_or_404(Category, cat_title=theme)
 
     if request.user not in category.followers.all():
         category.followers.add(request.user)

@@ -35,68 +35,6 @@
                     </div>
                 </div>
                 <img src="/media/icons/bad-search-img.png" alt="" class="bad-search-img">
-                {% for post in posts %}
-                    <div class="post-wrapper" id="post-{{ post.id }}">
-                        <div class="posts">
-                            <div class="user-photo-name">
-                                <div class="user">
-                                    <img src="{{ post.user.image.url }}">
-                                    <div class="name-and-date-category">
-                                        <div class="username-and-follows">
-                                            <div class="username">
-                                                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
-                                                <span style="color: gray;">{{ post.pub_date|smart_time }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% if request.user != post.user %}
-                                    <div class="follow-btn" onclick="followFunc(this)" data-id="{{ post.user.id }}">Подписаться</div>
-                                {% endif %}
-                            </div>
-                            <br>
-                            <a href="{% url 'category' %}?theme={{ post.category }}" class="post_category">{{ post.category }}</a>
-                            <br>
-                            <br>
-                            <div class="title">
-                                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                            </div>
-                            <div class="ql-editor">
-                                {% if post.wrapp_img %}
-                                   <img src="{{ post.wrapp_img.url }}" alt="" class="wrapp_img">
-                                {% endif %}
-                                <p>{{ post.content|split_content|safe }}</p>
-                            </div>
-                            <div class="detail-button">
-                                <a href="{% url 'post_detail' post.id %}#top">Читать далее</a>
-                            </div>
-                            <div class="icon-cont">
-                                <div class="post-reactions">
-                                    <div class="like-wrapper" id="wrapper-id" onclick="func(this)" data-id="{{ post.id }}">
-                                        <img src="/media/icons/hart.png" class="heart-img" id="like-button">
-                                        <span class="likes-count" id="likes-count-{{ post.id }}">{{ post.liked_by.count }}</span>
-                                    </div>
-                                    <div class="comment-wrapper">
-                                        <a href="{% url 'post_detail' post.id %}">
-                                            <img src="/media/icons/comment.svg" class="comment-img">
-                                        </a>
-                                        <span class="comment-count">{{ post.update_comment_count }}</span>
-                                    </div>
-                                    <div class="bookmark-wrapper" onclick="setBookmark(this)" data-id="{{ post.id }}" data-section="bookmarks">
-                                        <a>
-                                            <img src="/media/icons/bookmark.svg" class="bookmark-img">
-                                        </a>
-                                        <span class="bookmark-count" id="bookmark-count-{{ post.id }}">{{ post.bookmark_user.count }}</span>
-                                    </div>
-                                </div>
-                                <div class="view-wrapper">
-                                    <img src="/media/icons/view.svg" class="views-img">
-                                    <span class="views-count">{{ post.views_count }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
             </div>
             <div class="popular-and-random">
                 {% if request.user.is_authenticated %}

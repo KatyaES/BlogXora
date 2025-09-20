@@ -58,96 +58,25 @@ async function setFilter(element) {
 }
 
 async function getFilterPosts(element) {
-    const user = element.getAttribute('datatype')
-    const id = element.getAttribute('data-id')
-    const BASE_URL = window.location.origin
+    const theme = getThemeFromUrl()
+    const filter = activeElement.value
+    const params = new URLSearchParams()
+    if (theme) params.set('theme', theme)
+    if (filter) params.set('filter', filter)
 
-    const request = await fetch(`${BASE_URL}/frontend_api/v1/filters/?filter=${activeElement.value}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
+    nextPageUrl = `${BASE_URL}/frontend_api/v1/posts/?${params.toString()}`
+    isLoading = false;
+    postsContainer = document.querySelector('.posts-container')
+    localStorage.setItem('isSearchMode', 'false')
+    const isSearchMode = localStorage.getItem('isSearchMode')
 
-    const data = await request.json()
     const oldPosts = document.querySelectorAll('.post-wrapper')
-
-    const postsContainer = document.querySelector('.posts-container')
 
     if (oldPosts) {
         oldPosts.forEach(post => post.remove())
     }
 
-    const badImg = document.querySelector('.bad-search-img')
-
-    if (badImg) {
-        badImg.style.display = 'none'
-    }
-    for (let i = 0; i < data.length; i++) {
-        const posts = `
-            <div class="post-wrapper">
-                <div class="posts">
-                    <div class="user-photo-name">
-                        <div class="user">
-                            <img src="${data[i].image}">
-                                <div class="name-and-date-category">
-                                    <div class="username">
-                                        <a href="${BASE_URL}/users/profile/${data[i].user}">${data[i].user}</a>
-                                    </div>
-                                    <div class="category-and-date">
-                                        <a href="#">Тема: ${data[i].category}</a>
-                                        <span style="color: gray;">${smart_time(data[i].pub_date)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            ${user !== data[i].user
-                                ? `<div class="follow-btn" onclick="followFunc(this)" data-id="${data[i].user_id}" datatype="${user}">Подписаться</div>`
-                                : ''
-                            }
-                        </div>
-                    <br>
-                    <div class="title">
-                        <a href="/home/post/${data[i].id}/#top">${data[i].title}</a>
-                    </div>
-                    <br>
-                    <div class="ql-editor">
-                        <img src="${data[i].wrapp_img}" alt="">
-                        <p>${splitContent(data[i].content)}</p>
-                    </div>
-                    <div class="detail-button">
-                        <a href="/home/post/${data[i].id}/#top">Читать далее</a>
-                    </div>
-                    <div class="icon-cont">
-                        <div class="post-reactions">
-                            <div class="like-wrapper-${data[i].id}" id="wrapper-id" onclick="func(this)" data-id="${data[i].id}">
-                                <img src="/media/icons/hart.png" class="heart-img" id="like-button">
-                                <span class="likes-count" id="likes-count-${data[i].id}">${data[i].liked_by.length}</span>
-                            </div>
-                            <div class="comment-wrapper">
-                                <a href="/home/post/${data[i].id}/">
-                                    <img src="/media/icons/comment.svg" class="comment-img">
-                                </a>
-                                <span class="comment-count">${data[i].comment_count}</span>
-                            </div>
-                            <div class="bookmark-wrapper" onclick="setBookmark(this)" data-id="${data[i].id}" data-section="bookmarks">
-                                <a>
-                                    <img src="/media/icons/bookmark.svg" class="bookmark-img">
-                                </a>
-                                <span class="bookmark-count" id="bookmark-count-${data[i].id}">${data[i].bookmark_user.length}</span>
-                            </div>
-                        </div>
-                        <div class="view-wrapper">
-                            <img src="/media/icons/view.svg" class="views-img">
-                            <span class="views-count">${data[i].views_count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `
-        postsContainer.insertAdjacentHTML('beforeend', posts)
-    }
-    window.bookmarksUpdate()
-    window.likesUpdate()
+    loadPosts()
 }
 
 function moveArrow() {

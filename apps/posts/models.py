@@ -45,6 +45,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     liked_by = models.ManyToManyField(User, related_name="likedBy", blank=True)
     reply_count = models.IntegerField(default=0)
+    bookmarked_by = models.ManyToManyField(User, related_name='bookmarkedBy', blank=True)
 
     def __str__(self):
         return self.description

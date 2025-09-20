@@ -11,12 +11,29 @@ class CommentSerializer(serializers.ModelSerializer):
     liked_by = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
     is_authenticated = serializers.SerializerMethodField()
+    post = serializers.SerializerMethodField()
+    post_id = serializers.SerializerMethodField()
+    bookmarked_by = serializers.SerializerMethodField()
+    set_bookmark = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = ['description', 'image', 'username', 'pub_date', 'likes',
-                  'liked_by', 'id', 'liked', 'is_authenticated']
+                  'liked_by', 'id', 'liked', 'is_authenticated', 'post', 'post_id',
+                  'bookmarked_by', 'set_bookmark']
 
+    def get_set_bookmark(self, obj):
+        request = self.context.get('request')
+        return obj.bookmarked_by.filter(id=request.user.id).exists()
+
+    def get_bookmarked_by(self, obj):
+        return list(obj.bookmarked_by.values('id', 'username'))
+
+    def get_post_id(self, obj):
+        return obj.post.id
+
+    def get_post(self, obj):
+        return obj.post.title
 
     def get_username(self, obj):
         return obj.user.username

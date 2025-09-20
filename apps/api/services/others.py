@@ -1,5 +1,8 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
+
 from apps.posts.models import Post, Comment, ReplyComment, User
 from apps.users.models import Notifications, Subscription
 
@@ -37,14 +40,23 @@ def add_user_subscription(request, pk):
         return 'remove'
 
 
-def add_bookmark(request, pk):
+def add_post_bookmark(request, pk):
     post = get_object_or_404(Post, id=pk)
     if post.bookmark_user.filter(id=request.user.id).exists():
         post.bookmark_user.remove(request.user)
     else:
         post.bookmark_user.add(request.user)
-    cache.delete(f'mark_{pk}')
     post.save()
+    return post
+
+def add_comment_bookmark(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
+    if comment.bookmarked_by.filter(id=request.user.id).exists():
+        comment.bookmarked_by.remove(request.user)
+    else:
+        comment.bookmarked_by.add(request.user)
+    comment.save()
+    return comment
 
 
 def get_cached_data(request, prefix, queryset, page, serializer_class, paginated_response):

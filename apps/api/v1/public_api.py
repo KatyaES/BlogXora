@@ -82,18 +82,6 @@ class PostsViewSet(viewsets.ModelViewSet):
                                self.get_paginated_response)
         return Response(data)
 
-    def perform_update(self, serializer):
-        clear_cache('posts')
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        clear_cache('posts')
-        instance.delete()
-
-    def perform_create(self, serializer):
-        clear_cache('posts')
-        serializer.save()
-
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
@@ -118,18 +106,6 @@ class CommentsViewSet(viewsets.ModelViewSet):
                                self.get_serializer_class(),
                                self.get_paginated_response)
         return Response(data)
-
-    def perform_update(self, serializer):
-        clear_cache('comments')
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        clear_cache('comments')
-        instance.delete()
-
-    def perform_create(self, serializer):
-        clear_cache('comments')
-        serializer.save()
 
 
 class PostsList(generics.ListAPIView):
@@ -156,20 +132,6 @@ class PostsList(generics.ListAPIView):
                                self.get_paginated_response)
         return Response(data)
 
-    def perform_update(self, serializer):
-        clear_cache('posts')
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        clear_cache('posts')
-        instance.delete()
-
-    def perform_create(self, serializer):
-        clear_cache('posts')
-        serializer.save()
-
-
-
 
 class PostApiView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthor,)
@@ -186,11 +148,3 @@ class PostApiView(generics.RetrieveUpdateDestroyAPIView):
                                self.get_serializer_class(),
                                self.get_paginated_response)
         return Response(data)
-
-    def perform_update(self, serializer):
-        clear_cache('posts')
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        clear_cache('posts')
-        instance.delete()

@@ -46,7 +46,6 @@ def set_comment_like(request, comment_pk):
     else:
         comment.liked_by.add(request.user)
 
-    cache.delete(f'comment_{comment_pk}')
     comment.save()
     return comment
 

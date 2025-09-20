@@ -1,9 +1,6 @@
-first = [1, 2, 3, 4, 4, 4]
-second = [2, 4]
+import random
 
-def func(a, b):
-    return [i for i in a if i not in second]
+computer_set = ['камень', 'ножницы', 'бумага']
 
-
-if __name__ == '__main__':
-    print(func(first, second))
+def start():
+    my_choice = input('камень ножницы или бумага: ')

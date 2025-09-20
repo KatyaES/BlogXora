@@ -14,7 +14,6 @@ def set_post_like(request, pk):
             user=post.user,
             message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим <a href="/home/post/{post.id}/">постом</a>'
         )
-    cache.delete(f'like_{pk}')
     post.save()
     return post
 
@@ -28,6 +27,6 @@ def get_filter_posts(request):
     elif filter_name == 'Обсуждаемое':
         filter_name = '-comment_count'
 
-    posts = Post.objects.filter(status__icontains='draft').order_by(filter_name)
+    posts = Post.objects.filter(status__icontains='draft').order_by(filter_name)[:2]
 
     return posts

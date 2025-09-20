@@ -20,50 +20,18 @@ async function followFunc(div) {
 
         if (response.status === 'add') {
             div.style.background = '#E7E8EA'
+            div.style.border = '1px solid var(--main-border)'
             div.style.color = '#70737B'
             div.style.fontWeight = '600'
             div.textContent = 'Отписаться'
         } else {
-            div.style.background = '#4a90e2'
+            div.style.background = 'var(--main-color)'
             div.style.color = 'white'
+            div.style.border = '1px solid var(--main-color)'
             div.style.fontWeight = ''
             div.textContent = 'Подписаться'
         }
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const followBtn = document.querySelectorAll('.follow-btn')
-
-    const status = await window.checkToken(false)
-    const BASE_URL = window.location.origin
-
-    if (status) {
-        for (const btn of followBtn) {
-            const userId = btn.getAttribute('data-id')
-
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                }
-            })
-
-            const response = await request.json()
-
-            if (response.status === 'subscribed') {
-                btn.style.background = '#E7E8EA'
-                btn.style.color = '#70737B'
-                btn.style.fontWeight = '600'
-                btn.textContent = 'Отписаться'
-            } else {
-                btn.style.background = '#4a90e2'
-                btn.style.color = 'white'
-                btn.style.fontWeight = ''
-                btn.textContent = 'Подписаться'
-            }
-        }
-    }
-})
+window.domFollowFunc()

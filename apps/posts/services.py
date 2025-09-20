@@ -18,7 +18,6 @@ def create_post(request):
     wrapp_img = request.FILES.get('wrapp_img')
     pub_date = timezone.now()
     cut_img = request.POST.get('cut_img')
-    print(wrapp_img)
 
     form = PostForm(
         data= {

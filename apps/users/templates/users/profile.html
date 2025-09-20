@@ -33,63 +33,58 @@
                                 <a href="{% url 'settings' %}" class="add-bio">добавить описание</a>
                             {% endif %}
                         {% else %}
-                        <div class="bio-wrapper" onclick="settings(this)" title="изменить описание">
                             <span>{{ profile_user.bio }}</span>
-                            <img class="pencil-img" src="/media/icons/pencil.svg">
-                        </div>
+                            {% if request.user == profile_user %}
+                                <img class="pencil-img" onclick="settings(this)" src="/media/icons/pencil.svg">
+                            {% endif %}
 
                         {% endif %}
                     </div>
-                    <div class="subs" id="subs-id">
-                        <span>Подписчики {{ profile_user.follower_count }}</span>
-                        <span>Подписки {{ profile_user.following_count }}</span>
-                    </div>
                 </div>
-                <div class="profile_follows">
-                    <div class="followers_wrapper">
-                        <span>Подписчики {{ profile_user.subscription.followers.all|length }}</span>
-                        {% for u in profile_user.subscription.followers.all %}
-                            <div class="follower">
-                                <img src="{{ u.image.url }}" class="follower_image">
-                                <a class="subs_username" href="{% url 'profile' u.username %}">{{ u.username }}</a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="followings_wrapper">
-                        <span>Подписки {{ profile_user.subscription.followings.all|length }}</span>
-                        {% for u in profile_user.subscription.followings.all %}
-                            <div class="following">
-                                <img src="{{ u.image.url }}" class="following_image">
-                                <a class="subs_username" href="{% url 'profile' u.username %}">{{ u.username }}</a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-<!--                {% if request.user == profile_user %}-->
-<!--                    <div class="notifications" id="notification-id">-->
-<!--                        Уведомления-->
-<!--                        <br>-->
-<!--                        {% if not notifications %}-->
-<!--                            <span>Здесь еще нет уведомлений</span>-->
-<!--                        {% else %}-->
-<!--                            {% for message in notifications %}-->
-<!--                                {% if message.is_active %}-->
-<!--                                    <div class="notification-body">-->
-<!--                                        <span>{{ message.message|safe }}</span>-->
-<!--                                        <span class="notification-date">{{ message.date|smart_time }}</span>-->
-<!--                                    </div>-->
-<!--                                {% endif %}-->
-<!--                            {% endfor %}-->
-<!--                        {% endif %}-->
-<!--                    </div>-->
-<!--                {% endif %}-->
                 <div class="profile-header-nav">
-                    <span class="self-profile-posts" onclick="selfPosts(this)" data-id="{{ profile_user }}">Посты</span>
-                    <span onclick="selfBookmarks(this)" data-id="{{ profile_user }}">Закладки</span>
-                    <span onclick="selfSubs(this)" data-id="{{ profile_user }}">Подписки</span>
-                    <span class="self-profile-comments" onclick="selfComments(this)" data-id="{{ profile_user }}" data-auth="{{ request.user }}">Комментарии</span>
+                    <span class="profile-posts" onclick="profilePostsFunc(this)" data-id="{{ profile_user }}">Посты</span>
+                    {% if profile_user == request.user %}
+                        <span class="profile-bookmarks" onclick="profileBookmarksFunc(this)" data-id="{{ profile_user }}">Закладки</span>
+                    {% endif %}
+                    <span class="profile-followings" onclick="profileSubscribesFunc(this)" data-id="{{ profile_user }}">Подписки</span>
+                    <span class="profile-followers" onclick="profileFollowersFunc(this)" data-id="{{ profile_user }}" data-auth="{{ request.user }}">Подписчики</span>
+                    <span class="profile-comments" onclick="profileCommentsFunc(this)" data-id="{{ profile_user }}" data-auth="{{ request.user }}">Комментарии</span>
                 </div>
                 <div class="profile-header-nav-cont"></div>
+                <div class="profile_follows">
+                    <div class="followings_wrapper">
+<!--                        <span>Подписки {{ profile_user.subscription.followings.all|length }}</span>-->
+                        {% for u in profile_user.subscription.followings.all %}
+                            <div class="following">
+                                <div class="username-img-wrapper">
+                                    <img src="{{ u.image.url }}" class="following_image">
+                                    <a class="subs_username" href="{% url 'profile' u.username %}">{{ u.username }}</a>
+                                </div>
+                                {% if request.user.username != u.username %}
+                                    <div class="follow-btn" onclick="followFunc(this)" data-id="{{ u.id }}" datatype="{{ request.user }}">Подписаться</div>
+                                {% else %}
+                                    <span style="color: #808080;">Это вы</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="followers_wrapper">
+<!--                        <span>Подписчики {{ profile_user.subscription.followers.all|length }}</span>-->
+                        {% for u in profile_user.subscription.followers.all %}
+                            <div class="follower">
+                                <div class="username-img-wrapper">
+                                    <img src="{{ u.image.url }}" class="following_image">
+                                    <a class="subs_username" href="{% url 'profile' u.username %}">{{ u.username }}</a>
+                                </div>
+                                {% if request.user.username != u.username %}
+                                    <div class="follow-btn" onclick="followFunc(this)" data-id="{{ u.id }}" datatype="{{ request.user }}">Подписаться</div>
+                                {% else %}
+                                    <span style="color: #808080;">Это вы</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="popular-and-random">
             {% if request.user.is_authenticated %}

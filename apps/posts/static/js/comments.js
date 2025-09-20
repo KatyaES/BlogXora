@@ -39,6 +39,14 @@ async function sendComment(div) {
                             <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
                             <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
                         </div>
+                        <div class="comment_bookmark-wrapper" onclick="setCommentBookmark(this)" data-id="${data.id}" data-section="bookmarks">
+                            <a>
+                                <svg class="comment_bookmark-img" width="24" height="24" viewBox="0 0 24 24">
+                                    <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
+                                </svg>
+                            </a>
+                            <span class="comment_bookmark-count" id="comment_bookmark-count-${data.id}">${data.bookmarked_by.length}</span>
+                        </div>
                         <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
                         ${currentUser == data.username ? `
                         <span class="delete-comment" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${postId}">Удалить</span>
@@ -263,8 +271,13 @@ async function commentDelete(span) {
             commentsCont = document.getElementById(`reply_comment-wrapper-${commentId}`)
         } else {
             commentsCont = document.querySelector('.comments')
+            if (!commentsCont) {
+                console.log('not defined')
+                commentsCont = document.querySelector('.profile-header-nav-cont')
+            }
         }
         if (request.status === 204) {
+            console.log(204)
             const successMessage = document.createElement('div')
             successMessage.innerText = 'Комментарий удален'
             successMessage.style.color = 'var(--main-color)'

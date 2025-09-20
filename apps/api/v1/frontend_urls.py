@@ -3,22 +3,23 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.api.v1.frontend_api import ReplyCommentViewSet, \
-    SearchPostsApiView, \
-    FollowsApiView, BookmarkApiView, GetFilterPostsApiView, GetSelfPosts, GetSelfComments, CommentViewSet, PostViewSet
+    SearchPostsViewSet, \
+    FollowsApiView, GetFilterPostsApiView, GetSelfPosts, GetSelfComments, CommentViewSet, PostViewSet, \
+    GetSelfBookmarks
 from apps.users.views import CookieTokenRefreshView
 
 router = routers.DefaultRouter()
 router.register(r'comments', CommentViewSet, basename='comments')
 router.register(r'reply_comments', ReplyCommentViewSet , basename='reply_comments')
 router.register(r'posts', PostViewSet , basename='posts')
+router.register(r'search', SearchPostsViewSet , basename='search')
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
-    path('search/posts/', SearchPostsApiView.as_view()),
     path('follows/<int:pk>/', FollowsApiView.as_view()),
-    path('bookmarks/<int:pk>/', BookmarkApiView.as_view()),
     path('filters/', GetFilterPostsApiView.as_view()),
     path('<str:username>/posts/', GetSelfPosts.as_view({'get': 'list'})),
     path('<str:username>/comments/', GetSelfComments.as_view({'get': 'list'})),
+    path('<str:username>/bookmarks/', GetSelfBookmarks.as_view({'get': 'list'})),
 ] + router.urls

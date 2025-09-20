@@ -1,3 +1,4 @@
+import json
 from enum import unique
 
 from django.contrib.auth import get_user_model
@@ -11,14 +12,15 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from unicodedata import category
 
 from apps.api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
 from apps.api.services.comments import create_comment, delete_comment, set_comment_like, get_comments, \
     create_reply_comment, delete_reply_comment
-from apps.api.services.others import add_user_subscription, add_bookmark
+from apps.api.services.others import add_user_subscription, add_comment_bookmark, add_post_bookmark
 from apps.api.services.posts import set_post_like, get_filter_posts
 from apps.api.utils.pagination import LargeResultsSetPagination
-from apps.posts.models import Comment, Post, ReplyComment
+from apps.posts.models import Comment, Post, ReplyComment, Category
 from apps.posts.services import create_post
 from apps.users.models import Subscription
 
@@ -42,7 +44,12 @@ class CommentViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def set_like(self, request, pk):
         comment = set_comment_like(request, pk)
+        serializer = CommentSerializer(comment, context={'request': request})
+        return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def set_bookmark(self, request, pk):
+        comment = add_comment_bookmark(request, pk)
         serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
@@ -87,6 +94,12 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get'])
+    def set_bookmark(self, request, pk):
+        queryset = add_post_bookmark(request, pk)
+        serializer = PostSerializer(queryset, context={'request': request})
+        return Response(serializer.data)
+
     def retrieve(self, request, *args, **kwargs):
         """
         Return one post
@@ -103,17 +116,24 @@ class PostViewSet(viewsets.ModelViewSet):
         return create_post(request)
 
     def list(self, request, *args, **kwargs):
-        filter_name = request.GET.get('filter')
-        if filter_name == 'Свежее':
-            filter_name = '-pub_date'
-        elif filter_name == 'Популярное':
-            filter_name = '-views_count'
-        elif filter_name == 'Обсуждаемое':
-            filter_name = '-comment_count'
-        else:
-            filter_name = '-pub_date'
+        """
+        Return list of posts
+        """
+        filter_key = request.GET.get('filter')
+        theme = request.GET.get('theme')
 
-        queryset = Post.objects.order_by(filter_name).distinct()[2:]
+        if filter_key:
+            filter_set = {
+                'Свежее':'pub_date',
+                'Популярное':'views_count',
+                'Обсуждаемое':'comment_count',
+            }
+            filter_name =  filter_set[filter_key]
+            queryset = Post.objects.order_by(filter_name).distinct()
+        elif theme:
+            category = get_object_or_404(Category, cat_title=theme)
+            queryset = Post.objects.filter(category=category.id).distinct()
+        else: queryset = Post.objects.order_by('-pub_date').distinct()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -162,7 +182,8 @@ class ReplyCommentViewSet(viewsets.ModelViewSet):
 
 
 
-class SearchPostsApiView(APIView):
+class SearchPostsViewSet(viewsets.ModelViewSet):
+    pagination_class = LargeResultsSetPagination
     permission_classes = [AllowAny]
 
     def get_renderers(self):
@@ -172,12 +193,14 @@ class SearchPostsApiView(APIView):
             return [BrowsableAPIRenderer()]
         return [JSONRenderer()]
 
-    def get(self, request):
+    def list(self, request, *args, **kwargs):
         query = request.GET.get('query')
-        posts = Post.objects.filter(status__icontains='draft', title__icontains=query)
+        queryset = Post.objects.filter(status__icontains='draft', title__icontains=query)
 
-        serializer = SearchPostSerializer(posts, many=True)
-        return Response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SearchPostSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
 
 
 class FollowsApiView(APIView):
@@ -203,24 +226,6 @@ class FollowsApiView(APIView):
         return Response({'status': 'not subscribed'})
 
 
-class BookmarkApiView(APIView):
-    def get_renderers(self):
-        accept = self.request.META.get('HTTP_ACCEPT', '')
-        if ('text/html' in accept and
-                self.request.user.is_staff):
-            return [BrowsableAPIRenderer()]
-        return [JSONRenderer()]
-
-    def post(self, request, pk):
-        add_bookmark(request, pk)
-
-        return HttpResponse(status=204)
-
-    def get(self, request, pk):
-        post = get_object_or_404(Post, id=pk)
-        serializer = PostSerializer(post, context={'request': request})
-        return Response(serializer.data)
-
 
 class GetFilterPostsApiView(APIView):
     permission_classes = [AllowAny]
@@ -245,6 +250,18 @@ class GetSelfPosts(viewsets.ModelViewSet):
         queryset = Post.objects.filter(user=user)
         serializer = SearchPostSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class GetSelfBookmarks(viewsets.ModelViewSet):
+
+    def list(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        posts_queryset = Post.objects.filter(bookmark_user=user)
+        comments_queryset = Comment.objects.filter(bookmarked_by=user)
+        posts = SearchPostSerializer(posts_queryset, many=True, context={'request': request}).data
+        comments = CommentSerializer(comments_queryset, many=True, context={'request': request}).data
+        return Response({'posts': posts, 'comments': comments})
 
 class GetSelfComments(viewsets.ModelViewSet):
 

@@ -32,21 +32,27 @@ async function loginHandler() {
     }
 }
 
-document.getElementById("second-button").addEventListener('click', () => {
-    const registerCont = document.querySelector('.register')
-    const loginCont = document.querySelector('.login-cont')
+const secondButton = document.getElementById("second-button")
+if (secondButton) {
+    secondButton.addEventListener('click', () => {
+        const registerCont = document.querySelector('.register')
+        const loginCont = document.querySelector('.login-cont')
 
-    registerCont.style.display = 'none'
-    loginCont.style.display = 'flex'
-})
+        registerCont.style.display = 'none'
+        loginCont.style.display = 'flex'
+    })
+}
 
-document.getElementById("login-second-button").addEventListener('click', () => {
-    const registerCont = document.querySelector('.register')
-    const loginCont = document.querySelector('.login-cont')
+const loginSecondButton = document.getElementById("login-second-button")
+if (loginSecondButton) {
+    loginSecondButton.addEventListener('click', () => {
+        const registerCont = document.querySelector('.register')
+        const loginCont = document.querySelector('.login-cont')
 
-    registerCont.style.display = 'flex'
-    loginCont.style.display = 'none'
-})
+        registerCont.style.display = 'flex'
+        loginCont.style.display = 'none'
+    })
+}
 
 async function logout() {
     const BASE_URL = window.location.origin
@@ -64,13 +70,16 @@ async function logout() {
     window.location.href = '/'
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initLoginCont() {
     const registerCont = document.querySelector('.register')
     const loginCont = document.querySelector('.login-cont')
-    registerCont.style.display = 'none'
-    loginCont.style.display = 'flex'
+    if (registerCont) {
+        registerCont.style.display = 'none'
+        loginCont.style.display = 'flex'
+    }
+
     localStorage.removeItem('showLogin')
-})
+}
 
 
 async function registerHandler() {

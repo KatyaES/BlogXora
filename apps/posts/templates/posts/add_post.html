@@ -160,6 +160,12 @@
                 <p>Описание</p>
                 <div class="editor">
                 </div>
+                <div class="post-type-selector">
+                    <div class="post-type_title">Тип публикации</div>
+                    <div class="radio-button" onclick="setPostType(this)">Новость</div>
+                    <div class="radio-button" onclick="setPostType(this)">Статья</div>
+                    <div class="radio-button" onclick="setPostType(this)">Пост</div>
+                </div>
                 <div class="category-and-send">
                     <div class="send-moder-button" id="send-moder" role="button" tabindex="0">
                         <a>Отправить на модерацию</a>
@@ -186,5 +192,4 @@
           theme: 'snow'
         });
     </script>
-    <script src="{% static 'js/add_post.js' %}"></script>
 {% endblock %}

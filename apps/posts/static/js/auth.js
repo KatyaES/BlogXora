@@ -32,4 +32,3 @@ async function checkToken(showAlert = true) {
         return response.status
     }
 }
-window.checkToken = checkToken

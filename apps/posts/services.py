@@ -18,6 +18,8 @@ def create_post(request):
     wrapp_img = request.FILES.get('wrapp_img')
     pub_date = timezone.now()
     cut_img = request.POST.get('cut_img')
+    post_type = request.POST.get('post_type')
+    print('post_type', post_type)
 
     form = PostForm(
         data= {
@@ -26,6 +28,7 @@ def create_post(request):
             'category': category.id if category else None,
             'pub_date': pub_date,
             'cut_img': cut_img,
+            'post_type': post_type,
             },
             files= {
                 'wrapp_img': wrapp_img,
@@ -35,6 +38,7 @@ def create_post(request):
         post = form.save(commit=False)
         post.user = request.user
         post.save()
+        print(post.post_type)
         return HttpResponse(status=status.HTTP_201_CREATED)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)

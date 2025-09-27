@@ -34,16 +34,19 @@ async function themeFollowFunc(span) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initThemeFollows() {
     const followBtn = document.querySelector('.theme_subscribe-btn')
-    const theme = followBtn.getAttribute('datatype')
+    if (followBtn) {
+        const theme = followBtn.getAttribute('datatype')
+        const userId = followBtn.getAttribute('data-id')
+    }
+
     const status = await window.checkToken(false)
 
-    const userId = followBtn.getAttribute('data-id')
 
     const BASE_URL = window.location.origin
 
-    if (status) {
+    if (theme && followBtn && userId && status) {
         const request = await fetch(`${BASE_URL}/users/theme_follows/?theme=${theme}`, {
             method: 'GET',
             credentials: 'include',
@@ -66,4 +69,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             followBtn.textContent = 'Подписаться'
         }
     }
-})
+}

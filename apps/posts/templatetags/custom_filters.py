@@ -7,6 +7,7 @@ register = template.Library()
 
 @register.filter
 def smart_time(datetime):
+    now = timezone.localtime(datetime)
     result = timezone.now() - datetime
     seconds = int(result.total_seconds())
     minutes = seconds // 60
@@ -14,7 +15,7 @@ def smart_time(datetime):
 
 
     if result.days > 0:
-        return date_format(datetime, format="j E Y", use_l10n=True)
+        return date_format(now, format="H:i", use_l10n=True)
 
 
 

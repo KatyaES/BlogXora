@@ -66,8 +66,20 @@ def login_user(request):
         auth.login(request, user)
         refresh = RefreshToken.for_user(user)
         response = JsonResponse({'detail':'Logged in'})
-        response.set_cookie('access_token', str(refresh.access_token), httponly=True, secure=True)
-        response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+        response.set_cookie(
+            'access_token',
+            str(refresh.access_token),
+            httponly=True,
+            secure=True,
+            max_age=360 * 12
+        )
+        response.set_cookie(
+            'refresh_token',
+            str(refresh),
+            httponly=True,
+            secure=True,
+            max_age=3600 * 12 * 7
+        )
         return response
     elif isinstance(user, dict):
         return JsonResponse(user, status=400)

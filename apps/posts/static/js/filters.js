@@ -43,41 +43,18 @@ function smart_time(date) {
 
 
 async function setFilter(element) {
-    const elements = document.querySelectorAll('.item_filter')
-    if (element === activeElement) {
-        element.checked = false
-        activeElement = null
+    const elements = document.querySelectorAll('.filter_radio-button')
+    if (element.classList.contains('selected')) {
+        element.classList.remove('selected')
+        window.postType = null
     } else {
-        elements.forEach(el => {
-            if (el !== element) {
-                el.checked = false
-            }
-        })
-        activeElement = element
+        elements.forEach(el => el.classList.remove('selected'))
+        element.classList.add('selected')
+        window.postFilter = element.textContent
     }
 }
 
-async function getFilterPosts(element) {
-    const theme = getThemeFromUrl()
-    const filter = activeElement.value
-    const params = new URLSearchParams()
-    if (theme) params.set('theme', theme)
-    if (filter) params.set('filter', filter)
 
-    nextPageUrl = `${BASE_URL}/frontend_api/v1/posts/?${params.toString()}`
-    isLoading = false;
-    postsContainer = document.querySelector('.posts-container')
-    localStorage.setItem('isSearchMode', 'false')
-    const isSearchMode = localStorage.getItem('isSearchMode')
-
-    const oldPosts = document.querySelectorAll('.post-wrapper')
-
-    if (oldPosts) {
-        oldPosts.forEach(post => post.remove())
-    }
-
-    loadPosts()
-}
 
 function moveArrow() {
     const lentaButton = document.querySelector('.filter_arrow')

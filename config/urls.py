@@ -29,6 +29,7 @@ urlpatterns = [
     path('', index, name='index'),
     path('users/', include('apps.users.urls')),
 
+    path('settings/', views.profile_settings, name='settings'),
     path("add_post/", add_post, name="add_post"),
     path("category/", category_page, name="category"),
     path("post/<int:pk>/", post_detail, name="post_detail"),

@@ -48,7 +48,7 @@ async function sendComment(div) {
                             <span class="comment_bookmark-count" id="comment_bookmark-count-${data.id}">${data.bookmarked_by.length}</span>
                         </div>
                         <span class="reply" onclick="commentReply(this)" data-id="${data.id}">Ответить</span>
-                        ${currentUser == data.username ? `
+                        ${username == data.username ? `
                         <span class="delete-comment" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${postId}">Удалить</span>
                     ` : ''}
                     </div>
@@ -66,9 +66,70 @@ async function sendComment(div) {
     }
 }
 
+async function initLoadComments() {
+    if (!nextCommentsPageUrl || isLoadingComments) return;
+    isLoadingComments = true
+
+    const response = await fetch(nextCommentsPageUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    const data = await response.json()
+    nextCommentsPageUrl = data.pages.next
+
+    for (let i = 0; i < data.results.length; i++) {
+        const newComment = `
+            <div class="profile_comment-item" id="comment-item-${data.results[i].post_id}">
+                <a href="/post/${data.results[i].post_id}" class="post_of_comment">${data.results[i].post}</a>
+                <div class="comment-item" id="comment-item-${data.results[i].id}">
+                    <div class="comment-head">
+                        <img src="${data.results[i].image}" alt="">
+                        ${username == data.results[i].username ? `
+                        <div class="username_wrapper">
+                            <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.results[i].username}</a></div>` : `${data.results[i].username}`}
+                        <span class="comment_pub-date">только что</span>
+                    </div>
+                    <div class="comment-content">
+                        ${data.results[i].description}
+                    </div>
+                    <div class="comment-reactions">
+                        <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
+                            <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
+                            <span class="comment_likes-count" id="comment_likes-count-${data.results[i].id}">${data.results[i].likes}</span>
+                        </div>
+                        <div class="comment_bookmark-wrapper" onclick="setCommentBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
+                            <a>
+                                <svg class="comment_bookmark-img" width="24" height="24" viewBox="0 0 24 24">
+                                    <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
+                                </svg>
+                            </a>
+                            <span class="comment_bookmark-count" id="comment_bookmark-count-${data.results[i].id}">${data.results[i].bookmarked_by.length}</span>
+                        </div>
+                        ${username == data.results[i].username ? `
+                        <span class="delete-comment" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
+                    ` : ''}
+                    </div>
+                    <div class="reply_comment-wrapper" id="reply_comment-wrapper-${data.results[i].id}">
+                        <textarea class="reply_comment-input" placeholder="Комментарий" id="reply_comment-input-${data.results[i].id}"></textarea>
+                        <div class="reply_send-comment" id="reply_comment-${data.results[i].id}" onclick="replySendComment(this)" data-field-id="${data.results[i].post_id}}" data-key="${data.results[i].id}" data-id="${data.results[i].id}">Отправить</div>
+                    </div>
+                </div>
+            </div>
+        `
+        postsContainer.insertAdjacentHTML('beforeend', newComment)
+
+    }
+    initCommentLikes()
+    initCommentBookmarks()
+    initCommentLikes()
+    initUserFollows();
+    isLoadingComments = false
+}
 
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initCommentLikes() {
     const status = await window.checkToken(false)
 
     const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
@@ -154,7 +215,44 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     }
-})
+}
+
+async function profileCommentsFunc(element) {
+    const user = element.getAttribute('data-id')
+    const BASE_URL = window.location.origin
+    const currentUser = element.getAttribute('data-auth')
+    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
+
+    element.style.backgroundColor = 'rgb(231, 232, 234)'
+    const profileFollows = document.querySelector('.profile_follows')
+    const profilePosts = document.querySelector('.profile-posts')
+    const profileBookmarks = document.querySelector('.profile-bookmarks')
+    const profileFollowings = document.querySelector('.profile-followings')
+    const profileFollowers = document.querySelector('.profile-followers')
+
+    profileFollowings.style.backgroundColor = ''
+    profileFollowers.style.backgroundColor = ''
+    profilePosts.style.backgroundColor = ''
+    if (profileBookmarks) {
+        profileBookmarks.style.backgroundColor = ''
+    }
+    profileFollows.style.display = 'none'
+
+    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_user_comments/${user}`
+    isLoadingComments = false;
+    isLoadingPosts = true;
+    localStorage.setItem('isSearchMode', 'false')
+    postsContainer = profileHeaderNavCont
+
+    const oldComments = document.querySelectorAll('.comment-item')
+
+    if (oldComments) {
+        oldComments.forEach(comment => comment.remove())
+    }
+    profileHeaderNavCont.innerHTML = ''
+
+    initLoadComments()
+}
 
 
 async function commentReply(span) {
@@ -278,10 +376,12 @@ async function commentDelete(span) {
         }
         if (request.status === 204) {
             console.log(204)
+            console.log(commentsCont)
             const successMessage = document.createElement('div')
             successMessage.innerText = 'Комментарий удален'
             successMessage.style.color = 'var(--main-color)'
             const delComment = document.getElementById(`comment-item-${id}`)
+            console.log(delComment)
             commentsCont.replaceChild(successMessage, delComment)
         }
     }
@@ -326,4 +426,141 @@ async function ReplyCommentDelete(span) {
     }
 }
 
+async function setCommentLike(div) {
+	const id = div.getAttribute("data-id");
+	let likesCount = ''
+	const commentType = div.getAttribute("data-type")
 
+    if (commentType === 'common') {
+        likesCount = document.getElementById(`comment_likes-count-${id}`);
+    } else {
+        likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
+    }
+
+	const status = await window.checkToken()
+
+	const BASE_URL = window.location.origin
+
+
+	try {
+	    if (status) {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/set_like/?type=${commentType}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            const data = await request.json()
+
+            likesCount.textContent = data.likes;
+
+            let before = ''
+            if (commentType === 'reply') {before = 'reply-'}
+            if (data.liked) {
+                div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
+                void likesCount.offsetWidth
+                likesCount.classList.add('dellikeanimate');
+            } else {
+                div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
+                likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
+                void likesCount.offsetWidth
+                likesCount.classList.add('setlikeanimate');
+            }
+	    }
+
+	} catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function initCommentLikes() {
+    const status = await window.checkToken(false)
+
+    const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
+    const replyWrapper = document.querySelectorAll(".reply-comment_like-wrapper")
+    const BASE_URL = window.location.origin
+
+    if (status) {
+        for (const img of imgWrapper) {
+            const id = img.getAttribute("data-id");
+            const type = img.getAttribute('data-type')
+            const likesCount = document.getElementById(`comment_likes-count-${id}`);
+
+            try {
+                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+
+                if (data.is_authenticated) {
+                    if (data.liked) {
+                        img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('dellikeanimate');
+                    } else {
+                        img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('setlikeanimate');
+                    }
+                } else {
+                    img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                    void likesCount.offsetWidth; // Принудительная перерисовка
+                    likesCount.classList.add('setlikeanimate');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        //reply below
+        for (const img of replyWrapper) {
+            const id = img.getAttribute("data-id");
+            const type = img.getAttribute('data-type')
+            const likesCount = document.getElementById(`reply_comment_likes-count-${id}`);
+
+            try {
+                if (status) {
+                    const response = await fetch(`${BASE_URL}/frontend_api/v1/reply_comments/${id}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (data.is_authenticated) {
+                        if (data.liked) {
+                            img.classList.replace("reply-comment_like-wrapper", "reply-comment_like-wrapper-liked")
+                            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                            void likesCount.offsetWidth; // Принудительная перерисовка
+                            likesCount.classList.add('dellikeanimate');
+                        } else {
+                            img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                            void likesCount.offsetWidth; // Принудительная перерисовка
+                            likesCount.classList.add('setlikeanimate');
+                        }
+                    } else {
+                        img.classList.replace("reply-comment_like-wrapper-liked", "reply-comment_like-wrapper")
+                        likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+                        void likesCount.offsetWidth; // Принудительная перерисовка
+                        likesCount.classList.add('setlikeanimate');
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+}

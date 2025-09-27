@@ -139,7 +139,7 @@ class SearchPostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['title', 'content', 'category', 'pub_date', 'views_count',
                   'user', 'comment_count', 'liked_by', 'image', 'wrapp_img',
-                  'id', 'user_id', 'bookmark_user']
+                  'id', 'user_id', 'bookmark_user', 'post_type']
 
 
 

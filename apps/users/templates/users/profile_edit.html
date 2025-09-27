@@ -44,11 +44,7 @@
                         <span>Новый пароль</span>
                         <input class="settings_new-password" type="password">
                     </div>
-                    <div class="settings_new-password-2-wrapper">
-                        <span>Новый пароль еще раз</span>
-                        <input class="settings_new-password-2" type="password">
-                    </div>
-                    <div class="error-password-message">Некоректные данные</div>
+                    <div class="error-password-message"></div>
                     <div class="success-message">Данные успешно обновлены</div>
                     <div class="save-password" onclick="changePassword(this)" data-key="{{ request.user.username }}">Сохранить</div>
                 </div>

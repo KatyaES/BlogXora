@@ -26,15 +26,36 @@
                         </div>
                     </div>
                     <div class="filter_buttons_wrapper">
-                        <div class="filter-btns">
-                            <input class="item_filter" type="checkbox" onclick="setFilter(this)" value="Обсуждаемое">Обсуждаемое
-                            <input class="item_filter" type="checkbox" onclick="setFilter(this)" value="Популярное">Популярное
-                            <input class="item_filter" type="checkbox" onclick="setFilter(this)" value="Свежее">Свежее
+                        <div class="post-type_title">Тип публикации</div>
+                        <div class="post-type_wrapper">
+                            <div class="radio-button" onclick="setPostType(this)">Новость</div>
+                            <div class="radio-button" onclick="setPostType(this)">Статья</div>
+                            <div class="radio-button" onclick="setPostType(this)">Пост</div>
                         </div>
-                        <div class="set_filters-btn" onclick="getFilterPosts(this)" data-id="{{ request.user.id }}" datatype="{{ request.user.username }}">Применить</div>
+                        <div class="post-filter_title">Сортировать</div>
+                        <div class="filter-items_wrapper">
+                            <div class="filter_radio-button" onclick="setFilter(this)">Обсуждаемое</div>
+                            <div class="filter_radio-button" onclick="setFilter(this)">Популярное</div>
+                            <div class="filter_radio-button" onclick="setFilter(this)">Свежее</div>
+                        </div>
+
+
+                        <span class="set_filters-btn" onclick="getFilterPosts(this)" data-id="{{ request.user.id }}" datatype="{{ request.user.username }}">Применить</span>
                     </div>
                 </div>
                 <img src="/media/icons/bad-search-img.png" alt="" class="bad-search-img">
+                <div class="news-widget">
+                    {% for post in news_posts %}
+                        <div class="news-block-item">
+                            <a href="{% url 'post_detail' post.id %}" class="news-widget_title">{{ post.title }}</a>
+                            <div class="news-block-item__meta">
+                                <div class="news-widget_date">{{ post.pub_date|smart_time }}</div>
+                                <img src="/media/icons/comment.svg" class="comment-img" onclick="window.location.href='post/{{ post.id }}/'">
+                                <div class="news-widget_comments">{{ post.update_comment_count }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
             <div class="popular-and-random">
                 {% if request.user.is_authenticated %}
@@ -134,7 +155,7 @@
                             <img src="/media/categories/sport.png" alt="">
                             <a href="{% url 'category' %}?theme=Спорт">Спорт</a>
                         </div>
-                        <div class="virt-button" id="virt-button" role="button">
+                        <div class="show-all-themes-button" id="show-all-themes-button" role="button">
                             <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
                             <span>Показать все</span>
                         </div>
@@ -247,5 +268,4 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/domloaded.js' %}"></script>
 {% endblock %}

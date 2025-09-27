@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from django.utils import timezone
+
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
@@ -10,6 +14,8 @@ from .services import create_post, add_comment
 
 def index(request):
     notification_count = Notifications.notification_count(request.user)
+    one_day_ago = timezone.now() - timedelta(days=1)
+    news_posts = Post.objects.filter(post_type='Новость', pub_date__gte=one_day_ago).order_by('?')[:5]
     cache_key = f'random_posts_ids'
     cached_ids = cache.get(cache_key)
     if cached_ids:
@@ -20,7 +26,8 @@ def index(request):
         cache.set(cache_key, random_posts_ids, 1)
     return render(request, "posts/index.html", {
                                                 "random_posts": random_posts,
-                                                "notification_count": notification_count})
+                                                "notification_count": notification_count,
+                                                "news_posts": news_posts})
 
 @login_required
 def add_post(request):

@@ -29,6 +29,12 @@
                 <a class="notification_wrapper" href="{% url 'profile' request.user %}#notifications-id" onclick="notificationFunc()">
                     <img class="bell-img" src="/media/icons/bell.png">
                     <div class="notification-count" style="text-decoration: none;" onclick="notificationFunc()">{{ notification_count }}</div>
+                    <div class="notification_container">
+                        <div class="navbar">
+                            <span>Уведомления</span>
+                        </div>
+                        <span class="notification_message">Admin поставил лайк</span>
+                    </div>
                 </a>
             {% endif %}
             <div class="head-links-cont">
@@ -43,11 +49,17 @@
     {% block body %}
     {% endblock %}
     <script>
-        const postID = '{{ post.id }}'
+        const username = "{{ request.user }}"
+        const BASE_URL = window.location.origin
     </script>
-    <script> window.csrfToken = "{{ csrf_token }}"</script>
+    <script>
+        window.postID = '{{ post.id }}'
+        window.csrfToken = "{{ csrf_token }}"
+        window.currentUser = '{{ request.user }}'
+        window.BASE_URL = window.location.origin
+    </script>
+    <script src="{% static 'js/globals.js' %}"></script>
     <script src="{% static 'js/domloaded.js' %}"></script>
-    <script src="{% static 'js/likes.js' %}"></script>
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/auth.js' %}"></script>
     <script src="{% static 'js/comments.js' %}"></script>
@@ -57,10 +69,7 @@
     <script src="{% static 'js/theme-follows.js' %}"></script>
     <script src="{% static 'js/follows.js' %}"></script>
     <script src="{% static 'js/filters.js' %}"></script>
-    <script>
-        const currentUser = '{{ request.user }}'
-        const username = "{{ request.user }}"
-        const BASE_URL = window.location.origin
-    </script>
+    <script src="{% static 'js/posts.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

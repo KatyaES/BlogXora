@@ -4,8 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.api.v1.frontend_api import ReplyCommentViewSet, \
     SearchPostsViewSet, \
-    FollowsApiView, GetFilterPostsApiView, GetSelfPosts, GetSelfComments, CommentViewSet, PostViewSet, \
-    GetSelfBookmarks
+    FollowsApiView, GetSelfComments, CommentViewSet, PostViewSet
 from apps.users.views import CookieTokenRefreshView
 
 router = routers.DefaultRouter()
@@ -18,8 +17,5 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('follows/<int:pk>/', FollowsApiView.as_view()),
-    path('filters/', GetFilterPostsApiView.as_view()),
-    path('<str:username>/posts/', GetSelfPosts.as_view({'get': 'list'})),
     path('<str:username>/comments/', GetSelfComments.as_view({'get': 'list'})),
-    path('<str:username>/bookmarks/', GetSelfBookmarks.as_view({'get': 'list'})),
 ] + router.urls

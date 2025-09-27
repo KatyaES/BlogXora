@@ -51,16 +51,16 @@ class LogoutView(APIView):
         logout(request)
         response = Response({'detail': 'Successfully logged out.'})
         response.set_cookie(
-            'refresh_token',
+            key='refresh_token',
             path='/',
             secure=True,
             httponly=True,
             samesite='Strict'
         )
-        response.set_cookie(
-            'access_token',
+        response.delete_cookie(
+            key='access_token',
             path='/',
-            httponly=True,
+            domain='http://127.0.0.1:8000/',
             samesite='Strict'
         )
         return response
@@ -87,11 +87,25 @@ class ThemeFollows(APIView):
             return Response({'status': 'subscribed'})
         return Response({'status': 'not subscribed'})
 
-
 class ChangePasswordView(APIView):
 
     def post(self, request):
-        return change_password(request)
+        data = request.data
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+        user = request.user
+        if not user.check_password(old_password):
+            return Response({'error': 'Старый пароль неверный'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            validate_password(new_password,  user=user)
+        except ValidationError as e:
+            return Response({'error': e.messages}, status=400)
+        except Exception as e:
+            return Response({'error': e.messages}, status=400)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'status': 'success'}, status=200)
 
 class ChangeDataView(APIView):
 

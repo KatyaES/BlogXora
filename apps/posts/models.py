@@ -13,6 +13,7 @@ class Post(models.Model):
     wrapp_img = models.ImageField(upload_to='post_img/', null=True, blank=True)
     cut_img = models.CharField(max_length=255, default='Без темы')
     pub_date = models.DateTimeField(default=timezone.now)
+    post_type = models.CharField(max_length=100)
     status = models.TextField(default="published", choices=[("draft","Одобрено"),
                                                             ("published", "На рассмотрении"),
                                                             ("canceled", "Отклонено"),])

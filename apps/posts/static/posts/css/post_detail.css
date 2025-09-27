@@ -233,6 +233,11 @@ textarea.comment-input:focus {
     color: var(--main-color);
 }
 
+.send-comment-wrapper {
+    display: flex;
+    justify-content: right;
+}
+
 .send-comment:hover {
     background-color: var(--main-color);
     color: #ebebeb;

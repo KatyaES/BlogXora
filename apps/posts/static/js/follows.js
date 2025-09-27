@@ -1,4 +1,4 @@
-async function followFunc(div) {
+async function userFollows(div) {
     const userId = div.getAttribute('data-id')
 
     const status = await window.checkToken()
@@ -34,4 +34,40 @@ async function followFunc(div) {
     }
 }
 
-window.domFollowFunc()
+async function initUserFollows() {
+    const followBtn = document.querySelectorAll('.follow-btn')
+
+    const status = await window.checkToken(false)
+    const BASE_URL = window.location.origin
+
+    if (status) {
+        for (const btn of followBtn) {
+            const userId = btn.getAttribute('data-id')
+
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                }
+            })
+
+            const response = await request.json()
+
+            if (response.status === 'subscribed') {
+                btn.style.background = '#E7E8EA'
+                btn.style.border = '1px solid var(--main-border)'
+                btn.style.color = '#70737B'
+                btn.style.fontWeight = '600'
+                btn.textContent = 'Отписаться'
+            } else {
+                btn.style.background = 'var(--main-color)'
+                btn.style.color = 'white'
+                btn.style.border = '1px solid var(--main-color)'
+                btn.style.fontWeight = ''
+                btn.textContent = 'Подписаться'
+            }
+        }
+    }
+}

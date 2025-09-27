@@ -1,5 +1,6 @@
 import json
 from enum import unique
+from pickle import FALSE
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -53,6 +54,26 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='get_my_bookmarks_comments/(?P<username>[^/.]+)')
+    def get_my_bookmarks_comments(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        comments_queryset = Comment.objects.filter(bookmarked_by=user)
+        comment_page = self.paginate_queryset(comments_queryset)
+        if comment_page is not None:
+            comments = CommentSerializer(comment_page, many=True, context={'request': request}).data
+            return self.get_paginated_response(comments)
+
+    @action(detail=False, methods=['get'], url_path='get_user_comments/(?P<username>[^/.]+)', permission_classes=[AllowAny])
+    def get_user_comments(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        comments_queryset = Comment.objects.filter(bookmarked_by=user)
+        comment_page = self.paginate_queryset(comments_queryset)
+        if comment_page is not None:
+            comments = CommentSerializer(comment_page, many=True, context={'request': request}).data
+            return self.get_paginated_response(comments)
+
     def create(self, request, *args, **kwargs):
         post_pk = request.data.get('post')
         comment = create_comment(request, post_pk)
@@ -100,25 +121,44 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(queryset, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def get_filter_queryset(self, request):
+        queryset = get_filter_posts(request)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SearchPostSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='get_user_posts/(?P<username>[^/.]+)', permission_classes=[AllowAny])
+    def get_user_posts(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        queryset = Post.objects.filter(user=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SearchPostSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='get_my_bookmarks_posts/(?P<username>[^/.]+)')
+    def get_my_bookmarks_posts(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        user = get_object_or_404(User, username=username)
+        posts_queryset = Post.objects.filter(bookmark_user=user)
+        post_page = self.paginate_queryset(posts_queryset)
+        if post_page is not None:
+            posts = SearchPostSerializer(post_page, many=True, context={'request': request}).data
+            return self.get_paginated_response(posts)
+
     def retrieve(self, request, *args, **kwargs):
-        """
-        Return one post
-        """
         post_pk = kwargs.get('pk')
         post = get_object_or_404(Post, id=post_pk)
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        """
-        Create post
-        """
         return create_post(request)
 
     def list(self, request, *args, **kwargs):
-        """
-        Return list of posts
-        """
         filter_key = request.GET.get('filter')
         theme = request.GET.get('theme')
 
@@ -195,6 +235,7 @@ class SearchPostsViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         query = request.GET.get('query')
+
         queryset = Post.objects.filter(status__icontains='draft', title__icontains=query)
 
         page = self.paginate_queryset(queryset)
@@ -225,43 +266,6 @@ class FollowsApiView(APIView):
             return Response({'status': 'subscribed'})
         return Response({'status': 'not subscribed'})
 
-
-
-class GetFilterPostsApiView(APIView):
-    permission_classes = [AllowAny]
-    def get_renderers(self):
-        accept = self.request.META.get('HTTP_ACCEPT', '')
-        if ('text/html' in accept and
-                self.request.user.is_staff):
-            return [BrowsableAPIRenderer()]
-        return [JSONRenderer()]
-
-    def get(self, request):
-        posts = get_filter_posts(request)
-        serializer = SearchPostSerializer(posts, many=True, context={'request': request})
-        return Response(serializer.data)
-
-
-class GetSelfPosts(viewsets.ModelViewSet):
-
-    def list(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        user = get_object_or_404(User, username=username)
-        queryset = Post.objects.filter(user=user)
-        serializer = SearchPostSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
-
-
-class GetSelfBookmarks(viewsets.ModelViewSet):
-
-    def list(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        user = get_object_or_404(User, username=username)
-        posts_queryset = Post.objects.filter(bookmark_user=user)
-        comments_queryset = Comment.objects.filter(bookmarked_by=user)
-        posts = SearchPostSerializer(posts_queryset, many=True, context={'request': request}).data
-        comments = CommentSerializer(comments_queryset, many=True, context={'request': request}).data
-        return Response({'posts': posts, 'comments': comments})
 
 class GetSelfComments(viewsets.ModelViewSet):
 

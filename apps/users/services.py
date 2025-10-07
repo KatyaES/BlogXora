@@ -89,13 +89,11 @@ def login_user(request):
 def get_profile_user_data(profile_user):
     return {
         'profile_user': profile_user,
-        'notifications': Notifications.objects.filter(user=profile_user),
         'posts': Post.objects.filter(bookmark_user=profile_user),
         'comments': Comment.objects.filter(user=profile_user),
         'reply_comments': ReplyComment.objects.all(),
         'bookmarks': Post.objects.filter(bookmark_user=profile_user),
         'random_posts': Post.objects.all().order_by('?')[:5],
-        'notification_count': Notifications.notification_count(profile_user)
     }
 
 

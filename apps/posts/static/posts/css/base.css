@@ -4,6 +4,7 @@
     --main-background: #fafafc;
     --main-element-background: #fcfcfc;
     --main-border: #f3f4f5;
+    --main-hover: #ebebeb;
 }
 
 /* header */
@@ -122,6 +123,7 @@ li a:hover {
     align-items: center;
     text-decoration: none;
     justify-content: center;
+    cursor: pointer;
 }
 
 .notification-count {
@@ -143,6 +145,11 @@ li a:hover {
     justify-content: center;
     white-space: nowrap;
 }
+
+.notification-count.hidden {
+    display: none;
+}
+
 .pencil_wrapper {
     display: flex;
     gap: 5px;

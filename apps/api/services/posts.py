@@ -10,10 +10,13 @@ def set_post_like(request, pk):
         post.liked_by.remove(request.user)
     else:
         post.liked_by.add(request.user)
-        notification = Notifications.objects.create(
-            user=post.user,
-            message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим <a href="/home/post/{post.id}/">постом</a>'
-        )
+        if request.user != post.user:
+            notification = Notifications.objects.create(
+                user=post.user,
+                actor=request.user,
+                link=f'/post/{post.id}/',
+                message=f'<div class="notification_message">Пользователь <a href="/users/{request.user}/">{request.user}</a> оценил ваш <a href="/post/{post.id}/">пост</a></div>'
+            )
     post.save()
     return post
 

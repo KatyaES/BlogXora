@@ -11,4 +11,6 @@ admin.site.register(Subscription)
 class ReplyCommentAdmin(admin.ModelAdmin):
 	list_display = ['id', 'username']
 
-admin.site.register(Notifications)
+@admin.register(Notifications)
+class NotificationsAdmin(admin.ModelAdmin):
+	list_display = ['id', 'message', 'user_id', 'actor_id', 'date']

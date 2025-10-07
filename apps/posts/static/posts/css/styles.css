@@ -464,7 +464,7 @@
     cursor: pointer;
 }
 
-.comment-wrapper:hover .comment-count{
+.comment-wrapper:hover .comment-count {
     color: var(--main-color);
     
 }
@@ -474,7 +474,7 @@
 }
 
 .comment-wrapper:hover {
-    background-color: #ebebeb;
+    background-color: var(--main-hover);
 }
 .comment-img {
     width: 17px;
@@ -1323,7 +1323,7 @@ button:first-of-type:hover {
     width: auto;
     height: auto;
     border-radius: 10px;
-    padding: 20px;
+    padding: 20px 20px 0 20px;
     gap: 20px;
 }
 
@@ -1398,18 +1398,17 @@ button:first-of-type:hover {
     width: 100%;
 }
 
-.followers_wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 20px;
-}
 
-.followings_wrapper {
-    display: flex;
+.followings_wrapper, .followers_wrapper {
+    display: none;
     flex-direction: column;
-    width: 100%;
+    min-width: 660px;
+    width: auto;
     gap: 20px;
+    background: var(--main-element-background);
+    border: 1px solid var(--main-border);
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .subs {
@@ -1617,11 +1616,11 @@ button:first-of-type:hover {
 .profile-header-nav {
     display: flex;
     gap: 30px;
+    margin: 10px 0 0 0;
 }
 
 .profile-header-nav span {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 0 15px 0;
     cursor: pointer;
 }
 
@@ -1749,6 +1748,7 @@ button:first-of-type:hover {
 .subs_username {
     text-decoration: none;
     color: #444850;
+    cursor: pointer;
 }
 
 .lenta_base {
@@ -1877,25 +1877,75 @@ button:first-of-type:hover {
 
 .notification_container {
     display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    padding: 20px;
-    width: 370px;
-    height: 100px;
-    background: red;
-
 }
 
 .notification_container.clicked {
     display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0px;
+    width: 370px;
+    height: auto;
+    background: red;
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    background: var(--main-element-background);
+    cursor: initial;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.notification_message {
+.notification-message_wrapper {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    padding: 0;
 }
 
 .navbar {
     display: flex;
+    position: relative;
+    top: 0px;
+    left: 0px;
     justify-content: left;
+    height: auto;
+    width: auto;
+    padding: 15px 20px 10px 20px;
+}
+
+.notification_message {
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.user-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.notification-compact {
+    display: inline-flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.notification-hover:hover {
+    background: var(--main-hover);
+}
+
+.notification-hover {
+    padding: 10px 20px 10px 20px;
+    cursor: pointer;
+}
+
+.notification-compact a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: 500;
+}
+.notification-date {
+    color: #808080;
+    font-size: 13px;
+    margin: 2px 0 0 0;
 }

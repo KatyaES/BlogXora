@@ -15,7 +15,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from unicodedata import category
 
-from apps.api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer
+from apps.api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer, \
+    UserSubscriptionSerializer
 from apps.api.services.comments import create_comment, delete_comment, set_comment_like, get_comments, \
     create_reply_comment, delete_reply_comment
 from apps.api.services.others import add_user_subscription, add_comment_bookmark, add_post_bookmark
@@ -23,7 +24,7 @@ from apps.api.services.posts import set_post_like, get_filter_posts
 from apps.api.utils.pagination import LargeResultsSetPagination
 from apps.posts.models import Comment, Post, ReplyComment, Category
 from apps.posts.services import create_post
-from apps.users.models import Subscription
+from apps.users.models import Subscription, CustomUser
 
 User = get_user_model()
 
@@ -244,7 +245,7 @@ class SearchPostsViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
 
-class FollowsApiView(APIView):
+class SubscriptionViewSet(viewsets.ModelViewSet):
     def get_renderers(self):
         accept = self.request.META.get('HTTP_ACCEPT', '')
         if ('text/html' in accept and
@@ -252,11 +253,19 @@ class FollowsApiView(APIView):
             return [BrowsableAPIRenderer()]
         return [JSONRenderer()]
 
-    def post(self, request, pk):
+    @action(detail=True, methods=['get'])
+    def get_followers(self, request, pk):
+        obj = get_object_or_404(CustomUser, id=pk)
+        serializer = UserSubscriptionSerializer(obj, context={'request': request})
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        pk = request.data.get('user_id')
         result = add_user_subscription(request, pk)
         return Response({'status': result})
 
-    def get(self, request, pk):
+    def retrieve(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
         follower_on = User.objects.get(id=pk)
         subscription, created = Subscription.objects.get_or_create(
             user=follower_on,

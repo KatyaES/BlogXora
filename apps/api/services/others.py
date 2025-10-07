@@ -13,7 +13,7 @@ def add_user_subscription(request, pk):
     subscription, created = Subscription.objects.get_or_create(
         user=follower_on,
     )
-
+    print(request.user)
     if request.user not in subscription.followers.all():
         subscription.followers.add(request.user)
 
@@ -22,10 +22,13 @@ def add_user_subscription(request, pk):
         )
         my_subscription.followings.add(follower_on)
 
-        notification = Notifications.objects.create(
-            user=follower_on,
-            message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> подписался на вас',
-        )
+        if follower_on != request.user:
+            notification = Notifications.objects.create(
+                user=follower_on,
+                actor=request.user,
+                link=f'/users/{request.user}/',
+                message=f'Пользователь <a href="/users/{request.user}/">{request.user}</a> подписался на вас',
+            )
 
         return 'add'
 

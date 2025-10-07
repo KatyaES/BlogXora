@@ -15,15 +15,16 @@ def create_comment(request, post_pk):
         description=request_comment,
         user=request.user,
     )
+    if request.user != post.user:
+        notifications = Notifications.objects.create(
+            user=post.user,
+            actor=request.user,
+            link=f'/post/{post.id}/',
+            message=f'<div class="notification_message">Пользователь <a href="/users/{request.user}/">{request.user}</a> ответил под вашим <a href="/post/{post.id}/">комментарием</a></div>'
+        )
     post.comment_count += 1
     comment.save()
     post.save()
-
-    if request.user != post.user or request.user != comment.user:
-        notification = Notifications.objects.create(
-            user=post.user,
-            message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> оставил комментарий под вашим <a href="/home/post/{post.id}/">постом</a>'
-        )
 
     return comment
 
@@ -45,8 +46,16 @@ def set_comment_like(request, comment_pk):
         comment.liked_by.remove(request.user)
     else:
         comment.liked_by.add(request.user)
-
+        user = comment.user
+        if request.user != comment.user:
+            notifications = Notifications.objects.create (
+                user=user,
+                actor=request.user,
+                link=f'/post/{comment.post.id}/',
+                message=f'<div class="notification_message">Пользователь <a href="/users/{request.user}/">{request.user}</a> оценил ваш <a href="/post/{comment.post.id}/">комментарий</a></div>'
+            )
     comment.save()
+
     return comment
 
 
@@ -71,11 +80,13 @@ def create_reply_comment(request):
     )
     reply_comment.save()
     parent.update_reply_count()
-
-    notification = Notifications.objects.create(
-        user=parent.user,
-        message=f'Пользователь <a href="/users/profile/{request.user}/">{request.user}</a> поставил лайк под вашим комментарием',
-    )
+    if request.user != parent.user:
+        notifications = Notifications.objects.create(
+            user=parent.user,
+            actor=request.user,
+            link=f'/post/{parent.post.id}/',
+            message=f'<div class="notification_message">Пользователь <a href="/users/{request.user}/">{request.user}</a> ответил под вашим <a href="/post/{parent.post.id}/">комментарием</a></div>'
+        )
 
     return reply_comment
 

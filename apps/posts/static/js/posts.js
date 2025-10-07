@@ -222,26 +222,26 @@ async function setPostLike(div) {
 }
 
 async function profilePostsFunc(element) {
-    const user = element.getAttribute('data-id')
-    const BASE_URL = window.location.origin
+    userId = element.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
+    isLoadingComments = false;
+    isLoadingPosts = true;
+    localStorage.setItem('isSearchMode', 'false')
 
-    element.style.backgroundColor = 'rgb(231, 232, 234)'
-    const profileFollows = document.querySelector('.profile_follows')
-    const profileComments = document.querySelector('.profile-comments')
-    const profileBookmarks = document.querySelector('.profile-bookmarks')
-    const profileFollowings = document.querySelector('.profile-followings')
-    const profileFollowers = document.querySelector('.profile-followers')
+    profileHeaderNavCont.innerHTML = ''
+    const profileNavItems = document.querySelectorAll('.profile-nav__item')
+    profileNavItems.forEach(el => {
+        if (el !== element) {
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+        }
+        element.style.borderBottom = '3.5px solid var(--main-color)'
+    })
 
-    profileFollowings.style.backgroundColor = ''
-    profileFollowers.style.backgroundColor = ''
-    profileComments.style.backgroundColor = ''
-    if (profileBookmarks) {
-        profileBookmarks.style.backgroundColor = ''
-    }
-    profileFollows.style.display = 'none'
 
-    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_user_posts/${user}`
+    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_user_posts/${profileUser}`
 
     isLoadingPosts = false;
     postsContainer = profileHeaderNavCont
@@ -257,10 +257,7 @@ async function profilePostsFunc(element) {
 
     initLoadPosts()
     initPostBookmarks()
-    initCommentLikes()
     initPostLikes()
-    initCommentBookmarks()
-    initCommentLikes()
     initUserFollows();
 }
 
@@ -287,11 +284,11 @@ async function getFilterPosts(element) {
 
     initLoadPosts()
 }
+
+
 async function initLoadPosts() {
     if (!nextPostsPageUrl || isLoadingPosts) return;
     isLoadingPosts = true
-    console.log()
-
     const response = await fetch(nextPostsPageUrl, {
         method: 'GET',
         headers: {
@@ -300,7 +297,12 @@ async function initLoadPosts() {
     })
     const data = await response.json()
     nextPostsPageUrl = data.pages.next
+    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
+    if (profileHeaderNavCont) {
+        postsContainer = profileHeaderNavCont
+    }
 
+    console.log(data)
     for (let i = 0; i < data.results.length; i++) {
 
         if (document.getElementById(`post-${data.results[i].id}`)) continue;

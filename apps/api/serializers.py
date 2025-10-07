@@ -133,6 +133,7 @@ class SearchPostSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     wrapp_img = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -142,6 +143,8 @@ class SearchPostSerializer(serializers.ModelSerializer):
                   'id', 'user_id', 'bookmark_user', 'post_type']
 
 
+    def get_comment_count(self, obj):
+        return obj.update_comment_count
 
     def get_user_id(self, obj):
         return obj.user.id
@@ -159,6 +162,26 @@ class SearchPostSerializer(serializers.ModelSerializer):
         if obj.wrapp_img and hasattr(obj.wrapp_img, 'url'):
             return obj.wrapp_img.url
         return None
+
+class UserSubscriptionSerializer(serializers.ModelSerializer):
+    followers = serializers.SerializerMethodField()
+    followings = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'followers', 'followings', 'username']
+
+    def get_followers(self, obj):
+        request = self.context.get('request')
+        return [{'username': object.user.username,
+                 'image': object.user.image.url,
+                 'id': object.user.id} for object in obj.my_followers.all() if object.user != request.user]
+
+    def get_followings(self, obj):
+        request = self.context.get('request')
+        return [{'username': object.user.username,
+                 'image': object.user.image.url,
+                 'id': object.user.id} for object in obj.my_followings.all() if object.user != request.user]
 
 
 class PublicPostsSerializer(serializers.HyperlinkedModelSerializer):

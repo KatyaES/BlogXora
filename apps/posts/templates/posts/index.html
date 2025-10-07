@@ -76,19 +76,19 @@
                                 <a>Администрация</a>
                             </div>
                             {% endif %}
-                            <div class="notifications-cont" onclick="window.location.href = 'users/profile/' + username + '#notification-id'">
-                                <a href="{% url 'profile' request.user %}#notifications-id">Уведомления</a>
+                            <div class="notifications-cont" onclick="window.location.href = `${BASE_URL}/users/{{ request.user }}`">
+                                <a href="{% url 'profile' request.user %}">Уведомления</a>
                             </div>
-                            <div class="subscribes-cont" onclick="window.location.href = 'users/profile/' + username + '#subs-id'">
+                            <div class="subscribes-cont" onclick="window.location.href = 'users/' + username + '#subs-id'">
                                 <a href="{% url 'profile' request.user %}#subscribes-id">Подписки</a>
                             </div>
-                            <div class="bookmarks-cont" onclick="window.location.href = 'users/profile/' + username + '#bookmarks-id'">
-                                <a href="{% url 'profile' request.user %}#bookmarks-id">Закладки</a>
+                            <div class="bookmarks-cont" onclick="profile('{{ request.user.username }}', 'profile-bookmarks')" data-id="{{ request.user }}">
+                                <a href="{% url 'profile' request.user %}">Закладки</a>
                             </div>
-                            <div class="self-posts-cont" onclick="window.location.href = 'users/profile/' + username + '#self-posts-id'">
+                            <div class="self-posts-cont" onclick="window.location.href = 'users/' + username + '#self-posts-id'">
                                 <a href="{% url 'profile' request.user %}#self-posts-id">Посты</a>
                             </div>
-                            <div class="comment-cont" onclick="window.location.href = 'users/profile/' + username + '#comments'">
+                            <div class="comment-cont" onclick="window.location.href = 'users/' + username + '#comments'">
                                 <a href="{% url 'profile' request.user %}#comment">Комментарии</a>
                             </div>
                         </div>

@@ -34,13 +34,18 @@ class CustomUser(AbstractUser):
 
 class Subscription(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)
-    followers = models.ManyToManyField(CustomUser, related_name="my_follows", blank=True)
-    followings = models.ManyToManyField(CustomUser, related_name="my_followings", blank=True)
+    followers = models.ManyToManyField(CustomUser, related_name="my_followings", blank=True)
+    followings = models.ManyToManyField(CustomUser, related_name="my_followers", blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 
 class Notifications(models.Model):
-    user = ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    actor = ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, related_name='notifications_sent')
     message = models.TextField(max_length=500)
+    link = models.TextField(max_length=500, default='none')
     date = models.DateTimeField(default=timezone.now)
 
     def is_active(self):

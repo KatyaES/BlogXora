@@ -26,16 +26,34 @@
                 <img class="pencil-img" src="/media/icons/pencil.svg">
                 Написать</a>
             {% if request.user.is_authenticated %}
-                <a class="notification_wrapper" href="{% url 'profile' request.user %}#notifications-id" onclick="notificationFunc()">
+                <div class="notification_wrapper" onclick="notificationFunc()">
                     <img class="bell-img" src="/media/icons/bell.png">
-                    <div class="notification-count" style="text-decoration: none;" onclick="notificationFunc()">{{ notification_count }}</div>
+                    <div class="notification-count" style="text-decoration: none;">{{ notification_count }}</div>
                     <div class="notification_container">
                         <div class="navbar">
                             <span>Уведомления</span>
                         </div>
-                        <span class="notification_message">Admin поставил лайк</span>
+                        <div class="notification-message_wrapper">
+                            {% for notification in notifications %}
+                                {% if notification.is_active %}
+                                <div class="notification-hover" onclick="window.location.href='{{ notification.link }}'">
+                                    <div class="notification-compact">
+                                        <img src="{{ notification.actor.image.url }}" class="user-img">
+                                        <div>
+                                            {{ notification.message|safe }}
+                                            <div class="notification-date">
+                                                {{ notification.date|smart_time }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
-                </a>
+                </div>
             {% endif %}
             <div class="head-links-cont">
                 {% if user.is_authenticated %}
@@ -49,7 +67,7 @@
     {% block body %}
     {% endblock %}
     <script>
-        const username = "{{ request.user }}"
+        const username = "{{ request.user.username }}"
         const BASE_URL = window.location.origin
     </script>
     <script>

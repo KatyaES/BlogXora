@@ -15,5 +15,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initSettingsPasswordWrapper();
     initThemeFollows();
     initImageUploader(); // 1
-
+    initHiddenNotifications();
 })

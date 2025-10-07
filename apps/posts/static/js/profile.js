@@ -1,6 +1,66 @@
+document.addEventListener('DOMContentLoaded', () => {
+    element = document.getElementById('profile-nav__item_1')
+    profilePostsFunc(element)
+})
+
 async function settings(img) {
     const BASE_URL = window.location.origin
     window.location.href = `${BASE_URL}/settings/`
+}
+
+async function profileBookmarksFunc(element) {
+    const user = element.getAttribute('data-id')
+    const BASE_URL = window.location.origin
+    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
+    profileHeaderNavCont.innerHTML = ''
+    const profileNavItems = document.querySelectorAll('.profile-nav__item')
+    profileNavItems.forEach(el => {
+        if (el !== element) {
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+        }
+        element.style.borderBottom = '3.5px solid var(--main-color)'
+    })
+
+
+
+    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_my_bookmarks_posts/${user}`
+    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_my_bookmarks_comments/${user}`
+    isLoadingPosts = false;
+    isLoadingComments = false;
+    postsContainer = profileHeaderNavCont
+    localStorage.setItem('isSearchMode', 'false')
+    const isSearchMode = localStorage.getItem('isSearchMode')
+
+    const oldPosts = document.querySelectorAll('.post-wrapper')
+
+    if (oldPosts) {
+        oldPosts.forEach(post => post.remove())
+    }
+
+    const oldComments = document.querySelectorAll('.comment-item')
+
+    if (oldComments) {
+        oldComments.forEach(comment => comment.remove())
+    }
+    profileHeaderNavCont.innerHTML = ''
+
+    initPostLikes();
+    initPostBookmarks();
+    initUserFollows();
+    initCommentBookmarks();
+    initCommentLikes();
+}
+
+function profile(username, element=null) {
+    window.location.href = `${BASE_URL}/users/${username}/`
+    if (element) {
+        const profileBookmarks = document.querySelector(`.${element}`)
+        console.log(profileBookmarks)
+        profileBookmarks.addEventListener('click', profileBookmarksFunc)
+    }
 }
 
 function initSettingsPasswordWrapper() {
@@ -129,63 +189,151 @@ function adminRedirect() {
 }
 
 
-function profileFollowersFunc(element) {
-    element.style.backgroundColor = 'rgb(231, 232, 234)'
-
-    const profileFollows = document.querySelector('.profile_follows')
-    const profileFollowersWrapper = document.querySelector('.followers_wrapper')
-    const profileFollowingsWrapper = document.querySelector('.followings_wrapper')
-    const profilePosts = document.querySelector('.profile-posts')
-    const profileBookmarks = document.querySelector('.profile-bookmarks')
-    const profileComments = document.querySelector('.profile-comments')
+async function profileFollowersFunc(element) {
+    userId = element.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
-    const profileFollowings = document.querySelector('.profile-followings')
+    const followersWrapper = document.createElement('div')
+    followersWrapper.classList.add('followers_wrapper')
+    followersWrapper.style.display = 'flex'
+    isLoadingComments = false;
+    isLoadingPosts = true;
+    localStorage.setItem('isSearchMode', 'false')
 
-    profileFollowings.style.backgroundColor = ''
+    profileHeaderNavCont.appendChild(followersWrapper)
     profileHeaderNavCont.innerHTML = ''
-    profilePosts.style.backgroundColor = ''
-    profileComments.style.backgroundColor = ''
-    if (profileBookmarks) {
-        profileBookmarks.style.backgroundColor = ''
+    followersWrapper.innerHTML = ''
+    const profileNavItems = document.querySelectorAll('.profile-nav__item')
+    profileNavItems.forEach(el => {
+        if (el !== element) {
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+        }
+        element.style.borderBottom = '3.5px solid var(--main-color)'
+    })
+
+    postsContainer = profileHeaderNavCont
+
+    const oldSubscriptions = document.querySelectorAll('.follower')
+
+    if (oldSubscriptions) {
+        oldSubscriptions.forEach(subscription => subscription.remove())
+    }
+    profileHeaderNavCont.innerHTML = ''
+
+    const response = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/get_followers`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    const data = await response.json()
+    if (data.followers.length === 0) {
+        followersWrapper.style.display = 'none'
     }
 
+    postsContainer = profileHeaderNavCont
+    for (let i = 0; i < data.followers.length; i++) {
+        const follower = `
+            <div class="follower">
+                <div class="username-img-wrapper">
+                    <img src=${data.followers[i].image} class="following_image">
+                    <a class="subs_username" onclick="profile('${data.followers[i].username}')" >${data.followers[i].username}</a>
+                </div>
+                <div class="follow-btn" onclick="userFollows(this)" data-id="${data.followers[i].id}" datatype="${username}">Подписаться</div>
+            </div>
+        `
+        followersWrapper.insertAdjacentHTML('beforeend', follower)
+    }
+    postsContainer.appendChild(followersWrapper)
+    initUserFollows()
 
-    profileFollowersWrapper.style.display = 'flex'
-    profileFollowingsWrapper.style.display = 'none'
-    profileFollows.style.display = 'flex'
-    window.followFunc()
 }
 
-function profileSubscribesFunc(element) {
-    element.style.backgroundColor = 'rgb(231, 232, 234)'
 
-    const profileFollows = document.querySelector('.profile_follows')
-    const profileFollowersWrapper = document.querySelector('.followers_wrapper')
-    const profileFollowingsWrapper = document.querySelector('.followings_wrapper')
-    const profilePosts = document.querySelector('.profile-posts')
-    const profileComments = document.querySelector('.profile-comments')
-    const profileBookmarks = document.querySelector('.profile-bookmarks')
+async function profileSubscribesFunc(element) {
+    userId = element.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
-    const profileFollowers = document.querySelector('.profile-followers')
+    const followingsWrapper = document.createElement('div')
+    followingsWrapper.classList.add('followings_wrapper')
+    followingsWrapper.style.display = 'flex'
+    isLoadingComments = false;
+    isLoadingPosts = true;
+    localStorage.setItem('isSearchMode', 'false')
 
+    profileHeaderNavCont.appendChild(followingsWrapper)
     profileHeaderNavCont.innerHTML = ''
-    profilePosts.style.backgroundColor = ''
-    profileComments.style.backgroundColor = ''
-    if (profileBookmarks) {
-        profileBookmarks.style.backgroundColor = ''
+    followingsWrapper.innerHTML = ''
+    const profileNavItems = document.querySelectorAll('.profile-nav__item')
+    profileNavItems.forEach(el => {
+        if (el !== element) {
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+        }
+        element.style.borderBottom = '3.5px solid var(--main-color)'
+    })
+
+    postsContainer = profileHeaderNavCont
+
+    const oldSubscriptions = document.querySelectorAll('.following')
+
+    if (oldSubscriptions) {
+        oldSubscriptions.forEach(subscription => subscription.remove())
     }
-    profileFollowers.style.backgroundColor = ''
-    profileFollowersWrapper.style.display = 'none'
-    profileFollowingsWrapper.style.display = 'flex'
-    profileFollows.style.display = 'flex'
+    profileHeaderNavCont.innerHTML = ''
+
+    const response = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/get_followers`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    const data = await response.json()
+    if (data.followings.length === 0) {
+        followingsWrapper.style.display = 'none'
+    }
+    postsContainer = profileHeaderNavCont
+    for (let i = 0; i < data.followings.length; i++) {
+        const following = `
+            <div class="following">
+                <div class="username-img-wrapper">
+                    <img src=${data.followings[i].image} class="following_image">
+                    <a class="subs_username" onclick="profile('${data.followings[i].username}')" >${data.followings[i].username}</a>
+                </div>
+                ${username !== data.followings[i].username
+                    ?`<div class="follow-btn" onclick="userFollows(this)" data-id="${data.followings[i].id}" datatype="${username}">Подписаться</div>`
+                    : ``
+                }
+            </div>
+        `
+        followingsWrapper.insertAdjacentHTML('beforeend', following)
+    }
+    postsContainer.appendChild(followingsWrapper)
     initUserFollows()
 }
 
 function notificationFunc() {
     const notificationContainer = document.querySelector('.notification_container')
+    const notificationCount = document.querySelector('.notification-count')
+    notificationCount.classList.add('hidden')
+    localStorage.setItem('isNotificationCountActive', false)
     if (notificationContainer.classList.contains('clicked')) {
         notificationContainer.classList.remove('clicked')
     } else {
         notificationContainer.classList.add('clicked')
     }
 }
+
+function initHiddenNotifications() {
+    const notificationsState = localStorage.getItem('isNotificationCountActive')
+    const notificationCount = document.querySelector('.notification-count')
+    if (notificationsState === 'false') {
+        notificationCount.classList.add('hidden')
+    } else {
+        notificationCount.classList.remove('hidden')
+    }
+}
+

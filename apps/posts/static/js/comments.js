@@ -223,20 +223,17 @@ async function profileCommentsFunc(element) {
     const currentUser = element.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
 
-    element.style.backgroundColor = 'rgb(231, 232, 234)'
-    const profileFollows = document.querySelector('.profile_follows')
-    const profilePosts = document.querySelector('.profile-posts')
-    const profileBookmarks = document.querySelector('.profile-bookmarks')
-    const profileFollowings = document.querySelector('.profile-followings')
-    const profileFollowers = document.querySelector('.profile-followers')
-
-    profileFollowings.style.backgroundColor = ''
-    profileFollowers.style.backgroundColor = ''
-    profilePosts.style.backgroundColor = ''
-    if (profileBookmarks) {
-        profileBookmarks.style.backgroundColor = ''
-    }
-    profileFollows.style.display = 'none'
+    profileHeaderNavCont.innerHTML = ''
+    const profileNavItems = document.querySelectorAll('.profile-nav__item')
+    profileNavItems.forEach(el => {
+        if (el !== element) {
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+            el.style.borderBottom = ''
+        }
+        element.style.borderBottom = '3.5px solid var(--main-color)'
+    })
 
     nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_user_comments/${user}`
     isLoadingComments = false;

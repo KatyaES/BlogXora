@@ -5,15 +5,17 @@ async function userFollows(div) {
     const BASE_URL = window.location.origin
 
     if (status) {
-        const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
+        const request = await fetch(`${BASE_URL}/frontend_api/v1/subscription/`, {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({
+                'user_id': userId
             })
+        })
 
         const response = await request.json()
 
@@ -44,7 +46,7 @@ async function initUserFollows() {
         for (const btn of followBtn) {
             const userId = btn.getAttribute('data-id')
 
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/follows/${userId}/`, {
+            const request = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

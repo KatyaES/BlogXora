@@ -7,13 +7,59 @@
     --main-hover: #ebebeb;
 }
 
+body {
+    overflow: hidden;
+}
+
 /* header */
+
+.site-header__logo {
+    text-decoration: none;
+    color: black;
+    font-size: 24px;
+    font-weight: 700;
+}
 
 * {
     font-family: "Roboto", sans-serif;
 }
 
-.login-logout {
+.site-header__account-menu {
+    display: none;
+}
+
+.site-header__menu-item-link {
+    font-size: 17px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.site-header__menu-item {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 13px
+}
+
+.site-header__menu-item:hover {
+    background: var(--main-hover);
+}
+
+.site-header__account-menu.clicked {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0px;
+    width: auto;
+    padding: 10px;
+    background: red;
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    background: var(--main-element-background);
+    cursor: initial;
+}
+
+.site-header__login-button {
     display: flex;
     text-decoration: none;
     font-size: 15px;
@@ -26,9 +72,15 @@
     background: var(--main-color);
 }
 
-.logo {
-    text-decoration: none;
-    color: black;
+.user-card {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.user-card__name {
+    font-size: 20px;
+    font-weight: 500;
 }
 
 .main-container {
@@ -65,19 +117,14 @@ header {
     box-sizing: border-box;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.head-links {
+.site-header__actions {
     display: inline-flex;
     gap: 15px;
     align-items: center;
     justify-content: flex-end;
 }
 
-.nav-links li {
+.site-header__actions li {
     display: inline-flex;
     padding: 15px 8px 15px 8px;
     list-style: none;
@@ -93,6 +140,77 @@ li a:hover {
     transition: color 200ms ease ease-out;
 }
 
+/* ===SEARCH=== */
+
+.site-header__search-wrapper {
+    position: relative;
+    width: auto;
+    height: auto;
+}
+
+.site-header__input-search {
+    width: 200px;
+    height: 30px;
+    border: 2px solid var(--main-color);
+    border-radius: 20px;
+    padding-left: 10px;
+    padding-right: 50px;
+    display: flex;
+    outline: none;
+    box-shadow: none;
+    align-items: center;
+}
+
+.site-header__search-img {
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    filter: brightness(0)
+    saturate(100%) invert(57%)
+    sepia(0%) saturate(3187%)
+    hue-rotate(21deg)
+    brightness(92%) contrast(92%);
+}
+
+.site-header__search-img-wrapper {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 25%;
+    right: 15px;
+}
+
+
+.bad-search-img {
+    width: 400px;
+    height: 50%;
+}
+
+.bad-search-img {
+    display: none;
+}
+
+/* ===SEARCH=== */
+
+.site-header__button-add-post {
+    display: flex;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color);
+    width: 100px;
+    height: auto;
+    gap: 5px;
+    padding: 7px;
+    border-radius: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    background: var(--main-element-background);
+}
+
+.site-header__button-add-post:hover {
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+
 .nav-links ul {
     padding: 0;
 }
@@ -102,19 +220,19 @@ li a:hover {
     color: var(--text-color);
 }
 
-.pencil-img {
+.site-header__img-add-post {
     height: 20px;
     width: 20px;
     cursor: pointer;
 }
 
-.bell-img {
+.site-header__img-notifications {
     height: 20px;
     width: 20px;
     cursor: pointer;
 }
 
-.notification_wrapper {
+.site-header__icon-notifications-wrapper {
     position: relative;
     height: 20px;
     width: 30px;
@@ -126,7 +244,7 @@ li a:hover {
     cursor: pointer;
 }
 
-.notification-count {
+.site-header__notifications-count {
     border-radius: 3px;
     width: auto;
     min-width: 16px;
@@ -146,21 +264,85 @@ li a:hover {
     white-space: nowrap;
 }
 
-.notification-count.hidden {
+.site-header__notifications-count.hidden {
     display: none;
 }
 
-.pencil_wrapper {
+.site-header__notification-container {
+    display: none;
+}
+
+.site-header__notification-container.clicked {
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0px;
+    width: 420px;
+    height: auto;
+    background: red;
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    background: var(--main-element-background);
+    cursor: initial;
 }
 
-.pencil_wrapper:hover {
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+.site-header__notifications-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
 }
 
+.site-header__notifications-navbar {
+    display: flex;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    justify-content: left;
+    height: auto;
+    width: auto;
+    padding: 15px 20px 10px 20px;
+}
 
-.head-links-cont {
+.site-header__notification-item-message {
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.site-header__notification-item-user-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.site-header__notification-item-compact {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+}
+
+.site-header__notification-item-hover:hover {
+    background: var(--main-hover);
+}
+
+.site-header__notification-item-hover {
+    padding: 10px 20px 10px 20px;
+    cursor: pointer;
+}
+
+.site-header__notification-item-date {
+    color: #808080;
+    font-size: 13px;
+    margin: 2px 0 0 0;
+}
+
+.site-header__account-button {
     height: auto;
     width: auto;
     display: flex;
@@ -171,26 +353,12 @@ li a:hover {
     position: relative;
 }
 
-.header_user-img {
+.site-header__account-img {
     height: 35px;
     width: 35px;
     border-radius: 50%;
+    object-fit: cover;
 }
-
-.pencil_wrapper {
-    display: flex;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text-color);
-    width: 100px;
-    height: auto;
-    padding: 7px;
-    border-radius: 20px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-    background: var(--main-element-background);
-}
-
 
 .hidden_profile_data {
     display: flex;

@@ -167,7 +167,7 @@ function initScroll() {
     if (showAllThemesButton) {
         showAllThemesButton.addEventListener('click', () => {
             document.getElementById('show-all-themes-button').style.display = 'none'
-            document.getElementById('popular-id').style.height = '1600px'
+            document.getElementById('popular-id').style.height = 'auto'
         })
         window.addEventListener('scroll', () => {
             if (Math.round(window.scrollY) >= 200) {
@@ -221,27 +221,18 @@ async function setPostLike(div) {
 
 }
 
-async function profilePostsFunc(element) {
-    userId = element.getAttribute('data-auth')
+async function profilePostsFunc() {
+    const commentButton = document.getElementById('profile-nav__item_1')
+    userId = commentButton.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     isLoadingComments = false;
     isLoadingPosts = true;
     localStorage.setItem('isSearchMode', 'false')
 
     profileHeaderNavCont.innerHTML = ''
-    const profileNavItems = document.querySelectorAll('.profile-nav__item')
-    profileNavItems.forEach(el => {
-        if (el !== element) {
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-        }
-        element.style.borderBottom = '3.5px solid var(--main-color)'
-    })
+    console.log(currentProfile)
 
-
-    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_user_posts/${profileUser}`
+    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_user_posts/${currentProfile}`
 
     isLoadingPosts = false;
     postsContainer = profileHeaderNavCont
@@ -287,7 +278,7 @@ async function getFilterPosts(element) {
 
 
 async function initLoadPosts() {
-    if (!nextPostsPageUrl || isLoadingPosts) return;
+    if (section && (!nextPostsPageUrl || isLoadingPosts || section === 'comments' || section === 'followers' || section === 'subscribes')) return;
     isLoadingPosts = true
     const response = await fetch(nextPostsPageUrl, {
         method: 'GET',
@@ -296,13 +287,14 @@ async function initLoadPosts() {
         },
     })
     const data = await response.json()
+    console.log(data)
+
     nextPostsPageUrl = data.pages.next
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     if (profileHeaderNavCont) {
         postsContainer = profileHeaderNavCont
     }
 
-    console.log(data)
     for (let i = 0; i < data.results.length; i++) {
 
         if (document.getElementById(`post-${data.results[i].id}`)) continue;
@@ -319,14 +311,14 @@ async function initLoadPosts() {
                                     </div>
                                 </div>
                             </div>
-                            ${username !== data.results[i].user
-                                ? `<div class="follow-btn" onclick="userFollows(this)" data-id="${data.results[i].user_id}" datatype="${username}">Подписаться</div>`
+                            ${currentUser !== data.results[i].user
+                                ? `<div class="follow-btn" onclick="userFollows(this)" data-id="${data.results[i].user_id}" datatype="${currentUser}">Подписаться</div>`
                                 : ''
                             }
                         </div>
                     <br>
                         <div class="post-meta">
-                            <a href="${BASE_URL}/category/?theme=${data.results[i].category}" class="post_category">${data.results[i].category}</a>
+                            <a href="${BASE_URL}/${data.results[i].tag}" class="post_category">${data.results[i].category}</a>
                             <div class="post-type">${data.results[i].post_type}</div>
                         </div>
                     <br>
@@ -343,7 +335,7 @@ async function initLoadPosts() {
                         <p>${splitContent(data.results[i].content)}</p>
                     </div>
                     <div class="detail-button">
-                        <a href="/post/${data.results[i].id}/#top">Читать далее</a>
+                        <a href="/post/${data.results[i].id}/">Читать далее</a>
                     </div>
                     <div class="icon-cont">
                         <div class="post-reactions">
@@ -380,38 +372,53 @@ async function initLoadPosts() {
     isLoadingPosts = false
 }
 
-async function initScrollForPosts() {
+function getThemeFromUrl() {
+    const category = decodeURIComponent(window.location.pathname.split('/')[1])
+    console.log(category)
+    if (category !== 'users') return category;
+}
 
-    if (window.location.pathname.startsWith('/post/')) return;
+async function initScrollForPosts() {
     const theme = getThemeFromUrl()
     const filter = postFilter
     const type = postType
     const params = new URLSearchParams()
-    if (theme) params.set('theme', theme)
+    console.log(theme)
+    console.log(filter)
+    console.log(postType)
+    if (theme) params.set('tag', theme)
     if (filter) params.set('filter', filter)
     if (type) params.set('post_type', postType)
 
     if (window.location.pathname.startsWith('/')) isLoadingPosts = false;
 
     nextPostsPageUrl = `${window.BASE_URL}/frontend_api/v1/posts/?${params.toString()}`
-    nextCommentsPageUrl = `${window.BASE_URL}/frontend_api/v1/posts/?${params.toString()}`
+    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/?post_pk=${postID}`
 
     postsContainer = document.querySelector('.posts-container')
     localStorage.setItem('isSearchMode', 'false')
 
 
     window.addEventListener('scroll', async () => {
+        const moreComments = localStorage.getItem('moreComments')
         const isSearchMode = localStorage.getItem('isSearchMode')
 
         if (isSearchMode === 'false' && window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
             if (!isLoadingPosts) {
+                console.log(1)
                 await initLoadPosts()
             }
-            if (!isLoadingComments) {
+            if (!moreComments && path.startsWith('/post/')) return;
+            if (!isLoadingComments && path.startsWith('/post/') && moreComments === 'true') {
+                await initLoadPostComments()
+            }
+            if (!isLoadingComments && path.endsWith('/comments/')) {
                 await initLoadComments()
             }
 
-        } else if (isSearchMode === 'true' && window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        }
+        if (isSearchMode === 'true' && window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+            console.log(2)
             await searchPosts()
         }
     })
@@ -437,20 +444,11 @@ async function initPostLikes() {
             if (data.is_authenticated) {
                 if (data.liked) {
                     img.classList.replace("like-wrapper", "like-wrapper-liked")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
-                    void likesCount.offsetWidth
-                    likesCount.classList.add('dellikeanimate');
                 } else {
                     img.classList.replace("like-wrapper-liked", "like-wrapper")
-                    likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
-                    void likesCount.offsetWidth
-                    likesCount.classList.add('setlikeanimate');
                 }
             } else {
                 img.classList.replace("like-wrapper-liked", "like-wrapper")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate');
-                void likesCount.offsetWidth;
-                likesCount.classList.add('setlikeanimate');
             }
         }
     }
@@ -458,7 +456,7 @@ async function initPostLikes() {
 
 
 function setPostType(element) {
-    const elements = document.querySelectorAll('.radio-button')
+    const elements = document.querySelectorAll('.filters__type-option')
     if (element.classList.contains('selected')) {
         element.classList.remove('selected')
         window.postType = null

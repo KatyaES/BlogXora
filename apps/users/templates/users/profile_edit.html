@@ -17,6 +17,8 @@
             <div class="profile-edit">
                 <div class="settings_title">Настройки</div>
                 <div class="settings_username-wrapper">
+                    <span>Фото</span>
+                    <input class="settings-photo" type="file">
                     <span>Имя пользователя</span>
                     <input class="settings_username" value="{{ user.username }}">
                     <div class="username_error"></div>
@@ -133,114 +135,18 @@
                 {% endif %}
                 <div id="popular-id" class="popular-cat">
                     <p class="popular-title">Темы</p>
-                        <div class="category-item">
-                            <img src="/media/categories/psychology.png" alt="">
-                            <a href="{% url 'category' %}?theme=Психология">Психология</a>
+                    {% for category in categories %}
+                        {% if forloop.counter == 6 %}
+                            <div class="show-all-themes-button" id="show-all-themes-button" role="button">
+                                <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
+                                <span>Показать все</span>
+                            </div>
+                        {% endif %}
+                        <div class="category-item" onclick="window.location.href = `${BASE_URL}/{{ category.tag }}`">
+                            <img src="{{ category.image.url }}" alt="">
+                            <a href="{% url 'category' category.tag %}">{{ category.cat_title }}</a>
                         </div>
-                        <div class="category-item">
-                            <img src="/media/categories/technologies.png" alt="">
-                            <a href="{% url 'category' %}?theme=Технологии">Технологии</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/offtop.png" alt="">
-                            <a href="{% url 'category' %}?theme=Офтоп">Офтоп</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/travel.png" alt="">
-                            <a href="{% url 'category' %}?theme=Путешествия">Путешествия</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/sport.png" alt="">
-                            <a href="{% url 'category' %}?theme=Спорт">Спорт</a>
-                        </div>
-                        <div class="virt-button" id="virt-button" role="button">
-                            <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
-                            <span>Показать все</span>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/finance.png" alt="">
-                            <a href="{% url 'category' %}?theme=Деньги и инвестиции">Деньги и инвестиции</a>
-                        </div>
-                        <div class="category-item" id="cinema">
-                            <img src="/media/categories/movies.png" alt="">
-                            <a href="{% url 'category' %}?theme=Кино">Кино</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/creation.png" alt="">
-                            <a href="{% url 'category' %}?theme=Творчество">Творчество</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/health.png" alt="">
-                            <a href="{% url 'category' %}?theme=Здоровье">Здоровье</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/games.png" alt="">
-                            <a href="{% url 'category' %}?theme=Игры">Игры</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/history.png" alt="">
-                            <a href="{% url 'category' %}?theme=История">История</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/music.png" alt="">
-                            <a href="{% url 'category' %}?theme=Музыка">Музыка</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/science.png" alt="">
-                            <a href="{% url 'category' %}?theme=Наука">Наука</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/news.png" alt="">
-                            <a href="{% url 'category' %}?theme=Новости">Новости</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/humor.png" alt="">
-                            <a href="{% url 'category' %}?theme=Юмор">Юмор</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/career.png" alt="">
-                            <a href="{% url 'category' %}?theme=Карьера">Карьера</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/development.png" alt="">
-                            <a href="{% url 'category' %}?theme=Разработка">Разработка</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/intresting.png" alt="">
-                            <a href="{% url 'category' %}?theme=А вы знали?">А вы знали?</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/food.png" alt="">
-                            <a href="{% url 'category' %}?theme=Еда">Еда</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/android.png" alt="">
-                            <a href="{% url 'category' %}?theme=Android">Android</a>
-                        </div>
-                        <div class="category-item" href="#">
-                            <img src="/media/categories/apple.png" alt="">
-                            <a href="{% url 'category' %}?theme=Apple">Apple</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/fashion.png" alt="">
-                            <a href="{% url 'category' %}?theme=Мода">Мода</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/education.png" alt="">
-                            <a href="{% url 'category' %}?theme=Образование">Образование</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/ai.png" alt="">
-                            <a href="{% url 'category' %}?theme=Ai">AI</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/thoughts.png" alt="">
-                            <a href="{% url 'category' %}?theme=Размышления">Размышления</a>
-                        </div>
-                        <div class="category-item">
-                            <img src="/media/categories/animal.png" alt="">
-                            <a href="{% url 'category' %}?theme=Животные">Животные</a>
-                        </div>
+                    {% endfor %}
                 </div>
                 <div class="random-posts">
                     <div class="popular-post-p">
@@ -263,4 +169,5 @@
         </div>
     </div>
     <script src="{% static 'js/edit_profile.js' %}"></script>
+
 {% endblock %}

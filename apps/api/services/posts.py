@@ -15,7 +15,7 @@ def set_post_like(request, pk):
                 user=post.user,
                 actor=request.user,
                 link=f'/post/{post.id}/',
-                message=f'<div class="notification_message">Пользователь <a href="/users/{request.user}/">{request.user}</a> оценил ваш <a href="/post/{post.id}/">пост</a></div>'
+                message=f'<div class="site-header__notification-item-message">Пользователь {request.user} оценил ваш пост</div>'
             )
     post.save()
     return post

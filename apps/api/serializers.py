@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.posts.models import Comment, Post, ReplyComment, Category
+from apps.posts.models import Comment, Post, Category
 from apps.users.models import CustomUser
 
 
@@ -55,7 +55,6 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         return request.user.is_authenticated
 
-
 class PostSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
@@ -92,40 +91,6 @@ class PostSerializer(serializers.ModelSerializer):
         return request.user.id
 
 
-class ReplyCommentSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-    liked_by = serializers.SerializerMethodField()
-    liked = serializers.SerializerMethodField()
-    is_authenticated = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ReplyComment
-        fields = ['description', 'image', 'username', 'pub_date', 'likes',
-                  'liked_by', 'id', 'liked', 'is_authenticated']
-
-
-    def get_username(self, obj):
-        return obj.user.username
-
-    def get_image(self, obj):
-        return obj.user.image.url
-
-    def get_likes(self, obj):
-        return obj.liked_by.count()
-
-    def get_liked_by(self, obj):
-        return list(obj.liked_by.values('id', 'username'))
-
-    def get_liked(self, obj):
-        request = self.context.get('request')
-        return obj.liked_by.filter(id=request.user.id).exists()
-
-    def get_is_authenticated(self, obj):
-        request = self.context.get('request')
-        return request.user.is_authenticated
-
 
 class SearchPostSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
@@ -134,17 +99,21 @@ class SearchPostSerializer(serializers.ModelSerializer):
     wrapp_img = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    tag = serializers.SerializerMethodField()
 
 
     class Meta:
         model = Post
         fields = ['title', 'content', 'category', 'pub_date', 'views_count',
                   'user', 'comment_count', 'liked_by', 'image', 'wrapp_img',
-                  'id', 'user_id', 'bookmark_user', 'post_type']
+                  'id', 'user_id', 'bookmark_user', 'post_type', 'tag']
 
 
     def get_comment_count(self, obj):
-        return obj.update_comment_count
+        return obj.comments.count()
+
+    def get_tag(self, obj):
+        return obj.category.tag
 
     def get_user_id(self, obj):
         return obj.user.id
@@ -191,15 +160,10 @@ class PublicPostsSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PublicCommentsSerializer(serializers.HyperlinkedModelSerializer):
-    replies = ReplyCommentSerializer(many=True, read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'description', 'pub_date', 'liked_by', 'replies']
-
-class PublicReplyCommentsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ReplyComment
         fields = '__all__'
+
 
 class PublicCategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

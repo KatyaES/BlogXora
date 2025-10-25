@@ -15,20 +15,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from unicodedata import category
 
-from apps.api.serializers import CommentSerializer, PostSerializer, ReplyCommentSerializer, SearchPostSerializer, \
+from apps.api.serializers import CommentSerializer, PostSerializer, SearchPostSerializer, \
     UserSubscriptionSerializer
-from apps.api.services.comments import create_comment, delete_comment, set_comment_like, get_comments, \
-    create_reply_comment, delete_reply_comment
+from apps.api.services.comments import create_comment, delete_comment, set_comment_like
 from apps.api.services.others import add_user_subscription, add_comment_bookmark, add_post_bookmark
 from apps.api.services.posts import set_post_like, get_filter_posts
-from apps.api.utils.pagination import LargeResultsSetPagination
-from apps.posts.models import Comment, Post, ReplyComment, Category
+from apps.api.utils.pagination import LargeResultsSetPagination, SmallResultsSetPagination
+from apps.posts.models import Comment, Post, Category
 from apps.posts.services import create_post
 from apps.users.models import Subscription, CustomUser
 
 User = get_user_model()
 
 class CommentViewSet(viewsets.ModelViewSet):
+    pagination_class = LargeResultsSetPagination
+
     def get_renderers(self):
         accept = self.request.META.get('HTTP_ACCEPT', '')
         if ('text/html' in accept and
@@ -67,9 +68,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='get_user_comments/(?P<username>[^/.]+)', permission_classes=[AllowAny])
     def get_user_comments(self, request, *args, **kwargs):
+        self.pagination_class = LargeResultsSetPagination
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        comments_queryset = Comment.objects.filter(bookmarked_by=user)
+        comments_queryset = Comment.objects.filter(user=user)
         comment_page = self.paginate_queryset(comments_queryset)
         if comment_page is not None:
             comments = CommentSerializer(comment_page, many=True, context={'request': request}).data
@@ -92,6 +94,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comments, context={'request': request})
         return Response(serializer.data)
 
+    def list(self, request, *args, **kwargs):
+        self.pagination_class = LargeResultsSetPagination
+        post_pk = request.GET.get('post_pk')
+        post = get_object_or_404(Post, pk=post_pk)
+        queryset = Comment.objects.filter(post=post)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = CommentSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     pagination_class = LargeResultsSetPagination
@@ -104,7 +117,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return [JSONRenderer()]
 
     def get_permissions(self):
-        if self.action in ['retrieve', 'list']:
+        if self.action in ['retrieve', 'list', 'get_filter_queryset']:
             return [AllowAny()]
         elif self.action in ['create', 'destroy']:
             return [IsAuthenticated()]
@@ -161,7 +174,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         filter_key = request.GET.get('filter')
-        theme = request.GET.get('theme')
+        tag = request.GET.get('tag')
 
         if filter_key:
             filter_set = {
@@ -171,8 +184,8 @@ class PostViewSet(viewsets.ModelViewSet):
             }
             filter_name =  filter_set[filter_key]
             queryset = Post.objects.order_by(filter_name).distinct()
-        elif theme:
-            category = get_object_or_404(Category, cat_title=theme)
+        elif tag:
+            category = get_object_or_404(Category, tag=tag)
             queryset = Post.objects.filter(category=category.id).distinct()
         else: queryset = Post.objects.order_by('-pub_date').distinct()
 
@@ -180,47 +193,6 @@ class PostViewSet(viewsets.ModelViewSet):
         if page is not None:
             serializer = SearchPostSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
-
-
-class ReplyCommentViewSet(viewsets.ModelViewSet):
-    def get_renderers(self):
-        accept = self.request.META.get('HTTP_ACCEPT', '')
-        if ('text/html' in accept and
-                self.request.user.is_staff):
-            return [BrowsableAPIRenderer()]
-        return [JSONRenderer()]
-
-    def get_permissions(self):
-        if self.action in ['retrieve', 'list']:
-            return [AllowAny()]
-        elif self.action in ['create', 'destroy']:
-            return [IsAuthenticated()]
-        return super().get_permissions()
-
-    @action(detail=True, methods=['get'])
-    def set_like(self, request, pk):
-        comment = set_comment_like(request, pk)
-
-        serializer = CommentSerializer(comment, context={'request': request})
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        comment = create_reply_comment(request)
-        serializer = CommentSerializer(comment, context={'request': request})
-        return Response(serializer.data)
-
-    def destroy(self, request, *args, **kwargs):
-        comment_pk = kwargs.get('pk')
-        parent_pk = request.data.get('parent_pk')
-        delete_reply_comment(request, comment_pk, parent_pk)
-        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
-
-    def retrieve(self, request, *args, **kwargs):
-        comment_pk = kwargs.get('pk')
-        comments = get_object_or_404(ReplyComment, id=comment_pk)
-        serializer = CommentSerializer(comments, context={'request': request})
-        return Response(serializer.data)
-
 
 
 class SearchPostsViewSet(viewsets.ModelViewSet):

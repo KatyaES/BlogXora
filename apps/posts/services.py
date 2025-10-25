@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework import status
 
 from apps.posts.forms import PostForm, CommentForm
-from apps.posts.models import Category, Comment, ReplyComment, Post
+from apps.posts.models import Category, Comment, Post
 
 
 def create_post(request):
@@ -47,7 +47,6 @@ def create_post(request):
 def add_comment(request, pk):
     post = get_object_or_404(Post, id=pk)
     comments = Comment.objects.filter(post=post)
-    reply_comments = ReplyComment.objects.all()
     post.views_count += 1
     post.save()
 
@@ -76,5 +75,5 @@ def add_comment(request, pk):
         form = CommentForm()
         return render(request, "posts/post_detail.html", {"post": post,
                                                           "form": form,
-                                                          "comments": comments,
-                                                          'reply_comments': reply_comments})
+                                                          "comments": comments
+                                                          })

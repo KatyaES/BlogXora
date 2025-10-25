@@ -40,10 +40,24 @@ function smart_time(date) {
     }
 }
 
+function smart_word_end(number) {
+    if (number % 10 === 11 || number % 10 === 14) {
+        return 'комментариев'
+    } else {
+        if (number % 10 === 1) {
+            return 'комментарий'
+        } else if (number % 10 === 2 || number % 10 === 4) {
+            return 'комментария'
+        } else {
+            return 'комментариев'
+        }
+    }
+}
+
 
 
 async function setFilter(element) {
-    const elements = document.querySelectorAll('.filter_radio-button')
+    const elements = document.querySelectorAll('.filters__filter-option')
     if (element.classList.contains('selected')) {
         element.classList.remove('selected')
         window.postType = null
@@ -57,16 +71,14 @@ async function setFilter(element) {
 
 
 function moveArrow() {
-    const lentaButton = document.querySelector('.filter_arrow')
-    const filtersContainer = document.querySelector('.filters-container')
-    if (lentaButton.classList.contains('down')) {
-        lentaButton.classList.remove('down')
-        lentaButton.classList.add('up')
+    const lentaButton = document.querySelector('.filters__arrow')
+    const filtersContainer = document.querySelector('.filters')
+    if (lentaButton.classList.contains('filters__arrow--down')) {
+        lentaButton.classList.remove('filters__arrow--down')
         filtersContainer.style.height = 'auto'
         filtersContainer.style.padding = '25px 25px 15px 25px'
     } else {
-        lentaButton.classList.remove('up')
-        lentaButton.classList.add('down')
+        lentaButton.classList.add('filters__arrow--down')
         filtersContainer.style.height = '20px'
         filtersContainer.style.overflow = 'hidden'
         filtersContainer.style.padding = '25px 25px 25px 25px'

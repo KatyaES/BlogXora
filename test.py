@@ -1,6 +1,8 @@
-import random
+def generator():
+    yield 1
+    yield 2
 
-computer_set = ['камень', 'ножницы', 'бумага']
+obj = generator()
 
-def start():
-    my_choice = input('камень ножницы или бумага: ')
+for i in obj:
+    print(next(obj))

@@ -2,14 +2,13 @@ from django.urls import path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.api.v1.frontend_api import ReplyCommentViewSet, \
+from apps.api.v1.frontend_api import \
     SearchPostsViewSet, \
     SubscriptionViewSet, GetSelfComments, CommentViewSet, PostViewSet
 from apps.users.views import CookieTokenRefreshView
 
 router = routers.DefaultRouter()
 router.register(r'comments', CommentViewSet, basename='comments')
-router.register(r'reply_comments', ReplyCommentViewSet , basename='reply_comments')
 router.register(r'posts', PostViewSet , basename='posts')
 router.register(r'search', SearchPostsViewSet , basename='search')
 router.register(r'subscription', SubscriptionViewSet , basename='subscription')

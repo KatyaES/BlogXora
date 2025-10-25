@@ -7,18 +7,17 @@
 
 .comments {
     background-color: var(--main-element-background);
-    width: 680px;
     height: auto;
     display: flex;
+    gap: 40px;
     flex-direction: column;
-    padding: 25px;
     border-radius: 10px;
     border: 1px solid var(--main-border);
-    gap: 20px;
 }
 
 .comments-title {
     font-size: 17px;
+    margin: 24px;
 }
 
 .comment-item {
@@ -27,13 +26,14 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 20px;
+    margin: 0 24px 0 24px;
 }
 
 .comment-head img {
     height: 35px;
     width: 35px;
     border-radius: 50%;
+    object-fit: cover;
 }
 
 .comment-head a {
@@ -202,6 +202,7 @@
 
 .comment-input {
     padding: 20px;
+    margin: 0 24px 0 24px;
     min-height: 60px;
     height: auto;
     border: 1px solid var(--main-border);
@@ -221,6 +222,7 @@ textarea.comment-input:focus {
 
 .send-comment {
     display: flex;
+    margin: 0 24px 0 24px;
     justify-content: center;
     align-items: center;
     background-color: none;
@@ -263,7 +265,7 @@ textarea.reply_comment-input:focus {
     font-size: 16px;
 }
 
-.reply_comment-wrapper {
+.send_comment__form {
     display: none;
     flex-direction: column;
     gap: 20px;

@@ -1,31 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
-    element = document.getElementById('profile-nav__item_1')
-    profilePostsFunc(element)
-})
-
 async function settings(img) {
     const BASE_URL = window.location.origin
     window.location.href = `${BASE_URL}/settings/`
 }
 
-async function profileBookmarksFunc(element) {
-    const user = element.getAttribute('data-id')
+async function profileBookmarksFunc() {
+    const bookmarkButton = document.getElementById('profile-nav__item_2')
+    const user = bookmarkButton.getAttribute('data-id')
     const BASE_URL = window.location.origin
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     profileHeaderNavCont.innerHTML = ''
-    const profileNavItems = document.querySelectorAll('.profile-nav__item')
-    profileNavItems.forEach(el => {
-        if (el !== element) {
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-        }
-        element.style.borderBottom = '3.5px solid var(--main-color)'
-    })
-
-
-
     nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_my_bookmarks_posts/${user}`
     nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_my_bookmarks_comments/${user}`
     isLoadingPosts = false;
@@ -79,6 +62,8 @@ function showChangeWrapper() {
 
 async function saveProfileData() {
     const status = await window.checkToken()
+    const photo = document.querySelector('.settings-photo').value
+    console.log(photo)
 
     const username = document.querySelector('.settings_username').value
     const email = document.querySelector('.settings_email').value
@@ -188,9 +173,75 @@ function adminRedirect() {
     window.location.href = `${BASE_URL}/admin`
 }
 
+function initLoadProfileData() {
+    const path = window.location.pathname
+    if (path.endsWith('/bookmarks/')) {
+        const bookmarkButton = document.getElementById('profile-nav__item_2')
+        const profileNavItems = document.querySelectorAll('.profile-nav__item')
+        profileNavItems.forEach(el => {
+            if (el !== bookmarkButton) {
+                el.style.borderBottom = ''
 
-async function profileFollowersFunc(element) {
-    userId = element.getAttribute('data-auth')
+            }
+            bookmarkButton.style.borderBottom = '3.5px solid var(--main-color)'
+            bookmarkButton.style.color = 'var(--main-color)'
+        })
+        profileBookmarksFunc()
+    }
+
+    if (path.endsWith('/followers/')) {
+        const followersButton = document.getElementById('profile-nav__item_4')
+        const profileNavItems = document.querySelectorAll('.profile-nav__item')
+        profileNavItems.forEach(el => {
+            if (el !== followersButton) {
+                el.style.borderBottom = ''
+            }
+            followersButton.style.borderBottom = '3.5px solid var(--main-color)'
+            followersButton.style.color = 'var(--main-color)'
+        })
+        profileFollowersFunc()
+    }
+    if (path.endsWith('/subscribes/')) {
+        const subscribesButton = document.getElementById('profile-nav__item_3')
+        const profileNavItems = document.querySelectorAll('.profile-nav__item')
+        profileNavItems.forEach(el => {
+            if (el !== subscribesButton) {
+                el.style.borderBottom = ''
+            }
+            subscribesButton.style.borderBottom = '3.5px solid var(--main-color)'
+            subscribesButton.style.color = 'var(--main-color)'
+        })
+        profileSubscribesFunc()
+    }
+    if (path.endsWith('/posts/') || path.endsWith(`/${currentProfile}/`)) {
+        const postsButton = document.getElementById('profile-nav__item_1')
+        const profileNavItems = document.querySelectorAll('.profile-nav__item')
+        profileNavItems.forEach(el => {
+            if (el !== postsButton) {
+                el.style.borderBottom = ''
+            }
+            postsButton.style.borderBottom = '3.5px solid var(--main-color)'
+            postsButton.style.color = 'var(--main-color)'
+        })
+        profilePostsFunc()
+    }
+    if (path.endsWith('/comments/')) {
+        const commentButton = document.getElementById('profile-nav__item_5')
+        const profileNavItems = document.querySelectorAll('.profile-nav__item')
+        profileNavItems.forEach(el => {
+            if (el !== commentButton) {
+                el.style.borderBottom = ''
+            }
+            commentButton.style.borderBottom = '3.5px solid var(--main-color)'
+            commentButton.style.color = 'var(--main-color)'
+        })
+        profileCommentsFunc()
+    }
+}
+
+async function profileFollowersFunc() {
+    const followersButton = document.getElementById('profile-nav__item_4')
+    userId = followersButton.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     const followersWrapper = document.createElement('div')
     followersWrapper.classList.add('followers_wrapper')
@@ -202,23 +253,13 @@ async function profileFollowersFunc(element) {
     profileHeaderNavCont.appendChild(followersWrapper)
     profileHeaderNavCont.innerHTML = ''
     followersWrapper.innerHTML = ''
-    const profileNavItems = document.querySelectorAll('.profile-nav__item')
-    profileNavItems.forEach(el => {
-        if (el !== element) {
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-        }
-        element.style.borderBottom = '3.5px solid var(--main-color)'
-    })
 
     postsContainer = profileHeaderNavCont
 
-    const oldSubscriptions = document.querySelectorAll('.follower')
+    const oldFollowers = document.querySelectorAll('.follower')
 
-    if (oldSubscriptions) {
-        oldSubscriptions.forEach(subscription => subscription.remove())
+    if (oldFollowers) {
+        oldFollowers.forEach(follower => follower.remove())
     }
     profileHeaderNavCont.innerHTML = ''
 
@@ -232,7 +273,6 @@ async function profileFollowersFunc(element) {
     if (data.followers.length === 0) {
         followersWrapper.style.display = 'none'
     }
-
     postsContainer = profileHeaderNavCont
     for (let i = 0; i < data.followers.length; i++) {
         const follower = `
@@ -252,8 +292,9 @@ async function profileFollowersFunc(element) {
 }
 
 
-async function profileSubscribesFunc(element) {
-    userId = element.getAttribute('data-auth')
+async function profileSubscribesFunc() {
+    const subscribesButton = document.getElementById('profile-nav__item_3')
+    userId = subscribesButton.getAttribute('data-auth')
     const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     const followingsWrapper = document.createElement('div')
     followingsWrapper.classList.add('followings_wrapper')
@@ -265,16 +306,6 @@ async function profileSubscribesFunc(element) {
     profileHeaderNavCont.appendChild(followingsWrapper)
     profileHeaderNavCont.innerHTML = ''
     followingsWrapper.innerHTML = ''
-    const profileNavItems = document.querySelectorAll('.profile-nav__item')
-    profileNavItems.forEach(el => {
-        if (el !== element) {
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-            el.style.borderBottom = ''
-        }
-        element.style.borderBottom = '3.5px solid var(--main-color)'
-    })
 
     postsContainer = profileHeaderNavCont
 
@@ -315,9 +346,11 @@ async function profileSubscribesFunc(element) {
     initUserFollows()
 }
 
-function notificationFunc() {
-    const notificationContainer = document.querySelector('.notification_container')
-    const notificationCount = document.querySelector('.notification-count')
+const notificationsWrapper = document.querySelector('.site-header__icon-notifications-wrapper')
+
+notificationsWrapper.addEventListener('click', () => {
+    const notificationContainer = document.querySelector('.site-header__notification-container')
+    const notificationCount = document.querySelector('.site-header__notifications-count')
     notificationCount.classList.add('hidden')
     localStorage.setItem('isNotificationCountActive', false)
     if (notificationContainer.classList.contains('clicked')) {
@@ -325,15 +358,43 @@ function notificationFunc() {
     } else {
         notificationContainer.classList.add('clicked')
     }
-}
+})
 
-function initHiddenNotifications() {
-    const notificationsState = localStorage.getItem('isNotificationCountActive')
-    const notificationCount = document.querySelector('.notification-count')
-    if (notificationsState === 'false') {
-        notificationCount.classList.add('hidden')
+
+
+function profileMenuFunc(element) {
+    const profileMenu = document.querySelector('.site-header__account-menu')
+    if (profileMenu.classList.contains('clicked')) {
+        profileMenu.classList.remove('clicked')
     } else {
-        notificationCount.classList.remove('hidden')
+        profileMenu.classList.add('clicked')
     }
 }
 
+document.addEventListener('click', function (event) {
+    const profileMenu = document.querySelector('.site-header__account-menu')
+    const profileButton = document.querySelector('.site-header__account-img')
+    const notificationButton = document.querySelector('.site-header__icon-notifications-wrapper')
+    const notificationContainer = document.querySelector('.site-header__notification-container')
+
+    if (!profileMenu.contains(event.target) && !profileButton.contains(event.target)) {
+        profileMenu.classList.remove('clicked')
+    }
+
+    if (!notificationButton.contains(event.target) && !notificationContainer.contains(event.target)) {
+        notificationContainer.classList.remove('clicked')
+    }
+})
+
+function initHiddenNotifications() {
+    const notificationsState = localStorage.getItem('isNotificationCountActive')
+    const notificationCount = document.querySelector('.site-header__notifications-count')
+    if (notificationCount) {
+        if (notificationsState === 'false') {
+            notificationCount.classList.add('hidden')
+        } else {
+            notificationCount.classList.remove('hidden')
+        }
+    }
+
+}

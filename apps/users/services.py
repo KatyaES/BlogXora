@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.posts.models import Post, Comment, ReplyComment, User, Category
+from apps.posts.models import Post, Comment, User, Category
 from apps.users.forms import UserLoginForm, UserRegistrationForm
 from django.contrib import auth
 
@@ -86,14 +86,14 @@ def login_user(request):
     return HttpResponse(status=204)
 
 
-def get_profile_user_data(profile_user):
+def get_profile_user_data(profile_user, section):
     return {
         'profile_user': profile_user,
         'posts': Post.objects.filter(bookmark_user=profile_user),
         'comments': Comment.objects.filter(user=profile_user),
-        'reply_comments': ReplyComment.objects.all(),
         'bookmarks': Post.objects.filter(bookmark_user=profile_user),
         'random_posts': Post.objects.all().order_by('?')[:5],
+        'section': section,
     }
 
 
@@ -136,8 +136,8 @@ def change_data(request, username, email, bio):
 
 
 
-def add_or_remove_followers(request, theme):
-    category = get_object_or_404(Category, cat_title=theme)
+def add_or_remove_followers(request, tag):
+    category = get_object_or_404(Category, tag=tag)
 
     if request.user not in category.followers.all():
         category.followers.add(request.user)

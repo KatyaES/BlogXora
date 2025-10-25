@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from apps.api.utils import cache_utils
 
 from apps.api.utils.permissions import IsAdminOrReadOnly, IsAuthor
-from apps.api.serializers import PublicPostsSerializer, PublicCommentsSerializer, PublicCategorySerializer, \
-    PublicUserSerializer
+from apps.api.serializers import PublicPostsSerializer, PublicCategorySerializer, \
+    PublicUserSerializer, PublicCommentsSerializer
 from apps.api.services.others import get_cached_data, clear_cache
 from apps.posts.models import Post, Comment, Category
 from apps.users.models import CustomUser

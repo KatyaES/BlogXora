@@ -14,7 +14,7 @@ from .services import create_post, add_comment
 
 def index(request):
     one_day_ago = timezone.now() - timedelta(days=1)
-    news_posts = Post.objects.filter(post_type='Новость', pub_date__gte=one_day_ago).order_by('?')[:5]
+    news_posts = Post.objects.filter(post_type='Новость').order_by('?')[:5]
     cache_key = f'random_posts_ids'
     cached_ids = cache.get(cache_key)
     if cached_ids:
@@ -32,10 +32,9 @@ def index(request):
 def add_post(request):
     return render(request, "posts/add_post.html")
 
-def category_page(request):
-    cat = request.GET.get("theme")
-    category = Category.objects.filter(cat_title=cat).first()
-    context = {'category': category}
+def category_page(request, tag):
+    category_first = Category.objects.filter(tag=tag).first()
+    context = {'category': category_first}
     return render(request, "posts/category.html", context)
 
 def post_detail(request, pk):

@@ -31,12 +31,7 @@ class Post(models.Model):
 
     @property
     def update_comment_count(self):
-        total_reply_count = 0
-        for comment in self.comments.all():
-            total_reply_count += comment.replies.count()
-        self.comment_count = self.comments.count() + total_reply_count
-        self.save()
-        return total_reply_count + self.comments.count()
+        return self.comments.count()
 
 
 class Comment(models.Model):
@@ -45,28 +40,17 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     liked_by = models.ManyToManyField(User, related_name="likedBy", blank=True)
-    reply_count = models.IntegerField(default=0)
     bookmarked_by = models.ManyToManyField(User, related_name='bookmarkedBy', blank=True)
 
     def __str__(self):
         return self.description
 
-    def update_reply_count(self):
-        self.reply_count = self.replies.count()
-        self.save()
-
-
-class ReplyComment(models.Model):
-    parent = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
-    description = models.CharField(max_length=2000)
-    pub_date = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reply_user')
-    liked_by = models.ManyToManyField(User, related_name='reply_liked_by', blank=True)
 
 class Category(models.Model):
     followers = models.ManyToManyField(CustomUser, related_name="category_follows", blank=True)
     description = models.CharField(max_length=1000, default='Nothing', null=True, blank=True)
     cat_title = models.CharField(max_length=255, unique=True)
+    tag = models.CharField(max_length=255, unique=True, null=True, blank=True)
     image = models.ImageField(upload_to='categories/')
 
     def __str__(self):

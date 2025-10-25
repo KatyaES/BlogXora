@@ -40,9 +40,10 @@ def login(request):
     return redirect('index')
 
 
-def profile_page(request, username):
+
+def profile_page(request, username, section=None):
     profile_user = get_object_or_404(User, username=username)
-    context = get_profile_user_data(profile_user)
+    context = get_profile_user_data(profile_user, section)
     return render(request, 'users/profile.html', context)
 
 
@@ -76,12 +77,12 @@ def profile_settings(request):
 
 class ThemeFollows(APIView):
     def post(self, request):
-        theme = request.GET.get('theme')
-        return add_or_remove_followers(request, theme)
+        tag = request.GET.get('tag')
+        return add_or_remove_followers(request, tag)
 
     def get(self, request):
-        theme = request.GET.get('theme')
-        category = get_object_or_404(Category, cat_title=theme)
+        tag = request.GET.get('tag')
+        category = get_object_or_404(Category, tag=tag)
 
         if request.user in category.followers.all():
             return Response({'status': 'subscribed'})

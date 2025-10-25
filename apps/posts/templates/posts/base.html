@@ -6,42 +6,42 @@
 <head>
     <title>{{ title }}</title>
     <meta charset="UTF-8">
-    {% block link %} {% endblock %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'posts/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'posts/css/main.css' %}">
 </head>
 <body>
-    <header>
-        <a href="{% url 'index' %}" class="logo">Xora</a>
-        <div class="head-links">
-            <div class="input_wrapper">
-                <input class="search-input" placeholder="Поиск">
-                <div class="search-cont">
-                    <img class="input_search-img" src="/media/icons/search.svg" onclick="searchPosts()" datatype="{{ request.user.username }}">
+    <header class="site-header">
+        <a href="{% url 'index' %}" class="site-header__logo">Xora</a>
+        <div class="site-header__actions">
+            <div class="site-header__search-wrapper">
+                <input class="site-header__input-search" placeholder="Поиск">
+                <div class="site-header__search-img-wrapper">
+                    <img class="site-header__search-img" src="/media/icons/search.svg" onclick="searchPosts()" datatype="{{ request.user.username }}">
                 </div>
             </div>
-            <a class="pencil_wrapper" href="{% url 'add_post' %}">
-                <img class="pencil-img" src="/media/icons/pencil.svg">
-                Написать</a>
+            <a class="site-header__button-add-post" href="{% url 'add_post' %}">
+                <img class="site-header__img-add-post" src="/media/icons/pencil.svg">
+                Написать
+            </a>
             {% if request.user.is_authenticated %}
-                <div class="notification_wrapper" onclick="notificationFunc()">
-                    <img class="bell-img" src="/media/icons/bell.png">
-                    <div class="notification-count" style="text-decoration: none;">{{ notification_count }}</div>
-                    <div class="notification_container">
-                        <div class="navbar">
+                <div class="site-header__icon-notifications-wrapper" onclick="notificationFunc()">
+                    <img class="site-header__img-notifications" src="/media/icons/bell.png">
+                    <div class="site-header__notifications-count" style="text-decoration: none;">{{ notification_count }}</div>
+                    <div class="site-header__notification-container">
+                        <div class="site-header__notifications-navbar">
                             <span>Уведомления</span>
                         </div>
-                        <div class="notification-message_wrapper">
+                        <div class="site-header__notifications-message-wrapper">
                             {% for notification in notifications %}
                                 {% if notification.is_active %}
-                                <div class="notification-hover" onclick="window.location.href='{{ notification.link }}'">
-                                    <div class="notification-compact">
-                                        <img src="{{ notification.actor.image.url }}" class="user-img">
+                                <div class="site-header__notification-item-hover" onclick="window.location.href='{{ notification.link }}'">
+                                    <div class="site-header__notification-item-compact">
+                                        <img src="{{ notification.actor.image.url }}" class="site-header__notification-item-user-img">
                                         <div>
                                             {{ notification.message|safe }}
-                                            <div class="notification-date">
+                                            <div class="site-header__notification-item-date">
                                                 {{ notification.date|smart_time }}
                                             </div>
                                         </div>
@@ -55,25 +55,151 @@
                     </div>
                 </div>
             {% endif %}
-            <div class="head-links-cont">
+            <div class="site-header__account-button" onclick="profileMenuFunc(this)">
                 {% if user.is_authenticated %}
-                <img class="header_user-img" src="{{ user.image.url }}" onclick="window.location.href = window.location.origin + '/users/profile/' + username">
-            {% else %}
-                <a class="login-logout" href="{% url 'login' %}">Войти</a>
-            {% endif %}
+                    <img class="site-header__account-img" src="{{ user.image.url }}">
+                    <div class="site-header__account-menu">
+                        <div class="site-header__menu-item">
+                            <a href="{% url 'profile' request.user.username %}" class="site-header__menu-item-link">Профиль</a>
+                        </div>
+                        <div class="site-header__menu-item">
+                            <a href="{% url 'profile_with_section' request.user.username 'subscribes' %}" class="site-header__menu-item-link">Подписки</a>
+                        </div>
+                        <div class="site-header__menu-item">
+                            <a href="{% url 'profile_with_section' request.user.username 'bookmarks' %}" class="site-header__menu-item-link">Закладки</a>
+                        </div>
+                        <div class="site-header__menu-item">
+                            <a href="{% url 'profile_with_section' request.user.username 'comments' %}" class="site-header__menu-item-link">Комментарии</a>
+                        </div>
+                        <div class="site-header__menu-item">
+                            <a href="{% url 'settings' %}" class="site-header__menu-item-link">Настройки</a>
+                        </div>
+                        <div class="site-header__menu-item">
+                            <a onclick="logout()" class="site-header__menu-item-link">Выйти</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a class="site-header__login-button" href="{% url 'login' %}">Войти</a>
+                {% endif %}
             </div>
         </div>
-    </header>    
-    {% block body %}
-    {% endblock %}
+    </header>
+
+    <div class="main-container">
+        <div class="scroll-top" id="scroll-id">
+            <div class="wrapper-btn">
+                <img src="/media/icons/arrow-up.svg">
+            </div>
+        </div>
+        <div class="container">
+            <div class="posts-container">
+                {% block body %}
+                {% endblock %}
+            </div>
+            <div class="popular-and-random">
+                {% if request.user.is_authenticated %}
+                    <div class="profile-cont">
+                        <div class="profile-data">
+                            <div class="user-data">
+                                <img src="{{ user.image.url }}" class="profile-user-img">
+                                <div class="logout-and-username">
+                                    <a href="{% url 'profile' user.username %}">{{ request.user }}</a>
+                                    <a class="logout" onclick="logout()">выйти</a>
+                                </div>
+                            </div>
+                            <img class="settings-img" src="/media/icons/settings.svg" onclick="settings(this)">
+                        </div>
+                        <div class="profile-elements">
+                            {% if request.user.is_staff %}
+                            <div class="admin-cont" onclick="adminRedirect()">
+                                <a>Администрация</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                <div class="auth-modal-login__wrapper">
+            <div class="auth-modal__header">Войти</div>
+            <div class="auth-modal__fields">
+                <input class="auth-modal__input-username" placeholder="Логин" minlength="3">
+                <div class="auth-modal__username-error"></div>
+                <input class="auth-modal__input-password" type="password" placeholder="Пароль">
+                <div class="auth-modal__password-error"></div>
+            </div>
+            <div class="auth-modal__error-data">
+                <p class="auth-modal__error-message"></p>
+            </div>
+            <div class="auth-modal__buttons-wrapper">
+                <button class="auth-modal__button-enter" onclick="loginHandler()">Войти</button>
+                <button class="auth-modal__button-switch-to-register">Создать аккаунт</button>
+            </div>
+            <a class="auth-modal__forget-password" href="{% url 'password_reset' %}">Забыли пароль?</a>
+        </div>
+                <div class="auth-modal-register__wrapper auth-modal-register__wrapper--hidden">
+            <div class="auth-modal__header">Создать аккаунт</div>
+            <div class="auth-modal__fields">
+                <input class="auth-modal-register__input-email" placeholder="Email">
+                <div class="auth-modal-register__email-error"></div>
+                <input class="auth-modal-register__input-username" placeholder="Никнейм" maxlength="16">
+                <div class="auth-modal-register__username-error"></div>
+                <input class="auth-modal-register__input-password" type="password" placeholder="Пароль">
+                <div class="auth-modal-register__password-error"></div>
+                <input class="auth-modal-register__input-password2" type="password" placeholder="Повторите пароль">
+                <div class="auth-modal-register__password2-error"></div>
+            </div>
+            <div class="auth-modal-register__error-data">
+                <p class="auth-modal-register__error-message"></p>
+            </div>
+            <div class="auth-modal__buttons-wrapper">
+                <button class="auth-modal__button-register" onclick="registerHandler()">Создать аккаунт</button>
+                <button class="auth-modal__button-switch-to-login">Есть аккаунт? Войти</button>
+            </div>
+        </div>
+                {% endif %}
+                <div id="popular-id" class="popular-cat">
+                    <p class="popular-title">Темы</p>
+                    {% for category in categories %}
+                        {% if forloop.counter == 6 %}
+                            <div class="show-all-themes-button" id="show-all-themes-button" role="button">
+                                <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
+                                <span>Показать все</span>
+                            </div>
+                        {% endif %}
+                        <div class="category-item" onclick="window.location.href = `${BASE_URL}/{{ category.tag }}`">
+                            <img src="{{ category.image.url }}" alt="">
+                            <a href="{% url 'category' category.tag %}">{{ category.cat_title }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="random-posts">
+                <div class="popular-post-p">
+                    <span>ЧИТАЮТ СЕЙЧАС</span>
+                </div>
+                {% for post in random_posts %}
+                    <div class="cicle-container">
+                        <div class="date-and-name">
+                            <div class="side-img-name">
+                                <img src="{{ post.user.image.url }}">
+                                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                            </div>
+                            <a style="color: gray">{{ post.pub_date|smart_time }}</a>
+                        </div>
+                        <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
     <script>
-        const username = "{{ request.user.username }}"
         const BASE_URL = window.location.origin
+        const section = "{{ section }}"
     </script>
     <script>
         window.postID = '{{ post.id }}'
         window.csrfToken = "{{ csrf_token }}"
         window.currentUser = '{{ request.user }}'
+        const currentProfile = window.location.pathname.split('/')[2]
         window.BASE_URL = window.location.origin
     </script>
     <script src="{% static 'js/globals.js' %}"></script>

@@ -1,6 +1,6 @@
 async function sendComment(div) {
     const id = div.getAttribute('data-field-id')
-	const comment = document.getElementById(`comment-${id}`)
+	const comment = document.getElementById(`comment-input-${id}`)
 	console.log(id)
 	console.log(comment)
 	console.log(comment.value)
@@ -28,47 +28,49 @@ async function sendComment(div) {
                 })
 
                 const data = await request.json()
-                console.log(data)
+                console.log(data, '00')
 
                 const newComment = `
                     <div class="comment-item" id="comment-item-${data.id}">
-                        <div class="comment-head">
-                            <img src="${data.image}" alt="">
-                            ${currentUser == data.username ? `
-                            <div class="username_wrapper">
-                                <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a></div>` : `${data.username}`}
-                            <span class="comment_pub-date">только что</span>
+                        <div class="comment-item__user-info">
+                            <img src="${data.image}" class="comment-item__user-icon">
+                            ${currentUser == data.username
+                            ? `
+                                <div class="comment-item__user-info-details">
+                                    <a href="${BASE_URL}/${data.username}" style="color: white; font-weight: 500; font-size: 13px;">${data.username}</a>
+                                </div>`
+                            : `${data.username}`}
+                            <span class="comment-item__pub-date">${smart_time(data.pub_date)}</span>
                         </div>
-                        <div class="comment-content">
+                        <div class="comment-item__content">
                             ${data.description}
                         </div>
                         <div class="comment-reactions">
-                            <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.id}" data-type="common">
-                                <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                                <span class="comment_likes-count" id="comment_likes-count-${data.id}">${data.likes}</span>
+                            <div class="comment__like-button" onclick="setCommentLike(this)" data-id="${data.id}" data-type="common">
+                                <img src="/media/icons/hart.png" class="comment__like-icon">
+                                <span class="comment__likes-count" id="comment__likes-count-id-${data.id}">${data.likes}</span>
                             </div>
-                            <div class="comment_bookmark-wrapper" onclick="setCommentBookmark(this)" data-id="${data.id}" data-section="bookmarks">
+                            <div class="comment__bookmark-button" onclick="setCommentBookmark(this)" data-id="${data.id}" data-section="bookmarks">
                                 <a>
-                                    <svg class="comment_bookmark-img" width="24" height="24" viewBox="0 0 24 24">
+                                    <svg class="comment__bookmark-icon" width="24" height="24" viewBox="0 0 24 24">
                                         <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
                                     </svg>
                                 </a>
-                                <span class="comment_bookmark-count" id="comment_bookmark-count-${data.id}">${data.bookmarked_by.length}</span>
+                                <span class="comment__bookmark-count" id="comment__bookmark-count-id-${data.id}">${data.bookmarked_by.length}</span>
                             </div>
-                            <span class="reply" onclick="commentReply(this)" data-field-id="${postId}" data-id="${data.id}" datatype="commentReplyButton">Ответить</span>
+                            <span class="comment__reply-button" onclick="commentReply(this)" data-field-id="${postID}" data-id="${data.id}" datatype="commentReplyButton">Ответить</span>
                             ${currentUser == data.username ? `
-                            <span class="delete-comment" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${postId}">Удалить</span>
+                            <span class="comment__delete-button" onclick="commentDelete(this)" id="${data.id}" data-key="${data.id}" data-type="common" data-id="${data.post_id}">Удалить</span>
                         ` : ''}
                         </div>
                         <div class="send_comment__form" id="send_comment__form-${data.id}">
-                            <textarea id="comment-${data.id}" class="comment-input" placeholder="Комментарий" id="comment-input-${data.id}"></textarea>
-                            <div class="send-comment" id="comment-${data.id}" onclick="sendComment(this)" data-field-id="${data.id}" data-key="${data.id}" data-id="${postId}">Отправить</div>
+                            <textarea id="comment-input-${data.id}" class="comment-input" placeholder="Комментарий" id="reply_comment-input-${data.id}"></textarea>
+                            <div class="send-comment__button" id="comment-${data.id}" onclick="sendComment(this)" data-field-id="${data.id}" data-key="${data.id}" data-id="${data.post_id}">Отправить</div>
                         </div>
-
                     </div>
                 `
 
-                const commentsCont = document.querySelector('.comments-container')
+                const commentsCont = document.querySelector('.comments-list')
                 commentsCont.insertAdjacentHTML('beforeend', newComment)
             }
         }
@@ -95,39 +97,43 @@ async function initLoadComments() {
 
     for (let i = 0; i < data.results.length; i++) {
         const newComment = `
-            <div class="profile_comment-item" id="comment-item-${data.results[i].id}">
-                <a href="/post/${data.results[i].post_id}" class="post_of_comment">${data.results[i].post}</a>
+            <div class="profile__comment-wrapper" id="comment-item-${data.results[i].id}">
+                <a href="/post/${data.results[i].post_id}" class="post__title">${data.results[i].post}</a>
                 <div class="comment-item" id="comment-item-${data.results[i].id}">
-                    <div class="comment-head">
-                        <img src="${data.results[i].image}" alt="">
-                        ${currentProfile == data.results[i].username ? `
-                        <div class="username_wrapper">
-                            <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.results[i].username}</a></div>` : `${data.results[i].username}`}
-                        <span class="comment_pub-date">только что</span>
+                    <div class="comment-item__user-info">
+                        <img src="${data.results[i].image}" class="comment-item__user-icon">
+                        ${currentUser == data.results[i].username
+                        ? `
+                            <div class="comment-item__user-info-details">
+                                <a href="${BASE_URL}/${data.results[i].username}" style="color: white; font-weight: 500; font-size: 13px;">${data.results[i].username}</a>
+                            </div>`
+                        : `${data.results[i].username}`}
+                        <span class="comment-item__pub-date">${smart_time(data.results[i].pub_date)}</span>
                     </div>
-                    <div class="comment-content">
+                    <div class="comment-item__content">
                         ${data.results[i].description}
                     </div>
                     <div class="comment-reactions">
-                        <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
-                            <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                            <span class="comment_likes-count" id="comment_likes-count-${data.results[i].id}">${data.results[i].likes}</span>
+                        <div class="comment__like-button" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
+                            <img src="/media/icons/hart.png" class="comment__like-icon">
+                            <span class="comment__likes-count" id="comment__likes-count-id-${data.results[i].id}">${data.results[i].likes}</span>
                         </div>
-                        <div class="comment_bookmark-wrapper" onclick="setCommentBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
+                        <div class="comment__bookmark-button" onclick="setCommentBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
                             <a>
-                                <svg class="comment_bookmark-img" width="24" height="24" viewBox="0 0 24 24">
+                                <svg class="comment__bookmark-icon" width="24" height="24" viewBox="0 0 24 24">
                                     <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
                                 </svg>
                             </a>
-                            <span class="comment_bookmark-count" id="comment_bookmark-count-${data.results[i].id}">${data.results[i].bookmarked_by.length}</span>
+                            <span class="comment__bookmark-count" id="comment__bookmark-count-id-${data.results[i].id}">${data.results[i].bookmarked_by.length}</span>
                         </div>
-                        ${currentProfile == data.results[i].username ? `
-                        <span class="delete-comment" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
+                        <span class="comment__reply-button" onclick="commentReply(this)" data-field-id="${postID}" data-id="${data.results[i].id}" datatype="commentReplyButton">Ответить</span>
+                        ${currentUser == data.results[i].username ? `
+                        <span class="comment__delete-button" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
                     ` : ''}
                     </div>
                     <div class="send_comment__form" id="send_comment__form-${data.results[i].id}">
-                        <textarea id="comment-${data.results[i].id}" class="comment-input" placeholder="Комментарий" id="reply_comment-input-${data.results[i].id}"></textarea>
-                        <div class="reply_send-comment" id="reply_comment-${data.results[i].id}" onclick="SendComment(this)" data-field-id="${data.results[i].id}}" data-key="${data.results[i].id}" data-id="${data.results[i].id}">Отправить</div>
+                        <textarea id="comment-input-${data.results[i].id}" class="comment-input" placeholder="Комментарий" id="reply_comment-input-${data.results[i].id}"></textarea>
+                        <div class="send-comment__button" id="comment-${data.results[i].id}" onclick="sendComment(this)" data-field-id="${data.results[i].post_id}" data-key="${data.results[i].id}" data-id="${data.results[i].id}">Отправить</div>
                     </div>
                 </div>
             </div>
@@ -162,37 +168,40 @@ async function initLoadPostComments() {
     for (let i = 0; i < data.results.length; i++) {
         const newComment = `
             <div class="comment-item" id="comment-item-${data.results[i].id}">
-                <div class="comment-head">
-                    <img src="${data.results[i].image}" alt="">
-                    ${currentUser == data.results[i].username ? `
-                    <div class="username_wrapper">
-                        <a href="" style="color: white; font-weight: 500; font-size: 13px;">${data.results[i].username}</a></div>` : `${data.results[i].username}`}
-                    <span class="comment_pub-date">${smart_time(data.results[i].pub_date)}</span>
+                <div class="comment-item__user-info">
+                    <img src="${data.results[i].image}" class="comment-item__user-icon">
+                    ${currentUser == data.results[i].username
+                    ? `
+                        <div class="comment-item__user-info-details">
+                            <a href="${BASE_URL}/${data.results[i].username}" style="color: white; font-weight: 500; font-size: 13px;">${data.results[i].username}</a>
+                        </div>`
+                    : `${data.results[i].username}`}
+                    <span class="comment-item__pub-date">${smart_time(data.results[i].pub_date)}</span>
                 </div>
-                <div class="comment-content">
+                <div class="comment-item__content">
                     ${data.results[i].description}
                 </div>
                 <div class="comment-reactions">
-                    <div class="comment_like-wrapper" id="wrapper-id" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
-                        <img src="/media/icons/hart.png" class="comment_heart-img" id="like-button">
-                        <span class="comment_likes-count" id="comment_likes-count-${data.results[i].id}">${data.results[i].likes}</span>
+                    <div class="comment__like-button" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
+                        <img src="/media/icons/hart.png" class="comment__like-icon">
+                        <span class="comment__likes-count" id="comment__likes-count-id-${data.results[i].id}">${data.results[i].likes}</span>
                     </div>
-                    <div class="comment_bookmark-wrapper" onclick="setCommentBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
+                    <div class="comment__bookmark-button" onclick="setCommentBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
                         <a>
-                            <svg class="comment_bookmark-img" width="24" height="24" viewBox="0 0 24 24">
+                            <svg class="comment__bookmark-icon" width="24" height="24" viewBox="0 0 24 24">
                                 <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
                             </svg>
                         </a>
-                        <span class="comment_bookmark-count" id="comment_bookmark-count-${data.results[i].id}">${data.results[i].bookmarked_by.length}</span>
+                        <span class="comment__bookmark-count" id="comment__bookmark-count-id-${data.results[i].id}">${data.results[i].bookmarked_by.length}</span>
                     </div>
-                    <span class="reply" onclick="commentReply(this)" data-field-id="${postID}" data-id="${data.results[i].id}" datatype="commentReplyButton">Ответить</span>
+                    <span class="comment__reply-button" onclick="commentReply(this)" data-field-id="${postID}" data-id="${data.results[i].id}" datatype="commentReplyButton">Ответить</span>
                     ${currentUser == data.results[i].username ? `
                     <span class="delete-comment" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
                 ` : ''}
                 </div>
                 <div class="send_comment__form" id="send_comment__form-${data.results[i].id}">
-                    <textarea id="comment-${data.results[i].id}" class="comment-input" placeholder="Комментарий" id="reply_comment-input-${data.results[i].id}"></textarea>
-                    <div class="reply_send-comment" id="reply_comment-${data.results[i].id}" onclick="sendComment(this)" data-field-id="${data.results[i].post_id}" data-key="${data.results[i].id}" data-id="${data.results[i].id}">Отправить</div>
+                    <textarea id="comment-input-${data.results[i].id}" class="comment-input" placeholder="Комментарий" id="reply_comment-input-${data.results[i].id}"></textarea>
+                    <div class="send-comment__button" id="comment-${data.results[i].id}" onclick="sendComment(this)" data-field-id="${data.results[i].id}" data-key="${data.results[i].id}" data-id="${data.results[i].post_id}">Отправить</div>
                 </div>
             </div>
         `
@@ -204,7 +213,7 @@ async function initLoadPostComments() {
         moreCommentsButton = `<div class="hidden-comments__button" onclick="moreCommentsFunc()" >
                                         <span>Показать ${data.count - data.results.length} ${smart_word_end(data.count - data.results.length)}</span>
                                     </div>`
-        commentsContainer.insertAdjacentHTML('beforeend', moreCommentsButton)
+        postDetailContainer.insertAdjacentHTML('beforeend', moreCommentsButton)
     }
 
     initCommentLikes()
@@ -224,43 +233,6 @@ function moreCommentsFunc() {
 
 }
 
-async function initCommentLikes() {
-    const status = await window.checkToken(false)
-
-    const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
-    const BASE_URL = window.location.origin
-
-    if (status) {
-        for (const img of imgWrapper) {
-            const id = img.getAttribute("data-id");
-            const type = img.getAttribute('data-type')
-            const likesCount = document.getElementById(`comment_likes-count-${id}`);
-
-            try {
-                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const data = await response.json();
-
-                if (data.is_authenticated) {
-                    if (data.liked) {
-                        img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
-                    } else {
-                        img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
-                    }
-                } else {
-                    img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    }
-}
 
 async function profileCommentsFunc() {
     const commentButton = document.getElementById('profile-nav__item_5')
@@ -349,7 +321,7 @@ async function commentDelete(span) {
     const type = span.getAttribute('data-type')
     const postId = span.getAttribute('data-id')
     const id = span.getAttribute('data-key')
-    let commentsCont = document.querySelector('.comments-container')
+    let commentsCont = document.querySelector('.comments-list')
     const status = await window.checkToken()
     const BASE_URL = window.location.origin
 
@@ -390,7 +362,7 @@ async function setCommentLike(div) {
 	let likesCount = ''
 	const commentType = div.getAttribute("data-type")
 
-    likesCount = document.getElementById(`comment_likes-count-${id}`);
+    likesCount = document.getElementById(`comment__likes-count-id-${id}`);
 
 	const status = await window.checkToken()
 
@@ -411,15 +383,13 @@ async function setCommentLike(div) {
 
             likesCount.textContent = data.likes;
 
-            let before = ''
-            if (commentType === 'reply') {before = 'reply-'}
             if (data.liked) {
-                div.classList.replace(`${before}comment_like-wrapper`, `${before}comment_like-wrapper-liked`)
+                div.classList.add("comment__like-button--active")
                 likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
                 void likesCount.offsetWidth
                 likesCount.classList.add('dellikeanimate');
             } else {
-                div.classList.replace(`${before}comment_like-wrapper-liked`, `${before}comment_like-wrapper`)
+                div.classList.remove("comment__like-button--active")
                 likesCount.classList.remove('setlikeanimate', 'dellikeanimate')
                 void likesCount.offsetWidth
                 likesCount.classList.add('setlikeanimate');
@@ -435,15 +405,14 @@ async function setCommentLike(div) {
 async function initCommentLikes() {
     const status = await window.checkToken(false)
 
-    const imgWrapper = document.querySelectorAll(".comment_like-wrapper");
-    const replyWrapper = document.querySelectorAll(".reply-comment_like-wrapper")
+    const imgWrapper = document.querySelectorAll(".comment__like-button");
     const BASE_URL = window.location.origin
 
     if (status) {
         for (const img of imgWrapper) {
             const id = img.getAttribute("data-id");
             const type = img.getAttribute('data-type')
-            const likesCount = document.getElementById(`comment_likes-count-${id}`);
+            const likesCount = document.getElementById(`comment__likes-count-id-${id}`);
 
             try {
                 const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}`, {
@@ -457,18 +426,18 @@ async function initCommentLikes() {
 
                 if (data.is_authenticated) {
                     if (data.liked) {
-                        img.classList.replace("comment_like-wrapper", "comment_like-wrapper-liked")
+                        img.classList.add("comment__like-button--active")
                         likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                         void likesCount.offsetWidth; // Принудительная перерисовка
                         likesCount.classList.add('dellikeanimate');
                     } else {
-                        img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                        img.classList.remove("comment__like-button--active")
                         likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                         void likesCount.offsetWidth; // Принудительная перерисовка
                         likesCount.classList.add('setlikeanimate');
                     }
                 } else {
-                    img.classList.replace("comment_like-wrapper-liked", "comment_like-wrapper")
+                    img.classList.remove("comment__like-button--active")
                     likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                     void likesCount.offsetWidth; // Принудительная перерисовка
                     likesCount.classList.add('setlikeanimate');

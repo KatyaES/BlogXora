@@ -37,7 +37,7 @@ async function userFollows(div) {
 }
 
 async function initUserFollows() {
-    const followBtn = document.querySelectorAll('.follow-btn')
+    const followBtn = document.querySelectorAll('.button-follow')
 
     const status = await window.checkToken(false)
     const BASE_URL = window.location.origin

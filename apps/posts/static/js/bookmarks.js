@@ -4,7 +4,7 @@ async function setPostBookmark(element) {
         const BASE_URL = window.location.origin
 
         const status = await window.checkToken()
-        const bookmarksCount = document.getElementById(`bookmark-count-${post_id}`)
+        const bookmarksCount = document.getElementById(`bookmark-button__count-id-${post_id}`)
 
         if (status) {
             const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${post_id}/set_bookmark/`, {
@@ -21,18 +21,18 @@ async function setPostBookmark(element) {
 
             if (data.is_authenticated) {
                 if (data.set_bookmark) {
-                    element.classList.replace("bookmark-wrapper", "bookmark-wrapper-set")
+                    element.classList.add("bookmark-button--active")
                     bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarksCount.offsetWidth
                     bookmarksCount.classList.add('dellikeanimate');
                 } else {
-                    element.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                    element.classList.remove("bookmark-button--active")
                     bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarksCount.offsetWidth;
                     bookmarksCount.classList.add('setlikeanimate');
                 }
             } else {
-                element.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                element.classList.remove("bookmark-button--active")
                 bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                 void bookmarksCount.offsetWidth;
                 bookmarksCount.classList.add('setlikeanimate');
@@ -51,7 +51,7 @@ async function setCommentBookmark(element) {
         const BASE_URL = window.location.origin
 
         const status = await window.checkToken()
-        const bookmarksCount = document.getElementById(`comment_bookmark-count-${comment_id}`)
+        const bookmarksCount = document.getElementById(`comment__bookmark-count-id-${comment_id}`)
 
         if (status) {
             const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${comment_id}/set_bookmark/`, {
@@ -67,18 +67,18 @@ async function setCommentBookmark(element) {
 
             if (data.is_authenticated) {
                 if (data.set_bookmark) {
-                    element.classList.replace("comment_bookmark-wrapper", "comment_bookmark-wrapper-set")
+                    element.classList.add("comment__bookmark-button--active")
                     bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarksCount.offsetWidth
                     bookmarksCount.classList.add('dellikeanimate');
                 } else {
-                    element.classList.replace("comment_bookmark-wrapper-set", "comment_bookmark-wrapper")
+                    element.classList.remove("comment__bookmark-button--active")
                     bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarksCount.offsetWidth;
                     bookmarksCount.classList.add('setlikeanimate');
                 }
             } else {
-                element.classList.replace("comment_bookmark-wrapper-set", "comment_bookmark-wrapper")
+                element.classList.remove("comment__bookmark-button--active")
                 bookmarksCount.classList.remove('setlikeanimate', 'dellikeanimate')
                 void bookmarksCount.offsetWidth;
                 bookmarksCount.classList.add('setlikeanimate');
@@ -93,12 +93,12 @@ async function setCommentBookmark(element) {
 async function initPostBookmarks() {
     const BASE_URL = window.location.origin
 
-    const bookmarkWrapper = document.querySelectorAll(".bookmark-wrapper");
+    const bookmarkWrapper = document.querySelectorAll(".bookmark-button");
     const status = window.checkToken(true)
 
     for (const img of bookmarkWrapper) {
         const id = img.getAttribute("data-id");
-        const bookmarkCount = document.getElementById(`bookmark-count-${id}`);
+        const bookmarkCount = document.getElementById(`bookmark-button__count-id-${id}`);
 
         try {
             if (status) {
@@ -113,18 +113,18 @@ async function initPostBookmarks() {
 
                 if (data.is_authenticated) {
                     if (data.set_bookmark) {
-                        img.classList.replace("bookmark-wrapper", "bookmark-wrapper-set")
+                        img.classList.add("bookmark-button--active")
                         bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                         void bookmarkCount.offsetWidth
                         bookmarkCount.classList.add('dellikeanimate');
                     } else {
-                        img.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                        img.classList.remove("bookmark-button--active")
                         bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                         void bookmarkCount.offsetWidth;
                         bookmarkCount.classList.add('setlikeanimate');
                     }
                 } else {
-                    img.classList.replace("bookmark-wrapper-set", "bookmark-wrapper")
+                    img.classList.remove("bookmark-button--active")
                     bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarkCount.offsetWidth;
                     bookmarkCount.classList.add('setlikeanimate');
@@ -139,12 +139,12 @@ async function initPostBookmarks() {
 async function initCommentBookmarks() {
     const BASE_URL = window.location.origin
 
-    const bookmarkWrapper = document.querySelectorAll(".comment_bookmark-wrapper");
+    const bookmarkWrapper = document.querySelectorAll(".comment__bookmark-button");
     const status = window.checkToken(true)
 
     for (const img of bookmarkWrapper) {
         const comment_id = img.getAttribute("data-id");
-        const bookmarkCount = document.getElementById(`comment_bookmark-count-${comment_id}`);
+        const bookmarkCount = document.getElementById(`comment__bookmark-count-id-${comment_id}`);
 
         try {
             if (status) {
@@ -160,18 +160,18 @@ async function initCommentBookmarks() {
 
                 if (data.is_authenticated) {
                     if (data.set_bookmark) {
-                        img.classList.replace("comment_bookmark-wrapper", "comment_bookmark-wrapper-set")
+                        img.classList.add("comment__bookmark-button--active")
                         bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                         void bookmarkCount.offsetWidth
                         bookmarkCount.classList.add('dellikeanimate');
                     } else {
-                        img.classList.replace("comment_bookmark-wrapper-set", "comment_bookmark-wrapper")
+                        img.classList.remove("comment__bookmark-button--active")
                         bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                         void bookmarkCount.offsetWidth;
                         bookmarkCount.classList.add('setlikeanimate');
                     }
                 } else {
-                    img.classList.replace("comment_bookmark-wrapper-et", "comment_bookmark-wrapper")
+                    img.classList.remove("comment__bookmark-button--active")
                     bookmarkCount.classList.remove('setlikeanimate', 'dellikeanimate')
                     void bookmarkCount.offsetWidth;
                     bookmarkCount.classList.add('setlikeanimate');

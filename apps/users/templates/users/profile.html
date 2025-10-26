@@ -5,26 +5,26 @@
 
 
 {% block body %}
-    <div class="profile_wrapper">
-        <div class="main-profile">
-            <div class="user-profile-head">
-                <div class="profile_username-img">
-                    <img src="{{ profile_user.image.url }}" class="profile_head-img">
-                    <span class="profile_head-name">{{ profile_user.username }}</span>
+    <div class="profile__wrapper">
+        <div class="profile__head">
+            <div class="profile__meta">
+                <div class="profile__user-info">
+                    <img src="{{ profile_user.image.url }}" class="profile__avatar">
+                    <span class="profile__username">{{ profile_user.username }}</span>
                 </div>
                 {% if request.user != profile_user %}
-                    <div class="follow-btn" onclick="userFollows(this)" data-id="{{ profile_user.id }}">Подписаться</div>
+                    <div class="button-follow" onclick="userFollows(this)" data-id="{{ profile_user.id }}">Подписаться</div>
                 {% endif %}
             </div>
-            <div class="bio-wrapper">
+            <div class="profile__bio">
                 {% if not profile_user.bio or profile_user.bio == 'None' %}
                     {% if profile_user == request.user %}
-                        <a href="{% url 'settings' %}" class="add-bio">добавить описание</a>
+                        <a href="{% url 'settings' %}" class="profile__add-bio-button">добавить описание</a>
                     {% endif %}
                 {% else %}
                     <span>{{ profile_user.bio }}</span>
                     {% if request.user == profile_user %}
-                        <img class="pencil-img" onclick="settings(this)" src="/media/icons/pencil.svg">
+                        <img class="site-header__img-add-post" onclick="settings(this)" src="/media/icons/pencil.svg">
                     {% endif %}
 
                 {% endif %}

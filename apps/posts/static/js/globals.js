@@ -1,7 +1,8 @@
 window.isLoadingPosts = false;
 window.isLoadingComments = true;
-window.postsContainer = null;
-window.commentsContainer = document.querySelector('.comments-container');
+window.postsContainer = document.querySelector('.post-container');;
+window.commentsContainer = document.querySelector('.comments-list');
+window.postDetailContainer = document.querySelector('.post');
 window.lastQuery = '';
 window.selectedFile = null;
 window.postFilter = null;

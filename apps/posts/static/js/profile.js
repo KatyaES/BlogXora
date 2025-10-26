@@ -228,6 +228,7 @@ function initLoadProfileData() {
     if (path.endsWith('/comments/')) {
         const commentButton = document.getElementById('profile-nav__item_5')
         const profileNavItems = document.querySelectorAll('.profile-nav__item')
+
         profileNavItems.forEach(el => {
             if (el !== commentButton) {
                 el.style.borderBottom = ''
@@ -281,7 +282,7 @@ async function profileFollowersFunc() {
                     <img src=${data.followers[i].image} class="following_image">
                     <a class="subs_username" onclick="profile('${data.followers[i].username}')" >${data.followers[i].username}</a>
                 </div>
-                <div class="follow-btn" onclick="userFollows(this)" data-id="${data.followers[i].id}" datatype="${username}">Подписаться</div>
+                <div class="button-follow" onclick="userFollows(this)" data-id="${data.followers[i].id}" datatype="${currentUser}">Подписаться</div>
             </div>
         `
         followersWrapper.insertAdjacentHTML('beforeend', follower)
@@ -334,8 +335,8 @@ async function profileSubscribesFunc() {
                     <img src=${data.followings[i].image} class="following_image">
                     <a class="subs_username" onclick="profile('${data.followings[i].username}')" >${data.followings[i].username}</a>
                 </div>
-                ${username !== data.followings[i].username
-                    ?`<div class="follow-btn" onclick="userFollows(this)" data-id="${data.followings[i].id}" datatype="${username}">Подписаться</div>`
+                ${currentUser !== data.followings[i].username
+                    ?`<div class="button-follow" onclick="userFollows(this)" data-id="${data.followings[i].id}" datatype="${currentUser}">Подписаться</div>`
                     : ``
                 }
             </div>

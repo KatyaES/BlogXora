@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'posts/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/posts/main.css' %}">
 </head>
 <body>
     <header class="site-header">
@@ -28,7 +28,11 @@
             {% if request.user.is_authenticated %}
                 <div class="site-header__icon-notifications-wrapper" onclick="notificationFunc()">
                     <img class="site-header__img-notifications" src="/media/icons/bell.png">
-                    <div class="site-header__notifications-count" style="text-decoration: none;">{{ notification_count }}</div>
+                    {% if notification_count %}
+                        <div class="site-header__notifications-count" style="text-decoration: none;">{{ notification_count }}</div>
+                    {% else %}
+                        <div class="site-header__notifications-count" style="text-decoration: none;"></div>
+                    {% endif %}
                     <div class="site-header__notification-container">
                         <div class="site-header__notifications-navbar">
                             <span>Уведомления</span>
@@ -96,7 +100,7 @@
                 {% block body %}
                 {% endblock %}
             </div>
-            <div class="popular-and-random">
+            <div class="sticky-sidebar">
                 {% if request.user.is_authenticated %}
                     <div class="profile-cont">
                         <div class="profile-data">
@@ -119,22 +123,22 @@
                     </div>
                 {% else %}
                 <div class="auth-modal-login__wrapper">
-            <div class="auth-modal__header">Войти</div>
-            <div class="auth-modal__fields">
-                <input class="auth-modal__input-username" placeholder="Логин" minlength="3">
-                <div class="auth-modal__username-error"></div>
-                <input class="auth-modal__input-password" type="password" placeholder="Пароль">
-                <div class="auth-modal__password-error"></div>
-            </div>
-            <div class="auth-modal__error-data">
-                <p class="auth-modal__error-message"></p>
-            </div>
-            <div class="auth-modal__buttons-wrapper">
-                <button class="auth-modal__button-enter" onclick="loginHandler()">Войти</button>
-                <button class="auth-modal__button-switch-to-register">Создать аккаунт</button>
-            </div>
-            <a class="auth-modal__forget-password" href="{% url 'password_reset' %}">Забыли пароль?</a>
-        </div>
+                    <div class="auth-modal__header">Войти</div>
+                    <div class="auth-modal__fields">
+                        <input class="auth-modal__input-username" placeholder="Логин" minlength="3">
+                        <div class="auth-modal__username-error"></div>
+                        <input class="auth-modal__input-password" type="password" placeholder="Пароль">
+                        <div class="auth-modal__password-error"></div>
+                    </div>
+                    <div class="auth-modal__error-data">
+                        <p class="auth-modal__error-message"></p>
+                    </div>
+                    <div class="auth-modal__buttons-wrapper">
+                        <button class="auth-modal__button-enter" onclick="loginHandler()">Войти</button>
+                        <button class="auth-modal__button-switch-to-register">Создать аккаунт</button>
+                    </div>
+                    <a class="auth-modal__forget-password" href="{% url 'password_reset' %}">Забыли пароль?</a>
+                </div>
                 <div class="auth-modal-register__wrapper auth-modal-register__wrapper--hidden">
             <div class="auth-modal__header">Создать аккаунт</div>
             <div class="auth-modal__fields">
@@ -156,39 +160,37 @@
             </div>
         </div>
                 {% endif %}
-                <div id="popular-id" class="popular-cat">
-                    <p class="popular-title">Темы</p>
+                <div class="sidebar__section-topics">
+                    <div class="sidebar__title">Темы</div>
                     {% for category in categories %}
                         {% if forloop.counter == 6 %}
-                            <div class="show-all-themes-button" id="show-all-themes-button" role="button">
-                                <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
+                            <div class="topics-dropdown" role="button">
+                                <img class="topics-arrow" src="/media/icons/arrow-up.svg">
                                 <span>Показать все</span>
                             </div>
                         {% endif %}
-                        <div class="category-item" onclick="window.location.href = `${BASE_URL}/{{ category.tag }}`">
-                            <img src="{{ category.image.url }}" alt="">
-                            <a href="{% url 'category' category.tag %}">{{ category.cat_title }}</a>
+                        <div class="sidebar-item" onclick="window.location.href = `${BASE_URL}/{{ category.tag }}`">
+                            <img src="{{ category.image.url }}" class="sidebar-item__icon">
+                            <a href="{% url 'category' category.tag %}" class="sidebar-item__text">{{ category.cat_title }}</a>
                         </div>
                     {% endfor %}
                 </div>
 
-                <div class="random-posts">
-                <div class="popular-post-p">
-                    <span>ЧИТАЮТ СЕЙЧАС</span>
-                </div>
-                {% for post in random_posts %}
-                    <div class="cicle-container">
-                        <div class="date-and-name">
-                            <div class="side-img-name">
-                                <img src="{{ post.user.image.url }}">
-                                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                <div class="sidebar__section-articles">
+                    <div class="sidebar__section-articles__title">ЧИТАЮТ СЕЙЧАС</div>
+                    {% for post in random_posts %}
+                        <div class="sidebar__article-item">
+                            <div class="sidebar__user-info">
+                                <div class="sidebar__user-info-details">
+                                    <img src="{{ post.user.image.url }}" class="sidebar__user-avatar">
+                                    <a href="{% url 'profile' post.user.username %}" class="sidebar__user-username">{{ post.user.username }}</a>
+                                </div>
+                                <a class="sidebar__date">{{ post.pub_date|smart_time }}</a>
                             </div>
-                            <a style="color: gray">{{ post.pub_date|smart_time }}</a>
+                            <a href="{% url 'post_detail' post.id %}" class="sidebar__article-item__title">{{ post.title }}</a>
                         </div>
-                        <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     <script>

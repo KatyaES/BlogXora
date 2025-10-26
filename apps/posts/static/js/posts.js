@@ -163,11 +163,12 @@ function initImageUploader() {
 }
 
 function initScroll() {
-    const showAllThemesButton = document.getElementById('show-all-themes-button')
-    if (showAllThemesButton) {
-        showAllThemesButton.addEventListener('click', () => {
-            document.getElementById('show-all-themes-button').style.display = 'none'
-            document.getElementById('popular-id').style.height = 'auto'
+    const topicsDropdown = document.querySelector('.topics-dropdown')
+    const topicsSection = document.querySelector('.sidebar__section-topics')
+    if (topicsDropdown) {
+        topicsDropdown.addEventListener('click', () => {
+            topicsDropdown.classList.add('topics-dropdown--hidden')
+            topicsSection.classList.add('sidebar__section-topics--expanded')
         })
         window.addEventListener('scroll', () => {
             if (Math.round(window.scrollY) >= 200) {
@@ -190,7 +191,7 @@ async function setPostLike(div) {
         const status = await window.checkToken()
         const id = div.getAttribute("data-id")
 
-        const likesCount = document.getElementById(`likes-count-${id}`);
+        const likesCount = document.getElementById(`like-button__count-id-${id}`);
 
         if (status) {
             const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/set_like/`, {
@@ -201,15 +202,15 @@ async function setPostLike(div) {
                     }
                 })
             const data = await response.json()
-            document.getElementById(`likes-count-${id}`).textContent = data.likes;
+            likesCount.textContent = data.likes;
 
             if (data.liked) {
-                div.classList.replace("like-wrapper", "like-wrapper-liked")
+                div.classList.add("like-button--active")
                 likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                 void likesCount.offsetWidth; // Принудительная перерисовка
                 likesCount.classList.add('dellikeanimate');
             } else {
-                div.classList.replace("like-wrapper-liked", "like-wrapper")
+                div.classList.remove("like-button--active")
                 likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
                 void likesCount.offsetWidth; // Принудительная перерисовка
                 likesCount.classList.add('setlikeanimate');
@@ -299,66 +300,62 @@ async function initLoadPosts() {
 
         if (document.getElementById(`post-${data.results[i].id}`)) continue;
         const posts = `
-            <div class="post-wrapper" id="post-${data.results[i].id}">
-                <div class="posts">
-                    <div class="user-photo-name">
-                        <div class="user">
-                            <img src="${data.results[i].image}">
-                                <div class="name-and-date-category">
-                                    <div class="username">
-                                        <a href="${window.BASE_URL}/users/${data.results[i].user}">${data.results[i].user}</a>
-                                        <span style="color: gray;">${smart_time(data.results[i].pub_date)}</span>
-                                    </div>
+            <div class="post" id="post-${data.results[i].id}">
+                <div class="post__header">
+                    <div class="user-info">
+                        <div class="user-info__meta">
+                            <img src="${data.results[i].image}" class="user-info__avatar">
+                                <div class="user-info__details">
+                                    <a href="${window.BASE_URL}/users/${data.results[i].user}" class="user-info__username">${data.results[i].user}</a>
+                                    <div class="user-info__date">${smart_time(data.results[i].pub_date)}</div>
                                 </div>
                             </div>
                             ${currentUser !== data.results[i].user
-                                ? `<div class="follow-btn" onclick="userFollows(this)" data-id="${data.results[i].user_id}" datatype="${currentUser}">Подписаться</div>`
+                                ? `<div class="button-follow" onclick="userFollows(this)" data-id="${data.results[i].user_id}" datatype="${currentUser}">Подписаться</div>`
                                 : ''
                             }
                         </div>
                     <br>
-                        <div class="post-meta">
-                            <a href="${BASE_URL}/${data.results[i].tag}" class="post_category">${data.results[i].category}</a>
-                            <div class="post-type">${data.results[i].post_type}</div>
+                        <div class="post__meta">
+                            <a href="${BASE_URL}/${data.results[i].tag}" class="post__category">${data.results[i].category}</a>
+                            <div class="post__type">${data.results[i].post_type}</div>
                         </div>
                     <br>
                     <br>
-                    <div class="title">
+                    <div class="post__title">
                         <a href="/post/${data.results[i].id}">${data.results[i].title}</a>
                     </div>
                     <br>
-                    <div class="ql-editor">
+                    <div class="post__content">
                         ${data.results[i].wrapp_img
-                            ? `<img src="${data.results[i].wrapp_img}" alt="">`
+                            ? `<img src="${data.results[i].wrapp_img}" class="post__wrapp-img">`
                             : ''
                         }
                         <p>${splitContent(data.results[i].content)}</p>
                     </div>
-                    <div class="detail-button">
+                    <div class="post__button-detail">
                         <a href="/post/${data.results[i].id}/">Читать далее</a>
                     </div>
-                    <div class="icon-cont">
-                        <div class="post-reactions">
-                            <div class="like-wrapper" id="wrapper-id" onclick="setPostLike(this)" data-id="${data.results[i].id}">
-                                <img src="/media/icons/hart.png" class="heart-img" id="like-button">
-                                <span class="likes-count" id="likes-count-${data.results[i].id}">${data.results[i].liked_by.length}</span>
+                    <div class="post__actions">
+                        <div class="reactions">
+                            <div class="like-button" onclick="setPostLike(this)" data-id="${data.results[i].id}">
+                                <img src="/media/icons/hart.png" class="like-button__icon">
+                                <span class="like-button__count" id="like-button__count-id-${data.results[i].id}">${data.results[i].liked_by.length}</span>
                             </div>
-                            <div class="comment-wrapper">
-                                <img src="/media/icons/comment.svg" class="comment-img" onclick="window.location.href = '/post/${data.results[i].id}/'">
-                                <span class="comment-count">${data.results[i].comment_count}</span>
+                            <div class="comment-button">
+                                <img src="/media/icons/comment.svg" class="comment-button__icon" onclick="window.location.href = '/post/${data.results[i].id}/'">
+                                <span class="comment-button__count">${data.results[i].comment_count}</span>
                             </div>
-                            <div class="bookmark-wrapper" onclick="setPostBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
-                                <a>
-                                    <svg class="bookmark-img" width="24" height="24" viewBox="0 0 24 24">
-                                        <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
-                                    </svg>
-                                </a>
-                                <span class="bookmark-count" id="bookmark-count-${data.results[i].id}">${data.results[i].bookmark_user.length}</span>
+                            <div class="bookmark-button" onclick="setPostBookmark(this)" data-id="${data.results[i].id}" data-section="bookmarks">
+                                <svg class="bookmark-button__icon" width="24" height="24" viewBox="0 0 24 24">
+                                    <path d="M6 2C5.44772 2 5 2.44772 5 3V21C5 21.2761 5.22386 21.5 5.5 21.5C5.63261 21.5 5.76522 21.4477 5.85355 21.3536L12 15.7071L18.1464 21.3536C18.2348 21.4477 18.3674 21.5 18.5 21.5C18.7761 21.5 19 21.2761 19 21V3C19 2.44772 18.5523 2 18 2H6Z" stroke-width="2"/>
+                                </svg>
+                                <span class="bookmark-button__count" id="bookmark-button__count-id-${data.results[i].id}">${data.results[i].bookmark_user.length}</span>
                             </div>
                         </div>
-                        <div class="view-wrapper">
-                            <img src="/media/icons/view.svg" class="views-img">
-                            <span class="views-count">${data.results[i].views_count}</span>
+                        <div class="post__views">
+                            <img src="/media/icons/view.svg" class="post__view-icon">
+                            <span class="post__view-count">${data.results[i].views_count}</span>
                         </div>
                     </div>
                 </div>
@@ -426,13 +423,13 @@ async function initScrollForPosts() {
 
 async function initPostLikes() {
     const status = await window.checkToken()
-    const imgWrapper = document.querySelectorAll(".like-wrapper");
+    const imgWrapper = document.querySelectorAll(".like-button");
     const BASE_URL = window.location.origin
 
     if (status) {
         for (const img of imgWrapper) {
             const id = img.getAttribute("data-id");
-            const likesCount = document.getElementById(`likes-count-${id}`);
+            const likesCount = document.getElementById(`like-button__count-id-${id}`);
             const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/`, {
                 method: 'GET',
                 credentials: 'include',
@@ -443,12 +440,12 @@ async function initPostLikes() {
             const data = await response.json();
             if (data.is_authenticated) {
                 if (data.liked) {
-                    img.classList.replace("like-wrapper", "like-wrapper-liked")
+                    img.classList.add("like-button--active")
                 } else {
-                    img.classList.replace("like-wrapper-liked", "like-wrapper")
+                    img.classList.remove("like-button--active")
                 }
             } else {
-                img.classList.replace("like-wrapper-liked", "like-wrapper")
+                img.classList.remove("like-button--active")
             }
         }
     }

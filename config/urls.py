@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('config/', include('config.urls'))
 """
-
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
@@ -26,22 +26,18 @@ from config import settings
 from apps.posts.views import index, add_post, category_page, post_detail
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', index, name='index'),
+    path('admin/', admin.site.urls),
     path('users/', include('apps.users.urls')),
-
     path('settings/', views.profile_settings, name='settings'),
-    path("add_post/", add_post, name="add_post"),
+    path("add-post/", add_post, name="add_post"),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path("<str:tag>/", category_page, name="category"),
     path("post/<int:pk>/", post_detail, name="post_detail"),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
-
-    path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('frontend_api/v1/', include('apps.api.v1.frontend_urls')),
+    path('frontend-api/v1/', include('apps.api.v1.frontend_urls')),
     path('api/v1/', include('apps.api.v1.public_urls')),
-
-    path("comments/", profile_page, name="profile_page"),
 ]
 
 if config.settings.dev.DEBUG:
     urlpatterns += static(config.settings.base.MEDIA_URL, document_root=config.settings.base.MEDIA_ROOT)
+    urlpatterns += debug_toolbar_urls()

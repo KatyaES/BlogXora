@@ -13,160 +13,44 @@
                 <img src="/media/icons/arrow-up.svg">
             </div>
         </div>
-        <div class="container">
-            <div class="profile-edit">
-                <div class="settings_title">Настройки</div>
-                <div class="settings_username-wrapper">
+            <div class="settings">
+                <div class="settings__title">Настройки</div>
+                <div class="settings__basic">
                     <span>Фото</span>
-                    <input class="settings-photo" type="file">
+                    <img src="{{ user.image.url }}" class="profile-image">
+                    <input class="settings__photo" type="file">
                     <span>Имя пользователя</span>
-                    <input class="settings_username" value="{{ user.username }}">
-                    <div class="username_error"></div>
+                    <input class="settings__username-text" value="{{ user.username }}">
+                    <div class="settings__username-error"></div>
                 </div>
 
-                <div class="settings_email-wrapper">
+                <div class="settings__email">
                     <span>Почта</span>
-                    <input class="settings_email" value="{{ user.email }}">
+                    <input class="settings__email-text" value="{{ user.email }}">
                 </div>
 
-                <div class="settings_about-wrapper">
+                <div class="settings__about">
                     <span>О себе</span>
-                    <input class="settings_about" value="{{ user.bio }}">
+                    <input class="settings__about-text" value="{{ user.bio }}">
                 </div>
-                <div class="data_error"></div>
-                <div class="send-settings_data" onclick="saveProfileData()">Сохранить</div>
-                <div class="change-password-url" onclick="showChangeWrapper()">Сменить пароль</div>
-                <div class="settings_password-wrapper">
-                    <div class="settings_old-password-wrapper">
+                <div class="settings__errors"></div>
+                <div class="settings__button-data-save" onclick="saveProfileData()">Сохранить</div>
+                <div class="settings__button-change-password" onclick="showChangeWrapper()">Сменить пароль</div>
+                <div class="settings__password">
+                    <div class="settings__old-password">
                         <span>Старый пароль</span>
-                        <input class="settings_old-password" type="password">
-                        <a href="{% url 'password_reset' %}" class="forgot-password-message">Я не помню старый пароль</a>
+                        <input class="settings__old-password-text" type="password">
+                        <a href="{% url 'password_reset' %}" class="settings__forgot-password-message">Я не помню старый пароль</a>
                     </div>
-                    <div class="settings_new-password-wrapper">
+                    <div class="settings__new-password">
                         <span>Новый пароль</span>
-                        <input class="settings_new-password" type="password">
+                        <input class="settings__new-password-text" type="password">
                     </div>
-                    <div class="error-password-message"></div>
-                    <div class="success-message">Данные успешно обновлены</div>
-                    <div class="save-password" onclick="changePassword(this)" data-key="{{ request.user.username }}">Сохранить</div>
+                    <div class="settings__error-password-message"></div>
+                    <div class="settings__success-message">Данные успешно обновлены</div>
+                    <div class="settings__button-save-password" onclick="changePassword(this)" data-key="{{ request.user.username }}">Сохранить</div>
                 </div>
             </div>
-            <div class="popular-and-random">
-                {% if request.user.is_authenticated %}
-                    <div class="profile-cont">
-                        <div class="profile-data">
-                            <div class="user-data">
-                                <img src="{{ user.image.url }}" class="profile-user-img">
-                                <div class="logout-and-username">
-                                    <a href="{% url 'profile' user.username %}">{{ request.user }}</a>
-                                    <a class="logout" onclick="logout()">выйти</a>
-                                </div>
-                            </div>
-                            <img class="settings-img" src="/media/icons/settings.svg" onclick="settings(this)">
-                        </div>
-                        <div class="profile-elements">
-                            {% if request.user.is_staff %}
-                            <div class="admin-cont" onclick="adminRedirect()">
-                                <a href="http://127.0.0.1:8000/admin/">Администрация</a>
-                            </div>
-                            {% endif %}
-                            <script>
-                                const username = "{{ request.user }}"
-                            </script>
-                            <div class="notifications-cont" onclick="window.location.href = 'users/profile/' + username + '#notification-id'">
-                                <a href="{% url 'profile' request.user %}#notifications-id">Уведомления</a>
-                            </div>
-                            <div class="subscribes-cont" onclick="window.location.href = 'users/profile/' + username + '#subs-id'">
-                                <a href="{% url 'profile' request.user %}#subscribes-id">Подписки</a>
-                            </div>
-                            <div class="bookmarks-cont" onclick="window.location.href = 'users/profile/' + username + '#bookmarks-id'">
-                                <a href="{% url 'profile' request.user %}#bookmarks-id">Закладки</a>
-                            </div>
-                            <div class="self-posts-cont" onclick="window.location.href = 'users/profile/' + username + '#self-posts-id'">
-                                <a href="{% url 'profile' request.user %}#self-posts-id">Посты</a>
-                            </div>
-                            <div class="comment-cont" onclick="window.location.href = 'users/profile/' + username + '#comments'">
-                                <a href="{% url 'profile' request.user %}#comment">Комментарии</a>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                <div class="login-cont">
-                    <div class="auth-header">Войти</div>
-                    <div class="login-password">
-                        <input class="login-form" placeholder="Логин" minlength="3">
-                        <p class="login-warning">Обязательное поле</p>
-                        <p class="login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="password-form" type="password" placeholder="Пароль">
-                        <div class="password-warnings"></div>
-                        <p class="pass-warning">Обязательное поле</p>
-                        <p class="pass-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                    </div>
-                    <div class="error-data">
-                        <p class="error-message">Ошибка.Неправильный логин или пароль</p>
-                    </div>
-                    <div class="open-create">
-                        <button onclick="loginHandler()">Войти</button>
-                        <button id="login-second-button">Создать аккаунт</button>
-                    </div>
-                    <a href="{% url 'password_reset' %}" class="forget-password">Забыли пароль?</a>
-                </div>
-                <div class="register">
-                    <div class="auth-header-reg">Создать аккаунт</div>
-                    <div class="register-data">
-                        <input class="email-form" placeholder="Email">
-                        <p class="reg-email-warning">Обязательное поле</p>
-                        <p class="reg-email-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="reg-login-form" placeholder="Никнейм" maxlength="16">
-                        <p class="reg-login-warning">Обязательное поле</p>
-                        <p class="reg-login-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="reg-password-form" type="password" placeholder="Пароль">
-                        <p class="reg-pass1-warning">Обязательное поле</p>
-                        <p class="reg-pass1-min-length-warning">Ошибка.Минимальная длина 3 символа</p>
-                        <input class="repeat-password-form" type="password" placeholder="Повторите пароль">
-                        <p class="reg-pass2-warning">Обязательное поле</p>
-                        <p class="reg-pass2-min-length-warning">Ошибка.Пароли не совпадают</p>
-                    </div>
-                    <div class="open-create">
-                        <button onclick="registerHandler()">Создать аккаунт</button>
-                        <button id="second-button">Есть аккаунт? Войти</button>
-                    </div>
-                </div>
-                {% endif %}
-                <div id="popular-id" class="popular-cat">
-                    <p class="popular-title">Темы</p>
-                    {% for category in categories %}
-                        {% if forloop.counter == 6 %}
-                            <div class="show-all-themes-button" id="show-all-themes-button" role="button">
-                                <img class="down" id="img-id" src="/media/icons/arrow-up.svg">
-                                <span>Показать все</span>
-                            </div>
-                        {% endif %}
-                        <div class="category-item" onclick="window.location.href = `${BASE_URL}/{{ category.tag }}`">
-                            <img src="{{ category.image.url }}" alt="">
-                            <a href="{% url 'category' category.tag %}">{{ category.cat_title }}</a>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="random-posts">
-                    <div class="popular-post-p">
-                        <span>ЧИТАЮТ СЕЙЧАС</span>
-                    </div>
-                    {% for post in random_posts %}
-                        <div class="cicle-container">
-                            <div class="date-and-name">
-                                <div class="side-img-name">
-                                    <img src="{{ post.user.image.url }}">
-                                    <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
-                                </div>
-                                <a style="color: gray">{{ post.pub_date|smart_time }}</a>
-                            </div>
-                            <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
     </div>
     <script src="{% static 'js/edit_profile.js' %}"></script>
 

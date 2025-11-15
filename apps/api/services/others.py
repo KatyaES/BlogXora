@@ -3,12 +3,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_200_OK
 
-from apps.posts.models import Post, Comment, User
-from apps.users.models import Notifications, Subscription
+from apps.posts.models import Post, Comment
+from apps.users.models import Notifications, Subscription, CustomUser
 
 
 def add_user_subscription(request, pk):
-    follower_on = User.objects.get(id=pk)
+    follower_on = CustomUser.objects.get(id=pk)
 
     subscription, created = Subscription.objects.get_or_create(
         user=follower_on,

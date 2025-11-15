@@ -7,7 +7,7 @@ async function setPostBookmark(element) {
         const bookmarksCount = document.getElementById(`bookmark-button__count-id-${post_id}`)
 
         if (status) {
-            const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${post_id}/set_bookmark/`, {
+            const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${post_id}/set-bookmark/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -54,7 +54,7 @@ async function setCommentBookmark(element) {
         const bookmarksCount = document.getElementById(`comment__bookmark-count-id-${comment_id}`)
 
         if (status) {
-            const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${comment_id}/set_bookmark/`, {
+            const response = await fetch(`${BASE_URL}/frontend-api/v1/comments/${comment_id}/set-bookmark/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -148,7 +148,7 @@ async function initCommentBookmarks() {
 
         try {
             if (status) {
-                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${comment_id}/`, {
+                const response = await fetch(`${BASE_URL}/frontend-api/v1/comments/${comment_id}/`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

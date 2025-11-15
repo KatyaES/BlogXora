@@ -7,13 +7,12 @@ async function profileBookmarksFunc() {
     const bookmarkButton = document.getElementById('profile-nav__item_2')
     const user = bookmarkButton.getAttribute('data-id')
     const BASE_URL = window.location.origin
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
-    profileHeaderNavCont.innerHTML = ''
-    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_my_bookmarks_posts/${user}`
-    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_my_bookmarks_comments/${user}`
+    profileContentContainer.innerHTML = ''
+    nextPostsPageUrl = `${BASE_URL}/frontend-api/v1/posts/get-my-bookmarks-posts/${user}`
+    nextCommentsPageUrl = `${BASE_URL}/frontend-api/v1/comments/get-my-bookmarks-comments/${user}`
     isLoadingPosts = false;
     isLoadingComments = false;
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
     localStorage.setItem('isSearchMode', 'false')
     const isSearchMode = localStorage.getItem('isSearchMode')
 
@@ -28,7 +27,7 @@ async function profileBookmarksFunc() {
     if (oldComments) {
         oldComments.forEach(comment => comment.remove())
     }
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
     initPostLikes();
     initPostBookmarks();
@@ -47,14 +46,14 @@ function profile(username, element=null) {
 }
 
 function initSettingsPasswordWrapper() {
-    const settingsPasswordWrapper = document.querySelector('.settings_password-wrapper')
+    const settingsPasswordWrapper = document.querySelector('.settings__password')
     if (settingsPasswordWrapper) {
         settingsPasswordWrapper.style.display = 'none';
     }
 };
 
 function showChangeWrapper() {
-    const settingsPasswordWrapper = document.querySelector('.settings_password-wrapper')
+    const settingsPasswordWrapper = document.querySelector('.settings__password')
     if (settingsPasswordWrapper.style.display === 'none') {
         settingsPasswordWrapper.style.display = 'flex';
     } else { settingsPasswordWrapper.style.display = 'none'; }
@@ -62,16 +61,28 @@ function showChangeWrapper() {
 
 async function saveProfileData() {
     const status = await window.checkToken()
-    const photo = document.querySelector('.settings-photo').value
-    console.log(photo)
+    const usernameError = document.querySelector('.settings__username-error')
 
-    const username = document.querySelector('.settings_username').value
-    const email = document.querySelector('.settings_email').value
-    const about = document.querySelector('.settings_about').value
-    const BASE_URL = window.location.origin
+    const username = document.querySelector('.settings__username-text').value
+    const email = document.querySelector('.settings__email-text').value
+    const about = document.querySelector('.settings__about-text').value
+    const avatar = document.querySelector('.settings__photo').files[0]
+
+    const data = new FormData()
+    data.append('username', username)
+    data.append('email', email)
+    data.append('about', about)
+
+    if (!avatar) {
+        const avatar = document.querySelector('.profile-image').src
+        console.log(avatar)
+        data.append('avatar', avatar)
+    } else {
+        data.append('avatar', avatar)
+    }
+
 
     if (username.trim().length < 4) {
-        const usernameError = document.querySelector('.username_error')
         usernameError.textContent = 'Имя пользователя слишком короткое.'
         usernameError.style.color = '#e54848'
     } else {
@@ -80,14 +91,9 @@ async function saveProfileData() {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': window.csrfToken,
                 },
-                body: JSON.stringify({
-                    'username':username,
-                    'email':email,
-                    'about':about,
-                })
+                body: data,
             })
 
 
@@ -95,8 +101,7 @@ async function saveProfileData() {
                 location.reload()
             } else {
                 const data = await request.json()
-                const dataError = document.querySelector('.data_error')
-                const usernameError = document.querySelector('.username_error')
+                const dataError = document.querySelector('.settings__errors')
                 dataError.textContent = data.error
                 dataError.style.color = '#e54848'
 
@@ -108,7 +113,7 @@ async function saveProfileData() {
 
 
 async function changePassword(element) {
-    const errorElem = document.querySelector('.error-password-message')
+    const errorElem = document.querySelector('.settings__error-password-message')
     errorElem.textContent = ''
     const status = await window.checkToken()
 
@@ -116,8 +121,8 @@ async function changePassword(element) {
 
     const BASE_URL = window.location.origin
 
-    const oldPassword = document.querySelector('.settings_old-password').value
-    const newPassword = document.querySelector('.settings_new-password').value
+    const oldPassword = document.querySelector('.settings__old-password-text').value
+    const newPassword = document.querySelector('.settings__new-password-text').value
 
     if (!oldPassword || !newPassword) return;
 
@@ -136,22 +141,6 @@ async function changePassword(element) {
         })
         const data = await request.json()
         if (request.status === 200) {
-
-             const request = await fetch(`${BASE_URL}/users/login/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                },
-                body: JSON.stringify({
-                    'login': username,
-                    'password': newPassword
-                })
-            })
-
-            const data = await request.json()
-            const successElem = document.querySelector('.success-message')
-            window.location.reload()
             alert('Пароль успешно обновлен')
         } else {
             if (data.error.length) {
@@ -213,7 +202,7 @@ function initLoadProfileData() {
         })
         profileSubscribesFunc()
     }
-    if (path.endsWith('/posts/') || path.endsWith(`/${currentProfile}/`)) {
+    if (path.endsWith(`/${currentProfile}/`)) {
         const postsButton = document.getElementById('profile-nav__item_1')
         const profileNavItems = document.querySelectorAll('.profile-nav__item')
         profileNavItems.forEach(el => {
@@ -243,7 +232,6 @@ function initLoadProfileData() {
 async function profileFollowersFunc() {
     const followersButton = document.getElementById('profile-nav__item_4')
     userId = followersButton.getAttribute('data-auth')
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     const followersWrapper = document.createElement('div')
     followersWrapper.classList.add('followers_wrapper')
     followersWrapper.style.display = 'flex'
@@ -251,20 +239,20 @@ async function profileFollowersFunc() {
     isLoadingPosts = true;
     localStorage.setItem('isSearchMode', 'false')
 
-    profileHeaderNavCont.appendChild(followersWrapper)
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.appendChild(followersWrapper)
+    profileContentContainer.innerHTML = ''
     followersWrapper.innerHTML = ''
 
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
 
     const oldFollowers = document.querySelectorAll('.follower')
 
     if (oldFollowers) {
         oldFollowers.forEach(follower => follower.remove())
     }
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
-    const response = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/get_followers`, {
+    const response = await fetch(`${BASE_URL}/frontend-api/v1/subscription/${userId}/get-followers`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -274,7 +262,7 @@ async function profileFollowersFunc() {
     if (data.followers.length === 0) {
         followersWrapper.style.display = 'none'
     }
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
     for (let i = 0; i < data.followers.length; i++) {
         const follower = `
             <div class="follower">
@@ -296,7 +284,6 @@ async function profileFollowersFunc() {
 async function profileSubscribesFunc() {
     const subscribesButton = document.getElementById('profile-nav__item_3')
     userId = subscribesButton.getAttribute('data-auth')
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     const followingsWrapper = document.createElement('div')
     followingsWrapper.classList.add('followings_wrapper')
     followingsWrapper.style.display = 'flex'
@@ -304,20 +291,20 @@ async function profileSubscribesFunc() {
     isLoadingPosts = true;
     localStorage.setItem('isSearchMode', 'false')
 
-    profileHeaderNavCont.appendChild(followingsWrapper)
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.appendChild(followingsWrapper)
+    profileContentContainer.innerHTML = ''
     followingsWrapper.innerHTML = ''
 
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
 
     const oldSubscriptions = document.querySelectorAll('.following')
 
     if (oldSubscriptions) {
         oldSubscriptions.forEach(subscription => subscription.remove())
     }
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
-    const response = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/get_followers`, {
+    const response = await fetch(`${BASE_URL}/frontend-api/v1/subscription/${userId}/get-followers`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -327,7 +314,7 @@ async function profileSubscribesFunc() {
     if (data.followings.length === 0) {
         followingsWrapper.style.display = 'none'
     }
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
     for (let i = 0; i < data.followings.length; i++) {
         const following = `
             <div class="following">

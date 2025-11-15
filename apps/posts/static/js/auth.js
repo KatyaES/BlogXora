@@ -1,7 +1,7 @@
 async function checkToken(showAlert = true) {
     const BASE_URL = window.location.origin
     const isLoggingOut = localStorage.getItem('isLoggingOut')
-    const response = await fetch(`${BASE_URL}/frontend_api/v1/token/refresh/`, {
+    const response = await fetch(`${BASE_URL}/frontend-api/v1/token/refresh/`, {
         method: 'POST',
         credentials: 'include',
         headers: {

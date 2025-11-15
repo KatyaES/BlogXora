@@ -32,7 +32,6 @@ class CacheAndClearMixin:
         cache.set(f'{self.cache_prefix}_cache_keys', keys, None)
         data = cache.get(cache_key)
         if data:
-            print(cache_key)
             return data
 
         if page is not None:
@@ -41,7 +40,7 @@ class CacheAndClearMixin:
         else:
             serializer = serializer_class(instance=queryset, many=True, context={'request': request})
             data = serializer.data
-        cache.set(cache_key, data, 60 * 2)
+        cache.set(cache_key, data, None)
         return data
 
     def perform_update(self, serializer):

@@ -14,7 +14,7 @@ async function sendComment(div) {
     try {
         if (comment.value) {
             if (status) {
-                const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/`, {
+                const request = await fetch(`${BASE_URL}/frontend-api/v1/comments/`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: {
@@ -28,7 +28,10 @@ async function sendComment(div) {
                 })
 
                 const data = await request.json()
-                console.log(data, '00')
+                const description = data.description.replace(
+                    /@(\w+)/g,
+                    `<a href="${BASE_URL}/users/$1/" style="color: var(--main-color);">@$1</a>`
+                )
 
                 const newComment = `
                     <div class="comment-item" id="comment-item-${data.id}">
@@ -43,7 +46,7 @@ async function sendComment(div) {
                             <span class="comment-item__pub-date">${smart_time(data.pub_date)}</span>
                         </div>
                         <div class="comment-item__content">
-                            ${data.description}
+                            ${description}
                         </div>
                         <div class="comment-reactions">
                             <div class="comment__like-button" onclick="setCommentLike(this)" data-id="${data.id}" data-type="common">
@@ -84,6 +87,7 @@ async function initLoadComments() {
     console.log('start')
     if (!nextCommentsPageUrl || isLoadingComments) return;
     isLoadingComments = true
+    console.log(nextCommentsPageUrl)
 
     const response = await fetch(nextCommentsPageUrl, {
         method: 'GET',
@@ -153,7 +157,7 @@ async function initLoadPostComments() {
     if (!nextCommentsPageUrl || isLoadingComments) return;
     console.log(nextCommentsPageUrl)
     const moreComments = localStorage.getItem('moreComments')
-    isLoadingComments = true
+    iSsLoadingComments = true
 
     const response = await fetch(nextCommentsPageUrl, {
         method: 'GET',
@@ -166,6 +170,10 @@ async function initLoadPostComments() {
     nextCommentsPageUrl = data.pages.next
 
     for (let i = 0; i < data.results.length; i++) {
+        const description = data.results[i].description.replace(
+            /@(\w+)/g,
+            `<a href="${BASE_URL}/users/$1/" style="color: var(--main-color);">@$1</a>`
+        )
         const newComment = `
             <div class="comment-item" id="comment-item-${data.results[i].id}">
                 <div class="comment-item__user-info">
@@ -179,7 +187,7 @@ async function initLoadPostComments() {
                     <span class="comment-item__pub-date">${smart_time(data.results[i].pub_date)}</span>
                 </div>
                 <div class="comment-item__content">
-                    ${data.results[i].description}
+                    ${description}
                 </div>
                 <div class="comment-reactions">
                     <div class="comment__like-button" onclick="setCommentLike(this)" data-id="${data.results[i].id}" data-type="common">
@@ -196,7 +204,7 @@ async function initLoadPostComments() {
                     </div>
                     <span class="comment__reply-button" onclick="commentReply(this)" data-field-id="${postID}" data-id="${data.results[i].id}" datatype="commentReplyButton">Ответить</span>
                     ${currentUser == data.results[i].username ? `
-                    <span class="delete-comment" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
+                    <span class="comment__delete-button" onclick="commentDelete(this)" id="${data.results[i].id}" data-key="${data.results[i].id}" data-type="common" data-id="${data.results[i].post_id}">Удалить</span>
                 ` : ''}
                 </div>
                 <div class="send_comment__form" id="send_comment__form-${data.results[i].id}">
@@ -239,22 +247,21 @@ async function profileCommentsFunc() {
     const user = commentButton.getAttribute('data-id')
     const BASE_URL = window.location.origin
     const currentUser = commentButton.getAttribute('data-auth')
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
 
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
-    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/get_user_comments/${user}`
+    nextCommentsPageUrl = `${BASE_URL}/frontend-api/v1/comments/get-user-comments/${user}`
     isLoadingComments = false;
     isLoadingPosts = true;
     localStorage.setItem('isSearchMode', 'false')
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
 
     const oldComments = document.querySelectorAll('.comment-item')
 
     if (oldComments) {
         oldComments.forEach(comment => comment.remove())
     }
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
     initLoadComments()
 }
@@ -326,7 +333,7 @@ async function commentDelete(span) {
     const BASE_URL = window.location.origin
 
     if (status) {
-        const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/`, {
+        const request = await fetch(`${BASE_URL}/frontend-api/v1/comments/${id}/`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
@@ -371,7 +378,7 @@ async function setCommentLike(div) {
 
 	try {
 	    if (status) {
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}/set_like/`, {
+            const request = await fetch(`${BASE_URL}/frontend-api/v1/comments/${id}/set-like/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -415,7 +422,7 @@ async function initCommentLikes() {
             const likesCount = document.getElementById(`comment__likes-count-id-${id}`);
 
             try {
-                const response = await fetch(`${BASE_URL}/frontend_api/v1/comments/${id}`, {
+                const response = await fetch(`${BASE_URL}/frontend-api/v1/comments/${id}`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

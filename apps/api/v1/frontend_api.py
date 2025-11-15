@@ -44,38 +44,43 @@ class CommentViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return super().get_permissions()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='set-like')
     def set_like(self, request, pk):
         comment = set_comment_like(request, pk)
         serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='set-bookmark')
     def set_bookmark(self, request, pk):
         comment = add_comment_bookmark(request, pk)
         serializer = CommentSerializer(comment, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='get_my_bookmarks_comments/(?P<username>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='get-my-bookmarks-comments/(?P<username>[^/.]+)')
     def get_my_bookmarks_comments(self, request, *args, **kwargs):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        comments_queryset = Comment.objects.filter(bookmarked_by=user)
+        comments_queryset = (Comment.objects.filter(bookmarked_by=user).
+                                select_related('post', 'user').
+                                prefetch_related('liked_by', 'bookmarked_by'))
         comment_page = self.paginate_queryset(comments_queryset)
         if comment_page is not None:
             comments = CommentSerializer(comment_page, many=True, context={'request': request}).data
             return self.get_paginated_response(comments)
 
-    @action(detail=False, methods=['get'], url_path='get_user_comments/(?P<username>[^/.]+)', permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'], url_path='get-user-comments/(?P<username>[^/.]+)', permission_classes=[AllowAny])
     def get_user_comments(self, request, *args, **kwargs):
         self.pagination_class = LargeResultsSetPagination
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        comments_queryset = Comment.objects.filter(user=user)
+        comments_queryset = (Comment.objects.filter(user=user).
+                                 select_related('post', 'user').
+                                 prefetch_related('liked_by', 'bookmarked_by'))
         comment_page = self.paginate_queryset(comments_queryset)
         if comment_page is not None:
             comments = CommentSerializer(comment_page, many=True, context={'request': request}).data
             return self.get_paginated_response(comments)
+
 
     def create(self, request, *args, **kwargs):
         post_pk = request.data.get('post')
@@ -96,7 +101,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         self.pagination_class = LargeResultsSetPagination
-        post_pk = request.GET.get('post_pk')
+        post_pk = request.GET.get('post-pk')
         post = get_object_or_404(Post, pk=post_pk)
         queryset = Comment.objects.filter(post=post)
 
@@ -123,19 +128,19 @@ class PostViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return super().get_permissions()
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='set-like')
     def set_like(self, request, pk):
         post = set_post_like(request, pk)
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='set-bookmark')
     def set_bookmark(self, request, pk):
         queryset = add_post_bookmark(request, pk)
         serializer = PostSerializer(queryset, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='get-filter-queryset')
     def get_filter_queryset(self, request):
         queryset = get_filter_posts(request)
         page = self.paginate_queryset(queryset)
@@ -143,21 +148,27 @@ class PostViewSet(viewsets.ModelViewSet):
             serializer = SearchPostSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='get_user_posts/(?P<username>[^/.]+)', permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'], url_path='get-user-posts/(?P<username>[^/.]+)', permission_classes=[AllowAny])
     def get_user_posts(self, request, *args, **kwargs):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        queryset = Post.objects.filter(user=user)
+        queryset = (Post.objects
+                    .select_related('category', 'user')
+                    .prefetch_related('liked_by', 'bookmark_user', 'comments')
+                    .filter(user=user, status='draft'))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = SearchPostSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='get_my_bookmarks_posts/(?P<username>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='get-my-bookmarks-posts/(?P<username>[^/.]+)')
     def get_my_bookmarks_posts(self, request, *args, **kwargs):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        posts_queryset = Post.objects.filter(bookmark_user=user)
+        posts_queryset = (Post.objects
+                          .select_related('category', 'user')
+                          .prefetch_related('liked_by', 'bookmark_user', 'comments')
+                          .filter(bookmark_user=user, status='draft'))
         post_page = self.paginate_queryset(posts_queryset)
         if post_page is not None:
             posts = SearchPostSerializer(post_page, many=True, context={'request': request}).data
@@ -166,8 +177,9 @@ class PostViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         post_pk = kwargs.get('pk')
         post = get_object_or_404(Post, id=post_pk)
-        serializer = PostSerializer(post, context={'request': request})
-        return Response(serializer.data)
+        if post.status == 'draft':
+            serializer = PostSerializer(post, context={'request': request})
+            return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         return create_post(request)
@@ -183,11 +195,26 @@ class PostViewSet(viewsets.ModelViewSet):
                 'Обсуждаемое':'comment_count',
             }
             filter_name =  filter_set[filter_key]
-            queryset = Post.objects.order_by(filter_name).distinct()
+            queryset = (Post.objects
+                        .select_related('category', 'user')
+                        .prefetch_related('liked_by', 'bookmark_user', 'comments')
+                        .filter(status='draft')
+                        .order_by(filter_name)
+                        .distinct())
+
         elif tag:
             category = get_object_or_404(Category, tag=tag)
-            queryset = Post.objects.filter(category=category.id).distinct()
-        else: queryset = Post.objects.order_by('-pub_date').distinct()
+            queryset = (Post.objects
+                        .select_related('category', 'user')
+                        .prefetch_related('liked_by', 'bookmark_user', 'comments')
+                        .filter(category=category.id, status='draft')
+                        .distinct())
+        else: queryset = (Post.objects
+                          .select_related('category', 'user')
+                          .prefetch_related('liked_by', 'bookmark_user', 'comments')
+                          .filter(status='draft')
+                          .order_by('-pub_date')
+                          .distinct())
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -209,7 +236,10 @@ class SearchPostsViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         query = request.GET.get('query')
 
-        queryset = Post.objects.filter(status__icontains='draft', title__icontains=query)
+        queryset = (Post.objects.
+                select_related('category', 'user').
+                prefetch_related('liked_by', 'bookmark_user', 'comments').
+                filter(status__icontains='draft', title__icontains=query))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -225,7 +255,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
             return [BrowsableAPIRenderer()]
         return [JSONRenderer()]
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='get-followers')
     def get_followers(self, request, pk):
         obj = get_object_or_404(CustomUser, id=pk)
         serializer = UserSubscriptionSerializer(obj, context={'request': request})
@@ -253,6 +283,8 @@ class GetSelfComments(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         username = kwargs.get('username')
         user = get_object_or_404(User, username=username)
-        queryset = Comment.objects.filter(user=user)
+        queryset = (Comment.objects.filter(user=user).
+                    select_related('post', 'user').
+                    prefetch_related('liked_by', 'bookmarked_by'))
         serializer = CommentSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)

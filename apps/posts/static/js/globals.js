@@ -1,6 +1,7 @@
 window.isLoadingPosts = false;
 window.isLoadingComments = true;
-window.postsContainer = document.querySelector('.post-container');;
+window.postsContainer = document.querySelector('.post-container');
+window.profileContentContainer = document.querySelector('.profile__content-container');
 window.commentsContainer = document.querySelector('.comments-list');
 window.postDetailContainer = document.querySelector('.post');
 window.lastQuery = '';

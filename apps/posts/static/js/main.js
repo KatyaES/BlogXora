@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (path.startsWith('/post/')) {
         async function wait() {
-            nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/?post_pk=${postID}`
+            nextCommentsPageUrl = `${BASE_URL}/frontend-api/v1/comments/?post-pk=${postID}`
             isLoadingComments = false;
             isLoadingPosts = true;
             localStorage.setItem('isSearchMode', 'false')

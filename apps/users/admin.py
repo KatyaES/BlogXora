@@ -8,8 +8,8 @@ User = get_user_model()
 admin.site.register(Subscription)
 
 @admin.register(User)
-class ReplyCommentAdmin(admin.ModelAdmin):
-	list_display = ['id', 'username']
+class Users(admin.ModelAdmin):
+	list_display = ['id', 'username', 'email']
 
 @admin.register(Notifications)
 class NotificationsAdmin(admin.ModelAdmin):

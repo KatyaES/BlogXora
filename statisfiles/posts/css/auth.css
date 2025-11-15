@@ -1,0 +1,195 @@
+.auth-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+}
+
+.auth-modal-login__wrapper,
+.auth-modal-register__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    min-height: 300px;
+    height: auto;
+    border: 1px solid var(--main-border);
+    border-radius: 10px;
+    background-color: var(--main-element-background);
+    box-sizing: border-box;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+
+.auth-modal-login__wrapper--hidden,
+.auth-modal-register__wrapper--hidden {
+    display: none;
+}
+
+
+.auth-modal__input-username,
+.auth-modal__input-password {
+    height: 40px;
+    width: 90%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid var(--main-border);
+    padding-left: 20px;
+}
+
+.auth-modal__input-username::placeholder,
+.auth-modal__input-password::placeholder {
+    font-family: 'SF Pro Text';
+}
+
+.auth-modal__button-enter,
+.auth-modal__button-register {
+    height: 40px;
+    width: 90%;
+    background-color: #4fc827;
+    border: none;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: rgb(255, 245, 245);
+    font-weight: 600;
+    font-family: 'SF Pro Text';
+    cursor: pointer;
+}
+
+.auth-modal__button-switch-to-login,
+.auth-modal__button-switch-to-register {
+    height: 40px;
+    width: 90%;
+    background-color: #e6e6e6;
+    border: none;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: rgb(102, 102, 102);
+    font-weight: 600;
+    font-family: 'SF Pro Text';
+    cursor: pointer;
+}
+
+.auth-modal__fields,
+.auth-modal__buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-modal__buttons-wrapper {
+    gap: 8px
+}
+
+.auth-modal__fields {
+    gap: 5px
+}
+
+.auth-modal__buttons-wrapper button:last-of-type:hover {
+    background-color: #ececec;
+}
+
+.auth-modal__buttons-wrapper button:first-of-type:hover {
+    background-color: #6dd14c;
+}
+
+
+.auth-modal__input-username:focus, .auth-modal__input-password:focus {
+    border-color: #4fc827!important;
+    outline: none;
+}
+
+.auth-modal__header {
+    font-family: 'SF Pro Text';
+}
+
+.auth-modal__forget-password {
+    font-size: 14px;
+    color: #4fc827;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.auth-modal__error-message,
+.auth-modal-register__error-message {
+    font-size: 13px;
+    color: #c52828;
+}
+
+.auth-modal__error-data,
+.auth-modal-register__error-data {
+    height: 10px;
+    display: none;
+    width: 80%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.auth-modal__error-data--visible,
+.auth-modal-register__error-data--visible {
+    display: flex;
+}
+
+.register-data {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-modal-register__input-username,
+.auth-modal-register__input-password,
+.auth-modal-register__input-email,
+.auth-modal-register__input-password2 {
+    height: 40px;
+    width: 90%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid var(--main-border);
+    padding-left: 20px;
+}
+
+.auth-modal-register__input-username::placeholder,
+.auth-modal-register__input-password::placeholder,
+.auth-modal-register__input-password2::placeholder,
+.auth-modal-register__input-email::placeholder {
+    font-family: 'SF Pro Text';
+}
+
+.logout {
+    cursor: pointer;
+}
+
+.auth-modal-register__input-username:focus,
+.auth-modal-register__input-email:focus,
+.auth-modal-register__input-password:focus ,
+.auth-modal-register__input-password2:focus {
+    border-color: #4fc827!important;
+    outline: none;
+}
+
+.auth-modal-register__email-error,
+.auth-modal-register__username-error,
+.auth-modal-register__password-error,
+.auth-modal-register__password2-error,
+.auth-modal__password-error {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    margin: 0;
+    width: 80%;
+    max-width: 290px;
+    color: #c52828;
+    justify-content: left;
+}
+

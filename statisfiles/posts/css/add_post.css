@@ -1,0 +1,365 @@
+
+.main-container {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* popular-cat */
+
+.popular-cat {
+    flex-shrink: 0;
+    align-items: flex-start;
+    width: 254px;
+    height: auto;
+    background: #ffffff;
+    padding: 20px;
+    padding-top: 5px;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+ }
+
+ .popular-title {
+    margin-bottom: 20px;
+ }
+
+.popular-cat-container {
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.all-themes a {
+    text-decoration: none;
+}
+
+.popular-cat-container a {
+    text-decoration: none;
+}
+
+.count {
+    color: deeppink;
+}
+
+/* popular-cat */
+
+
+.button-cont button {
+    height: 27px;
+    width: 70px;
+    border: 1px solid lightgray;
+}
+
+.main-cont {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
+    margin-top: 65px;
+}
+
+.editor {
+    width: 600px;
+    min-height: 200px;
+    height: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+.ql-toolbar.ql-snow {
+    width: 600px;
+    border: 1px solid lightgray!important; 
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.ql-editor blockquote {
+    border-left: 4px solid #386aff !important;
+}
+
+.ql-editor blockquote * {
+    background-color: transparent!important;
+}
+
+.ql-editor img {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    max-width: 630px;
+    display: block;
+}
+
+.ql-editor.ql-blank::before {
+    font-size: 18px !important;  /* Устанавливаем нужный размер */
+    color: #bbb !important;      /* Цвет */
+    font-style: italic !important; /* Курсив */
+}
+
+.ql-editor {
+    font-size: 18px;
+    background-color: transparent;
+}
+
+.post-title input {
+    width: 600px;
+    height: 40px;
+    border: 1px solid lightgray;
+    text-indent: 20px;
+    caret-color: black;
+    border-radius: 5px;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    background-color: #ffffff;
+    padding: 30px;
+    padding-top: 10px;
+    margin-bottom: 20px;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    width: 600px;
+}
+
+.post-title input::placeholder {
+    font-size: 15px;
+    font-style: italic;
+    color: #bbb;
+}
+
+.post-category input::placeholder {
+    font-size: 15px;
+    font-style: italic;
+    color: #bbb;
+}
+
+.post-category input {
+    width: 200px;
+    height: 40px;
+    border: 1px solid lightgray;
+    text-indent: 20px;
+    caret-color: black;
+    border-radius: 5px;
+}
+
+.post-category {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.category-and-send {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.send-moder-button {
+    height: auto;
+    width: auto;
+    padding: 10px;
+    border: 1px solid var(--main-color);
+    color: var(--main-color);
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.send-moder-button:hover {
+    background-color: var(--main-color);
+    color: white;
+}
+
+
+.themes {
+    display: none;
+    flex-shrink: 0;
+    align-items: flex-start;
+    width: 240px;
+    height: 160px;
+    border: 1px solid rgb(231, 231, 231);
+    background: #ffffff;
+    padding: 5px 20px 0px 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    box-shadow: 0 4px 5px rgba(179, 174, 174, 0.2);
+}
+
+.theme-cont img {
+    height: 20px;
+    width: 20px;
+}
+
+.theme-cont {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.category-item {
+    padding-bottom: 20px;
+    border-radius:13px;
+    padding-right: 0;
+    padding: 5px;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+    cursor: pointer;
+}
+
+.category-item:hover {
+    background-color: #ededed;
+}
+
+.category-item img {
+    height: 30px;
+    width: 30px;
+}
+
+
+.category-item a {
+    font-family: 'Roboto' sans-serif;
+    color: black;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+
+.add-post_user {
+    display: inline-flex;
+    justify-content: left;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    margin: 0 0 -20px 0;
+}
+
+.add-post_user img {
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+}
+
+
+.drop-img {
+    border: 2px dashed #a6a6a6;
+    background-color: #f5f5f5;
+    min-height: 100px;
+    height: 100%;
+    width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    border-radius: 5px;
+}
+
+#img-preview {
+    display: none;
+    max-height: 440px;
+    height: 100%;
+    width: 600px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+.delete-cont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+
+.change-img {
+    height: 100%;
+    width: 180px;
+    border: 1px solid gray;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+
+}
+
+.img-and-delete {
+    display: none;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+.change-img {
+    border-radius: 10px;
+    border: 1px solid lightgray;
+    height: 35px;
+    font-size: 13px;
+    width: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.delete-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    height: 35px;
+    font-size: 13px;
+    width: 160px;
+    cursor: pointer;
+}
+
+.preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #808080;
+    gap: 10px;
+}
+
+.preview img {
+    height: 30px;
+    width: 30px;
+    filter: brightness(0) saturate(100%) invert(58%) sepia(32%) saturate(0%) hue-rotate(152deg) brightness(82%) contrast(76%);
+}
+
+.preview span {
+    display: none;
+    font-size: 13px;
+    color: #c52828;
+}
+
+.preview-message {
+    display: block;
+}
+
+
+.wrapper-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wrapper {
+    width: 600px;
+}
+
+#img-input {
+    display: none;
+}

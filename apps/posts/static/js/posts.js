@@ -1,22 +1,19 @@
 if (window.location.href.endsWith('add_post/')) {
-    document.querySelector('.input_wrapper').style.display = 'none'
+    document.querySelector('.site-header__search-wrapper').style.display = 'none'
 }
 
-const sendModer = document.getElementById('send-moder')
+const sendModer = document.querySelector('.send-moder__button')
 if (sendModer) {
     sendModer.addEventListener('click', async () => {
-        const post_img = document.getElementById('img-input')
-        const title = document.getElementById('title-id')
+        const post_img = document.querySelector('.preview-img__input')
+        const title = document.querySelector('.post-title__input')
         const content = document.querySelector('.ql-editor')
-        const theme = document.querySelector('.theme-cont')
-        const cut_img = document.getElementById('cut-img')
+        const theme = document.querySelector('.create-post__theme-button')
         const status = await window.checkToken()
         const post_type = postType
-        console.log(window.postType.textContent.length)
 
         const formData = new FormData()
         formData.append('wrapp_img', selectedFile)
-        formData.append('cut_img', cut_img.src)
         formData.append('title', title.value)
         formData.append('content', content.innerHTML)
         formData.append('theme', theme.textContent)
@@ -25,7 +22,7 @@ if (sendModer) {
         const BASE_URL = window.location.origin
 
         if (status) {
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/posts/`, {
+            const request = await fetch(`${BASE_URL}/frontend-api/v1/posts/`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -41,58 +38,56 @@ if (sendModer) {
 }
 
 function initThemeSelector() {
-	const themeCont = document.querySelector('.theme-cont')
-	const themeBtn = document.querySelector('.themes')
-	if (themeBtn && themeCont) {
-        themeBtn.style.display = 'none'
-        themeCont.addEventListener('click', () => {
-            if (getComputedStyle(themeBtn).display === 'none') {
-                themeBtn.style.display = 'flex'
-                themeBtn.style.margin = '10px 0 0 0'
+	const themeButton = document.querySelector('.create-post__theme-button')
+	const themesWrapper = document.querySelector('.themes')
+	if (themesWrapper && themeButton) {
+        themesWrapper.style.display = 'none'
+        themeButton.addEventListener('click', () => {
+            if (getComputedStyle(themesWrapper).display === 'none') {
+                themesWrapper.style.display = 'flex'
+                themesWrapper.style.margin = '10px 0 0 0'
             } else {
-                themeBtn.style.display = 'none'
+                themesWrapper.style.display = 'none'
             }
         })
 	}
 
-	const themesCont = document.querySelectorAll('.themes-cont .category-item')
+	const themesCont = document.querySelectorAll('.scrollable .theme-item')
 	for (const item of themesCont) {
 		item.addEventListener('click', () => {
-			const old_img = themeCont.querySelector('img')
+			const old_img = themeButton.querySelector('img')
 			if (old_img.id === 'cut-img') {old_img.remove()}
-			themeCont.removeAttribute('img')
+			themeButton.removeAttribute('img')
 			const theme = item.textContent.trim()
-			themeCont.firstChild.textContent = theme
-			const themeBtn = document.querySelector('.themes')
-			themeBtn.style.display = 'none'
+			themeButton.firstChild.textContent = theme
+			themesWrapper.style.display = 'none'
 			const cut_img = item.querySelector('img').cloneNode(true)
-			cut_img.style.margin = '0 5px'
+			cut_img.style.margin = '0 10px 0 0'
 			cut_img.id = 'cut-img'
-			themeCont.prepend(cut_img)
+			themeButton.prepend(cut_img)
 		})
 	}
 }
 
 function initImageUploader() {
 	const dragArea = document.getElementById('dragArea')
-	const imgInput = document.getElementById('img-input')
-	const imgPreview = document.getElementById('img-preview')
-	const deleteImg = document.querySelector('.delete-img')
-	const imgAndDelete = document.querySelector('.img-and-delete')
-	const Preview = document.querySelector('.preview')
-	const wrongFormat = document.getElementById('wrong-format')
+	const previewImgInput = document.querySelector('.preview-img__input')
+	const imgPreview = document.querySelector('.img-preview')
+	const deleteImgButton = document.querySelector('.delete-preview__button')
+	const preview = document.querySelector('.preview')
+	const wrongFormat = document.querySelector('.wrong-format__message')
 
-	if (dragArea && imgInput && imgPreview && deleteImg &&
-	    imgAndDelete && Preview && wrongFormat) {
+	if (dragArea && previewImgInput && imgPreview && deleteImgButton && preview && wrongFormat) {
 	        dragArea.addEventListener('dragover', (e) => {
                 e.preventDefault()
             })
 
             dragArea.addEventListener('click', () => {
-                imgInput.click()
+                previewImgInput.click()
             })
 
-            imgInput.addEventListener('change', (e) => {
+            previewImgInput.addEventListener('change', (e) => {
+                console.log('change-1')
                 const file = e.target.files[0]
                 if (!(file.name.endsWith('jpg') || file.name.endsWith('png') || file.name.endsWith('jpeg'))) {
                     imgPreview.removeAttribute('src')
@@ -103,6 +98,7 @@ function initImageUploader() {
             })
 
             dragArea.addEventListener('drop', (e) => {
+                console.log('drop')
                 e.preventDefault()
                 const files = e.dataTransfer.files
                 if (files && files.length > 0) {
@@ -112,50 +108,48 @@ function initImageUploader() {
             })
 
             function handleFile(file) {
+                console.log('handle')
                 if (!(file.name.endsWith('jpg') || file.name.endsWith('png') || file.name.endsWith('jpeg'))) {
-                    wrongFormat.style.display = 'flex'
+                    wrongFormat.classList.remove('wrong-format__message--hidden')
                 } else {
                     const reader = new FileReader()
                     reader.onload = function(e) {
                     imgPreview.src = e.target.result
                 }
                 reader.readAsDataURL(file);
-                imgPreview.style.display = 'block'
-                imgInput.style.display = 'none'
-                deleteImg.style.display = 'flex'
-                imgAndDelete.style.display = 'flex'
-                imgPreview.style.border = 'transparent'
-                Preview.style.display = 'none'
+                imgPreview.classList.add('img-preview--active')
+                deleteImgButton.classList.add('delete-preview__button--active')
+                preview.classList.add('preview--hidden')
                 }
             }
 
 
             document.getElementById('dragArea').addEventListener('change', e => {
+                console.log('change')
                 const reader = new FileReader()
                 reader.onload = function(e) {
-                    document.getElementById('img-preview').src = e.target.result
+                    imgPreview.src = e.target.result
                 }
                 if (!e.target.files[0].name.endsWith('jpg') || e.target.files[0].name.endsWith('png')) {
                     imgPreview.removeAttribute('src')
-                    wrongFormat.style.display = 'flex'
+                    wrongFormat.classList.remove('wrong-format__message--hidden')
 
                 } else {
                     reader.readAsDataURL(e.target.files[0])
-                    document.querySelector('.preview').style.display = 'none'
-                    imgAndDelete.style.display = 'flex'
-                    document.getElementById('img-preview').style.display = 'flex'
-                    deleteImg.style.display = 'flex'
+                    preview.classList.add('preview--hidden')
+                    imgPreview.classList.add('img-preview--active')
+                    deleteImgButton.classList.add('delete-preview__button--active')
                 }
 
             })
 
-            deleteImg.addEventListener('click', () => {
+            deleteImgButton.addEventListener('click', () => {
+                deleteImgButton.classList.remove('delete-preview__button--active')
                 imgPreview.removeAttribute('src')
-                imgPreview.style.display = 'none'
-                document.querySelector('.preview').style.display = 'flex'
-                deleteImg.style.display = 'none'
-                imgInput.value = ''
-                wrongFormat.style.display = 'none'
+                imgPreview.classList.remove('img-preview--active')
+                preview.classList.remove('preview--hidden')
+                previewImgInput.value = ''
+                wrongFormat.classList.add('wrong-format__message--hidden')
             })
 	    }
 
@@ -194,7 +188,7 @@ async function setPostLike(div) {
         const likesCount = document.getElementById(`like-button__count-id-${id}`);
 
         if (status) {
-            const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/set_like/`, {
+            const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/set-like/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -225,18 +219,16 @@ async function setPostLike(div) {
 async function profilePostsFunc() {
     const commentButton = document.getElementById('profile-nav__item_1')
     userId = commentButton.getAttribute('data-auth')
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
     isLoadingComments = false;
     isLoadingPosts = true;
     localStorage.setItem('isSearchMode', 'false')
 
-    profileHeaderNavCont.innerHTML = ''
-    console.log(currentProfile)
+    profileContentContainer.innerHTML = ''
 
-    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_user_posts/${currentProfile}`
+    nextPostsPageUrl = `${BASE_URL}/frontend-api/v1/posts/get-user-posts/${currentProfile}`
 
     isLoadingPosts = false;
-    postsContainer = profileHeaderNavCont
+    postsContainer = profileContentContainer
     localStorage.setItem('isSearchMode', 'false')
     const isSearchMode = localStorage.getItem('isSearchMode')
 
@@ -245,7 +237,7 @@ async function profilePostsFunc() {
     if (oldPosts) {
         oldPosts.forEach(post => post.remove())
     }
-    profileHeaderNavCont.innerHTML = ''
+    profileContentContainer.innerHTML = ''
 
     initLoadPosts()
     initPostBookmarks()
@@ -256,19 +248,22 @@ async function profilePostsFunc() {
 async function getFilterPosts(element) {
     const theme = getThemeFromUrl()
     const filter = postFilter
+    console.log(filter)
     const type = postType
+    console.log(type)
     const params = new URLSearchParams()
     if (theme) params.set('theme', theme)
     if (filter) params.set('filter', filter)
     if (type) params.set('post_type', postType)
 
-    nextPostsPageUrl = `${BASE_URL}/frontend_api/v1/posts/get_filter_queryset/?${params.toString()}`
+    nextPostsPageUrl = `${BASE_URL}/frontend-api/v1/posts/get-filter-queryset/?${params.toString()}`
+    console.log(nextPostsPageUrl)
     isLoadingPosts = false;
     postsContainer = document.querySelector('.posts-container')
     localStorage.setItem('isSearchMode', 'false')
     const isSearchMode = localStorage.getItem('isSearchMode')
 
-    const oldPosts = document.querySelectorAll('.post-wrapper')
+    const oldPosts = document.querySelectorAll('.post')
 
     if (oldPosts) {
         oldPosts.forEach(post => post.remove())
@@ -291,9 +286,8 @@ async function initLoadPosts() {
     console.log(data)
 
     nextPostsPageUrl = data.pages.next
-    const profileHeaderNavCont = document.querySelector('.profile-header-nav-cont')
-    if (profileHeaderNavCont) {
-        postsContainer = profileHeaderNavCont
+    if (profileContentContainer) {
+        postsContainer = profileContentContainer
     }
 
     for (let i = 0; i < data.results.length; i++) {
@@ -389,8 +383,9 @@ async function initScrollForPosts() {
 
     if (window.location.pathname.startsWith('/')) isLoadingPosts = false;
 
-    nextPostsPageUrl = `${window.BASE_URL}/frontend_api/v1/posts/?${params.toString()}`
-    nextCommentsPageUrl = `${BASE_URL}/frontend_api/v1/comments/?post_pk=${postID}`
+    nextPostsPageUrl = `${window.BASE_URL}/frontend-api/v1/posts/?${params.toString()}`
+    nextCommentsPageUrl = `${BASE_URL}/frontend-api/v1/comments/?post-pk=${postID}`
+    console.log(nextCommentsPageUrl)
 
     postsContainer = document.querySelector('.posts-container')
     localStorage.setItem('isSearchMode', 'false')
@@ -430,7 +425,7 @@ async function initPostLikes() {
         for (const img of imgWrapper) {
             const id = img.getAttribute("data-id");
             const likesCount = document.getElementById(`like-button__count-id-${id}`);
-            const response = await fetch(`${BASE_URL}/frontend_api/v1/posts/${id}/`, {
+            const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

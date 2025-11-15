@@ -22,19 +22,25 @@ def set_post_like(request, pk):
 
 
 def get_filter_posts(request):
-    filter_name = request.GET.get('filter')
+    filter_key = request.GET.get('filter')
     post_type = request.GET.get('post_type')
     queryset = Post.objects.filter(status='draft')
 
     if post_type:
         queryset = Post.objects.filter(post_type=post_type, status='draft')
 
+    filter_set = {
+        'Свежее': '-pub_date',
+        'Популярное': '-views_count',
+        'Обсуждаемое': '-comment_count',
+    }
+    if filter_key:
+        filter = filter_set[filter_key]
+        queryset = (queryset.select_related('user', 'category')
+                        .prefetch_related('comments')
+                        .order_by(filter))
 
-    if filter_name == 'Свежее':
-        queryset = queryset.order_by('-pub_date')
-    elif filter_name == 'Популярное':
-        queryset = queryset.order_by('-views_count')
-    elif filter_name == 'Обсуждаемое':
-        queryset = queryset.order_by('-comment_count')
+    for i in queryset:
+        print(i.comment_count)
 
     return queryset

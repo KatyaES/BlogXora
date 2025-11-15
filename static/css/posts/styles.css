@@ -573,90 +573,6 @@
     border-radius: 10px;
 }
 
-.profile-edit {
-    padding: 30px;
-    gap: 30px;
-    display: flex;
-    flex-direction: column;
-    width: 660px;
-    height: auto;
-    background: var(--main-element-background);
-    border: 1px solid var(--main-border);
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-.settings_username-wrapper,
-.settings_email-wrapper,
-.settings_about-wrapper,
-.settings_password-wrapper,
-.settings_old-password-wrapper,
-.settings_new-password-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.settings_username,
-.settings_email,
-.settings_about,
-.settings_old-password,
-.settings_new-password {
-    width: 500px;
-    height: 30px;
-}
-
-.send-settings_data,
-.change-password-url,
-.save-password {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3px;
-    background: var(--main-color);
-    color: white;
-    min-height: 40px;
-    min-width: 100px;
-    max-width: 150px;
-    cursor: pointer;
-    font-size: 15px;
-}
-
-.send-settings_data:hover,
-.change-password-url:hover,
-.save-password:hover {
-    background: #2c7cd8;
-    color: white;
-    border: none;
-}
-
-.settings_password-wrapper {
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.forgot-password-message {
-    font-size: 13px;
-    color: var(--main-color);
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.error-data-message {
-    display: none;
-    color: #e54848;
-}
-
-.error-password-message {
-    display: none;
-    color: #e54848;
-}
-
-.success-message {
-    display: none;
-    color: #1fff9e;
-}
 
 
 .category-container {
@@ -686,17 +602,6 @@
     gap: 20px;
 }
 /* ===PROFILE=== */
-
-.profile-header-nav {
-    display: flex;
-    gap: 30px;
-    margin: 10px 0 0 0;
-}
-
-.profile-header-nav span {
-    padding: 0 0 15px 0;
-    cursor: pointer;
-}
 
 .theme_header {
     display: flex;

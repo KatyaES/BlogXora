@@ -29,16 +29,16 @@
 
                 {% endif %}
             </div>
-            <div class="profile-header-nav">
-                <a href="/users/{{ profile_user.username }}/" id ="profile-nav__item_1" class="profile-nav__item" onclick="profilePostsFunc(this)" data-id="{{ profile_user }}">Посты</a>
+            <div class="profile__header-nav">
+                <a href="{% url 'profile' profile_user %}" id="profile-nav__item_1" class="profile-nav__item" onclick="profilePostsFunc(this)" data-id="{{ profile_user }}">Посты</a>
                 {% if profile_user == request.user %}
-                  <a href="/users/{{ profile_user.username }}/bookmarks/" id ="profile-nav__item_2" class="profile-nav__item" onclick="profileBookmarksFunc()" data-id="{{ profile_user }}">Закладки</a>
+                  <a href="{% url 'profile_with_section' profile_user 'bookmarks' %}" id="profile-nav__item_2" class="profile-nav__item" onclick="profileBookmarksFunc()" data-id="{{ profile_user }}">Закладки</a>
                 {% endif %}
-                <a href="/users/{{ profile_user.username }}/subscribes/" id="profile-nav__item_3" class="profile-nav__item" onclick="profileSubscribesFunc(this)" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Подписки</a>
-                <a href="/users/{{ profile_user.username }}/followers/" id ="profile-nav__item_4" class="profile-nav__item" onclick="profileFollowersFunc()" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Подписчики</a>
-                <a href="/users/{{ profile_user.username }}/comments/" id ="profile-nav__item_5" class="profile-nav__item" onclick="profileCommentsFunc()" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Комментарии</a>
+                <a href="{% url 'profile_with_section' profile_user 'subscribes' %}" id="profile-nav__item_3" class="profile-nav__item" onclick="profileSubscribesFunc(this)" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Подписки</a>
+                <a href="{% url 'profile_with_section' profile_user 'followers' %}" id="profile-nav__item_4" class="profile-nav__item" onclick="profileFollowersFunc()" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Подписчики</a>
+                <a href="{% url 'profile_with_section' profile_user 'comments' %}" id="profile-nav__item_5" class="profile-nav__item" onclick="profileCommentsFunc()" data-id="{{ profile_user }}" data-auth="{{ profile_user.id }}">Комментарии</a>
             </div>
         </div>
-        <div class="profile-header-nav-cont"></div>
+        <div class="profile__content-container"></div>
     </div>
 {% endblock %}

@@ -1,8 +1,7 @@
-def generator():
-    yield 1
-    yield 2
+heartbeat = 1
 
-obj = generator()
+def memory_of_her():
+    return True
 
-for i in obj:
-    print(next(obj))
+while memory_of_her():
+    heartbeat += 1

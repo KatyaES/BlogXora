@@ -5,7 +5,7 @@ async function userFollows(div) {
     const BASE_URL = window.location.origin
 
     if (status) {
-        const request = await fetch(`${BASE_URL}/frontend_api/v1/subscription/`, {
+        const request = await fetch(`${BASE_URL}/frontend-api/v1/subscription/`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -46,7 +46,7 @@ async function initUserFollows() {
         for (const btn of followBtn) {
             const userId = btn.getAttribute('data-id')
 
-            const request = await fetch(`${BASE_URL}/frontend_api/v1/subscription/${userId}/`, {
+            const request = await fetch(`${BASE_URL}/frontend-api/v1/subscription/${userId}/`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

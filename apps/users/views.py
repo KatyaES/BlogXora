@@ -1,39 +1,32 @@
+import random
+
+from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template.defaulttags import csrf_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from django.contrib.auth import logout, get_user_model
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from apps.users.forms import PasswordResetForm, ResetKeyForm, ResetPasswordForm
+from apps.users.models import CustomUser
 from apps.users.services import *
 
 User = get_user_model()
 
 def register(request):
     if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        email, login, password1, password2 = (data.get('email'),
-                                              data.get('login'),
-                                              data.get('password1'),
-                                              data.get('password2'))
+        return register_user(request)
+    return redirect('index')
 
-        if not all([email, login, password1, password2]):
-            return JsonResponse({'error': 'All fields are required'}, status=400)
-
-
-        return register_user(request, email, login, password1, password2)
-
-
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 def login(request):
     if request.method == 'POST':
         return login_user(request)
@@ -42,7 +35,7 @@ def login(request):
 
 
 def profile_page(request, username, section=None):
-    profile_user = get_object_or_404(User, username=username)
+    profile_user = get_object_or_404(CustomUser, username=username)
     context = get_profile_user_data(profile_user, section)
     return render(request, 'users/profile.html', context)
 
@@ -68,8 +61,11 @@ class LogoutView(APIView):
 
 
 def profile_settings(request):
-    user = get_object_or_404(User, username=request.user.username)
-    random_posts = Post.objects.all().order_by('?')[:5]
+    user = get_object_or_404(CustomUser, username=request.user.username)
+    random_posts = (Post.objects.all().
+                    select_related('category', 'user').
+                    prefetch_related('liked_by', 'bookmark_user', 'comments').
+                    order_by('?')[:5])
     return render(request, 'users/profile_edit.html',
                   {'user': user,
                           'random_posts': random_posts})
@@ -99,22 +95,22 @@ class ChangePasswordView(APIView):
             return Response({'error': 'Старый пароль неверный'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             validate_password(new_password,  user=user)
-        except ValidationError as e:
-            return Response({'error': e.messages}, status=400)
         except Exception as e:
             return Response({'error': e.messages}, status=400)
 
         user.set_password(new_password)
         user.save()
+        auth.login(request, user)
         return Response({'status': 'success'}, status=200)
 
 class ChangeDataView(APIView):
 
     def post(self, request):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        bio = request.data.get('about')
-        return change_data(request, username, email, bio)
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        bio = request.POST.get('about')
+        avatar = request.FILES.get('avatar')
+        return change_data(request, username, email, bio, avatar)
 
 
 class CookieTokenRefreshView(TokenRefreshView):
@@ -126,3 +122,99 @@ class CookieTokenRefreshView(TokenRefreshView):
         serializer = self.get_serializer(data={'refresh': refresh_token})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+def send_email(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            reset_key = ''.join(random.sample(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 6))
+            cache.set('reset_key', reset_key, 300)
+            cache.set('email', email, 300)
+            cache.set('confirm_access', True, 300)
+            send_mail(
+                'Код восстановления для вашего пароля',
+                'Ваш код восстановления: %s' % reset_key,
+                'gromovaa145@gmail.com',
+                [email]
+            )
+            return redirect('password_reset_done')
+        return HttpResponse({'errors': form.errors})
+    else:
+        form = PasswordResetForm()
+        return render(request, 'users/password_reset_form.html',
+                      context={'form': form})
+
+
+def confirm_reset_key(request):
+    print(cache.get('confirm_access'))
+    if not cache.get('confirm_access'):
+        return redirect('password_reset')
+
+
+    if request.method == 'POST':
+        form = ResetKeyForm(request.POST)
+        if form.is_valid():
+            user_reset_key = form.cleaned_data['reset_key']
+            server_reset_key = cache.get('reset_key')
+            if user_reset_key == server_reset_key:
+                cache.set('reset_password_access', True, 300)
+                return redirect('password_reset_confirm')
+            return JsonResponse({'error': 'Неверный код'})
+        return JsonResponse({'errors': form.errors})
+
+    else:
+        form = ResetKeyForm()
+        return render(request, 'users/password_reset_done.html',
+                    context={'form': form})
+
+
+def reset_password(request):
+    if not cache.get('reset_password_access'):
+        return redirect('password_reset')
+
+    if request.method == 'POST':
+        email = cache.get('email')
+        user = get_object_or_404(CustomUser, email=email)
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password']
+
+            try:
+                validate_password(new_password)
+                user.set_password(new_password)
+                user.save()
+                cache.set('reset_password_complete_access', True, 300)
+                return redirect('password_reset_complete')
+            except Exception as e:
+                return JsonResponse({'error': ''.join(e.messages)})
+        return JsonResponse({'errors': form.errors})
+    else:
+        form = ResetPasswordForm()
+        return render(request, 'users/password_reset_confirm.html',
+                      context={'form': form})
+
+
+def reset_password_complete(request):
+    if not cache.get('reset_password_complete_access'):
+        return redirect('password_reset')
+
+    cache.delete('reset_password_complete_access')
+    cache.delete('email')
+    cache.delete('reset_key')
+    cache.delete('confirm_access')
+    cache.delete('reset_password_access')
+    return render(request, 'users/password_reset_complete.html')
+
+
+
+
+
+
+
+
+
+
+
+
+

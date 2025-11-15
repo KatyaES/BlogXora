@@ -17,7 +17,6 @@ def create_post(request):
     category = Category.objects.filter(cat_title=cat).first()
     wrapp_img = request.FILES.get('wrapp_img')
     pub_date = timezone.now()
-    cut_img = request.POST.get('cut_img')
     post_type = request.POST.get('post_type')
     print('post_type', post_type)
 
@@ -27,7 +26,6 @@ def create_post(request):
             'content': content,
             'category': category.id if category else None,
             'pub_date': pub_date,
-            'cut_img': cut_img,
             'post_type': post_type,
             },
             files= {
@@ -38,14 +36,14 @@ def create_post(request):
         post = form.save(commit=False)
         post.user = request.user
         post.save()
-        print(post.post_type)
         return HttpResponse(status=status.HTTP_201_CREATED)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
 def add_comment(request, pk):
-    post = get_object_or_404(Post, id=pk)
+    post = get_object_or_404(Post, id=pk, status='draft')
+    print(post.title)
     comments = Comment.objects.filter(post=post)
     post.views_count += 1
     post.save()

@@ -31,19 +31,7 @@
     display: none;
 }
 
-
-.auth-modal__input-username,
-.auth-modal__input-password {
-    height: 40px;
-    width: 90%;
-    box-sizing: border-box;
-    border-radius: 6px;
-    border: 1px solid var(--main-border);
-    padding-left: 20px;
-}
-
-.auth-modal__input-username::placeholder,
-.auth-modal__input-password::placeholder {
+.form-input::placeholder {
     font-family: 'SF Pro Text';
 }
 
@@ -101,11 +89,6 @@
 }
 
 
-.auth-modal__input-username:focus, .auth-modal__input-password:focus {
-    border-color: #4fc827!important;
-    outline: none;
-}
-
 .auth-modal__header {
     font-family: 'SF Pro Text';
 }
@@ -117,27 +100,6 @@
     text-decoration: none;
 }
 
-.auth-modal__error-message,
-.auth-modal-register__error-message {
-    font-size: 13px;
-    color: #c52828;
-}
-
-.auth-modal__error-data,
-.auth-modal-register__error-data {
-    height: 10px;
-    display: none;
-    width: 80%;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.auth-modal__error-data--visible,
-.auth-modal-register__error-data--visible {
-    display: flex;
-}
-
 .register-data {
     display: flex;
     flex-direction: column;
@@ -147,10 +109,7 @@
     align-items: center;
 }
 
-.auth-modal-register__input-username,
-.auth-modal-register__input-password,
-.auth-modal-register__input-email,
-.auth-modal-register__input-password2 {
+.form-input {
     height: 40px;
     width: 90%;
     box-sizing: border-box;
@@ -159,10 +118,7 @@
     padding-left: 20px;
 }
 
-.auth-modal-register__input-username::placeholder,
-.auth-modal-register__input-password::placeholder,
-.auth-modal-register__input-password2::placeholder,
-.auth-modal-register__input-email::placeholder {
+.form-input::placeholder  {
     font-family: 'SF Pro Text';
 }
 
@@ -170,10 +126,7 @@
     cursor: pointer;
 }
 
-.auth-modal-register__input-username:focus,
-.auth-modal-register__input-email:focus,
-.auth-modal-register__input-password:focus ,
-.auth-modal-register__input-password2:focus {
+.form-input:focus {
     border-color: #4fc827!important;
     outline: none;
 }
@@ -193,3 +146,12 @@
     justify-content: left;
 }
 
+form {
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}

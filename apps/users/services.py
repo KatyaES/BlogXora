@@ -2,42 +2,37 @@ import json
 from http.client import responses
 
 from django.contrib.auth.password_validation import validate_password
+from django.core.files.storage import FileSystemStorage
 from django.db import IntegrityError
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.posts.models import Post, Comment, User, Category
+from apps.posts.models import Post, Comment, Category
 from apps.users.forms import UserLoginForm, UserRegistrationForm
 from django.contrib import auth
 
-from apps.users.models import Notifications, Subscription
+from apps.users.models import Notifications, Subscription, CustomUser
 from apps.users.serializers import UserSerializer
 
 
-def register_user(request, email, login, password1, password2):
-    form = UserRegistrationForm({
-        'username': login,
-        'email': email,
-        'password1': password1,
-        'password2': password2,
-    })
-    if form.is_valid():
-        user = form.save()
-        auth.login(request, user)
-        refresh = RefreshToken.for_user(user)
-
-        subscription, created = Subscription.objects.get_or_create(
-            user=user,
-        )
-        response = JsonResponse({'detail': 'Logged in'})
-        response.set_cookie('access_token', str(refresh.access_token), httponly=True, secure=True)
-        response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
-        return response
-    else:
-        return JsonResponse({'error': form.errors}, status=400)
+def register_user(request):
+    try:
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth.login(request, user)
+            refresh = RefreshToken.for_user(user)
+            response = redirect('/')
+            response.set_cookie('access_token', str(refresh.access_token), httponly=True, secure=True)
+            response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+            return response
+        else:
+            return JsonResponse({'register error': form.errors}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': e.messages})
 
 
 def auth_and_login(username, password):
@@ -58,32 +53,38 @@ def auth_and_login(username, password):
 
 
 def login_user(request):
-    data = json.loads(request.body)
-    username = data.get('login')
-    password = data.get('password')
-    user = auth_and_login(username, password)
-    if isinstance(user, User):
-        auth.login(request, user)
-        refresh = RefreshToken.for_user(user)
-        response = JsonResponse({'detail':'Logged in'})
-        response.set_cookie(
-            'access_token',
-            str(refresh.access_token),
-            httponly=True,
-            secure=True,
-            max_age=360 * 12
-        )
-        response.set_cookie(
-            'refresh_token',
-            str(refresh),
-            httponly=True,
-            secure=True,
-            max_age=3600 * 12 * 7
-        )
-        return response
-    elif isinstance(user, dict):
-        return JsonResponse(user, status=400)
-    return HttpResponse(status=204)
+    form = UserLoginForm(request.POST)
+    try:
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+        else:
+            return JsonResponse({'error': form.errors})
+        user = auth_and_login(username, password)
+        if isinstance(user, CustomUser):
+            auth.login(request, user)
+            refresh = RefreshToken.for_user(user)
+            response = redirect('/')
+            response.set_cookie(
+                'access_token',
+                str(refresh.access_token),
+                httponly=True,
+                secure=True,
+                max_age=360 * 12
+            )
+            response.set_cookie(
+                'refresh_token',
+                str(refresh),
+                httponly=True,
+                secure=True,
+                max_age=3600 * 12 * 7
+            )
+            return response
+        elif isinstance(user, dict):
+            return JsonResponse(user, status=400)
+        return HttpResponse(status=204)
+    except Exception as e:
+        return JsonResponse({'error': e.messages})
 
 
 def get_profile_user_data(profile_user, section):
@@ -92,7 +93,6 @@ def get_profile_user_data(profile_user, section):
         'posts': Post.objects.filter(bookmark_user=profile_user),
         'comments': Comment.objects.filter(user=profile_user),
         'bookmarks': Post.objects.filter(bookmark_user=profile_user),
-        'random_posts': Post.objects.all().order_by('?')[:5],
         'section': section,
     }
 
@@ -117,13 +117,18 @@ def change_password(request):
     return Response({'status': 'success'}, status=204)
 
 
-def change_data(request, username, email, bio):
+def change_data(request, username, email, bio, avatar):
+    print(avatar)
     data = {
         'username': username,
         'email': email,
-        'bio': bio
+        'bio': bio,
     }
-    user_model = get_object_or_404(User, username=request.user.username)
+    if avatar:
+        data['image'] = avatar
+
+    print(data)
+    user_model = get_object_or_404(CustomUser, username=request.user.username)
     serializer = UserSerializer(user_model, data=data, partial=True)
 
     if serializer.is_valid():
@@ -131,8 +136,9 @@ def change_data(request, username, email, bio):
             serializer.save()
             return Response(status=204)
         except IntegrityError as e:
-            return Response({"error": "Данный username или email уже занят."}, status=400)
-    return Response({"error": "Данный username или email уже занят."}, status=400)
+            return Response({"error": e}, status=400)
+    print(serializer.errors)
+    return Response({"error": serializer.errors}, status=400)
 
 
 

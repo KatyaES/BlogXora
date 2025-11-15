@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/posts/main.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
 </head>
 <body>
     <header class="site-header">
@@ -30,8 +31,6 @@
                     <img class="site-header__img-notifications" src="/media/icons/bell.png">
                     {% if notification_count %}
                         <div class="site-header__notifications-count" style="text-decoration: none;">{{ notification_count }}</div>
-                    {% else %}
-                        <div class="site-header__notifications-count" style="text-decoration: none;"></div>
                     {% endif %}
                     <div class="site-header__notification-container">
                         <div class="site-header__notifications-navbar">
@@ -122,43 +121,38 @@
                         </div>
                     </div>
                 {% else %}
-                <div class="auth-modal-login__wrapper">
-                    <div class="auth-modal__header">Войти</div>
-                    <div class="auth-modal__fields">
-                        <input class="auth-modal__input-username" placeholder="Логин" minlength="3">
-                        <div class="auth-modal__username-error"></div>
-                        <input class="auth-modal__input-password" type="password" placeholder="Пароль">
-                        <div class="auth-modal__password-error"></div>
+                    <div class="auth-modal-login__wrapper">
+                        <form method="post" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            <div class="auth-modal__header">Войти</div>
+                            <div class="auth-modal__fields">
+                                {{ login_form.username }}
+                                {{ login_form.password }}
+                            </div>
+                            <div class="auth-modal__buttons-wrapper">
+                                <button class="auth-modal__button-enter" onclick="loginHandler()" type="submit">Войти</button>
+                                <button class="auth-modal__button-switch-to-register">Создать аккаунт</button>
+                            </div>
+                        </form>
+
+                        <a class="auth-modal__forget-password" href="{% url 'password_reset' %}">Забыли пароль?</a>
                     </div>
-                    <div class="auth-modal__error-data">
-                        <p class="auth-modal__error-message"></p>
+                    <div class="auth-modal-register__wrapper auth-modal-register__wrapper--hidden">
+                        <form method="post" action="{% url 'register' %}">
+                            {% csrf_token %}
+                            <div class="auth-modal__header">Создать аккаунт</div>
+                            <div class="auth-modal__fields">
+                                {{ register_form.email }}
+                                {{ register_form.username }}
+                                {{ register_form.password1 }}
+                                {{ register_form.password2 }}
+                            </div>
+                            <div class="auth-modal__buttons-wrapper">
+                                <button class="auth-modal__button-register" type="submit">Создать аккаунт</button>
+                                <button class="auth-modal__button-switch-to-login">Есть аккаунт? Войти</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="auth-modal__buttons-wrapper">
-                        <button class="auth-modal__button-enter" onclick="loginHandler()">Войти</button>
-                        <button class="auth-modal__button-switch-to-register">Создать аккаунт</button>
-                    </div>
-                    <a class="auth-modal__forget-password" href="{% url 'password_reset' %}">Забыли пароль?</a>
-                </div>
-                <div class="auth-modal-register__wrapper auth-modal-register__wrapper--hidden">
-            <div class="auth-modal__header">Создать аккаунт</div>
-            <div class="auth-modal__fields">
-                <input class="auth-modal-register__input-email" placeholder="Email">
-                <div class="auth-modal-register__email-error"></div>
-                <input class="auth-modal-register__input-username" placeholder="Никнейм" maxlength="16">
-                <div class="auth-modal-register__username-error"></div>
-                <input class="auth-modal-register__input-password" type="password" placeholder="Пароль">
-                <div class="auth-modal-register__password-error"></div>
-                <input class="auth-modal-register__input-password2" type="password" placeholder="Повторите пароль">
-                <div class="auth-modal-register__password2-error"></div>
-            </div>
-            <div class="auth-modal-register__error-data">
-                <p class="auth-modal-register__error-message"></p>
-            </div>
-            <div class="auth-modal__buttons-wrapper">
-                <button class="auth-modal__button-register" onclick="registerHandler()">Создать аккаунт</button>
-                <button class="auth-modal__button-switch-to-login">Есть аккаунт? Войти</button>
-            </div>
-        </div>
                 {% endif %}
                 <div class="sidebar__section-topics">
                     <div class="sidebar__title">Темы</div>
@@ -178,18 +172,20 @@
 
                 <div class="sidebar__section-articles">
                     <div class="sidebar__section-articles__title">ЧИТАЮТ СЕЙЧАС</div>
-                    {% for post in random_posts %}
-                        <div class="sidebar__article-item">
-                            <div class="sidebar__user-info">
-                                <div class="sidebar__user-info-details">
-                                    <img src="{{ post.user.image.url }}" class="sidebar__user-avatar">
-                                    <a href="{% url 'profile' post.user.username %}" class="sidebar__user-username">{{ post.user.username }}</a>
+                    {% if random_posts %}
+                        {% for post in random_posts %}
+                            <div class="sidebar__article-item">
+                                <div class="sidebar__user-info">
+                                    <div class="sidebar__user-info-details">
+                                        <img src="{{ post.user.image.url }}" class="sidebar__user-avatar">
+                                        <a href="{% url 'profile' post.user.username %}" class="sidebar__user-username">{{ post.user.username }}</a>
+                                    </div>
+                                    <a class="sidebar__date">{{ post.pub_date|smart_time }}</a>
                                 </div>
-                                <a class="sidebar__date">{{ post.pub_date|smart_time }}</a>
+                                <a href="{% url 'post_detail' post.id %}" class="sidebar__article-item__title">{{ post.title }}</a>
                             </div>
-                            <a href="{% url 'post_detail' post.id %}" class="sidebar__article-item__title">{{ post.title }}</a>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>

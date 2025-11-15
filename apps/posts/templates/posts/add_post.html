@@ -1,142 +1,35 @@
 {% extends 'posts/base.html' %}
 {% load static %}
 
-{% block link %}
-    <title>Добавить пост</title>
-    <link rel="stylesheet" href="{% static 'posts/css/add_post.css' %}">
-    <link rel="stylesheet" href="{% static 'posts/css/styles.css' %}?v=3">
-    <!-- Quill стили -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-{% endblock %}
-
 {% block body %}
-    <div class="main-wrapper" id="main-wrapper-id">
-        <div class="add-post_user">
-            <img src="{{ request.user.image.url }}" alt="">
+    <div class="create-post__wrapper">
+        <div class="create-post__user-info">
+            <img src="{{ request.user.image.url }}" class="create-post__user-info-avatar">
             <a>{{ request.user }}</a>
         </div>
-        <div class="post-category">
-            <div class="theme-cont">Тема
-                <img src="/media/icons/arrow-up.svg" alt="">
+        <div class="create-post__themes-wrapper">
+            <div class="create-post__theme-button">Тема
+                <img src="/media/icons/arrow-up.svg" class="theme-button__arrow--up">
             </div>
-            <div id="themes-id" class="themes">
-                <div class="themes-cont">
-                    <div class="category-item">
-                        <img src="/media/categories/psychology.png" alt="">
-                        <a>Психология</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/technologies.png" alt="">
-                        <a>Технологии</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/offtop.png" alt="">
-                        <a>Офтоп</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/travel.png" alt="">
-                        <a>Путешествия</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/sport.png" alt="">
-                        <a>Спорт</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/finance.png" alt="">
-                        <a>Деньги и инвестиции</a>
-                    </div>
-                    <div class="category-item" id="cinema">
-                        <img src="/media/categories/movies.png" alt="">
-                        <a>Кино</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/creation.png" alt="">
-                        <a>Творчество</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/health.png" alt="">
-                        <a>Здоровье</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/games.png" alt="">
-                        <a>Игры</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/history.png" alt="">
-                        <a>История</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/music.png" alt="">
-                        <a>Музыка</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/science.png" alt="">
-                        <a>Наука</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/news.png" alt="">
-                        <a>Новости</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/humor.png" alt="">
-                        <a>Юмор</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/career.png" alt="">
-                        <a>Карьера</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/development.png" alt="">
-                        <a>Разработка</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/intresting.png" alt="">
-                        <a>А вы знали?</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/food.png" alt="">
-                        <a>Еда</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/android.png" alt="">
-                        <a>Android</a>
-                    </div>
-                    <div class="category-item" href="#">
-                        <img src="/media/categories/apple.png" alt="">
-                        <a>Apple</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/fashion.png" alt="">
-                        <a>Мода</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/education.png" alt="">
-                        <a>Образование</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/ai.png" alt="">
-                        <a>AI</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/thoughts.png" alt="">
-                        <a>Размышления</a>
-                    </div>
-                    <div class="category-item">
-                        <img src="/media/categories/animal.png" alt="">
-                        <a>Животные</a>
-                    </div>
+            <div class="themes">
+                <div class="scrollable">
+                    {% for theme in categories %}
+                        <div class="theme-item">
+                            <img src="{{ theme.image.url }}" class="theme-item__icon">
+                            <a class="theme-item__text">{{ theme.cat_title }}</a>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        <div class="wrapper">
+        <div class="wrapp-img__wrapper">
             <p>Обложка</p>
             <div class="drop-img" id="dragArea">
-                <img id="img-preview">
+                <img class="img-preview">
                 <div class="preview">
-                    <input type="file" accept="image/*" id="img-input">
-                    <div class="preview-message">
-                        <span id="wrong-format">Неправильный формат.Загрузите .png, .jpg, .jpeg</span>
+                    <input type="file" accept="image/*" class="preview-img__input">
+                    <div class="preview__message">
+                        <span class="wrong-format__message wrong-format__message--hidden">Неправильный формат.Загрузите .png, .jpg, .jpeg</span>
                         <div class="wrapper-message">
                             <img src="/media/icons/img-icon.svg" alt="">
                             <p>Добавьте обложку к посту</p>
@@ -145,31 +38,23 @@
                 </div>
             </div>
             <br>
-            <div class="img-and-delete">
-                <div class="delete-img">
-                    <span>Удалить изображение</span>
-                </div>
-            </div>
+            <div class="delete-preview__button">Удалить изображение</div>
         </div>
         <div class="post-title">
             <p>Название</p>
-            <input id="title-id" type="text" name="content" placeholder="Введите название">
+            <input class="post-title__input" type="text" name="content" placeholder="Введите название">
         </div>
         <div class="editor-cont">
             <p>Описание</p>
             <div class="editor">
             </div>
-            <div class="post-type-selector">
-                <div class="post-type_title">Тип публикации</div>
-                <div class="radio-button" onclick="setPostType(this)">Новость</div>
-                <div class="radio-button" onclick="setPostType(this)">Статья</div>
-                <div class="radio-button" onclick="setPostType(this)">Пост</div>
+            <div class="post-type__selector">
+                <div class="post-type__title">Тип публикации</div>
+                <div class="filters__type-option" onclick="setPostType(this)">Новость</div>
+                <div class="filters__type-option" onclick="setPostType(this)">Статья</div>
+                <div class="filters__type-option" onclick="setPostType(this)">Пост</div>
             </div>
-            <div class="category-and-send">
-                <div class="send-moder-button" id="send-moder" role="button" tabindex="0">
-                    <a>Отправить на модерацию</a>
-                </div>
-            </div>
+            <div class="send-moder__button">Отправить на модерацию</div>
         </div>
     </div>
     <!-- Quill скрипт -->
@@ -185,9 +70,9 @@
         const quill = new Quill('.editor', {
             placeholder: 'Введите описание',
             modules: {
-            toolbar: toolbarOptions
-          },
-          theme: 'snow'
-        });
+                toolbar: toolbarOptions
+              },
+              theme: 'snow'
+            });
     </script>
 {% endblock %}

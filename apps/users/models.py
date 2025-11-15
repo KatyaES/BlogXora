@@ -1,6 +1,3 @@
-from datetime import timedelta
-from os import remove
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import ForeignKey
@@ -8,11 +5,9 @@ from django.utils import timezone
 from rest_framework.generics import get_object_or_404
 
 
-# User = get_user_model()
-
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    image = models.ImageField(default='profile_pics/default_profile.jpg', upload_to='profile_pics')
+    image = models.ImageField(default='profile_pics/default_profile.jpg', upload_to='profile_pics', blank=True, null=True)
     bio = models.TextField(blank=True, null=True , max_length=255)
 
 
@@ -21,11 +16,11 @@ class CustomUser(AbstractUser):
 
     @property
     def follower_count(self):
-        return self.subscription.followers.count()
+        return len(self.subscription.followers)
 
     @property
     def following_count(self):
-        return self.subscription.followings.count()
+        return len(self.subscription.followings)
 
     @property
     def subscription(self):
@@ -33,7 +28,7 @@ class CustomUser(AbstractUser):
 
 
 class Subscription(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True, related_name='subscription')
     followers = models.ManyToManyField(CustomUser, related_name="my_followings", blank=True)
     followings = models.ManyToManyField(CustomUser, related_name="my_followers", blank=True)
 
@@ -42,8 +37,8 @@ class Subscription(models.Model):
 
 
 class Notifications(models.Model):
-    user = ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
-    actor = ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, related_name='notifications_sent')
+    user = ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_notifications')
+    actor = ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, related_name='actor_notifications')
     message = models.TextField(max_length=500)
     link = models.TextField(max_length=500, default='none')
     date = models.DateTimeField(default=timezone.now)

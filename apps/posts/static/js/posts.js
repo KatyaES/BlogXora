@@ -9,7 +9,6 @@ if (sendModer) {
         const title = document.querySelector('.post-title__input')
         const content = document.querySelector('.ql-editor')
         const theme = document.querySelector('.create-post__theme-button')
-        const status = await window.checkToken()
         const post_type = postType
 
         const formData = new FormData()
@@ -21,18 +20,23 @@ if (sendModer) {
 
         const BASE_URL = window.location.origin
 
-        if (status) {
-            const request = await fetch(`${BASE_URL}/frontend-api/v1/posts/`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-CSRFToken': window.csrfToken,
-                },
-                body: formData
-            })
-            if (request.status === 201) {
+        const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-CSRFToken': window.csrfToken,
+            },
+            body: formData
+        })
+        if (response.status === 401 || response.status === 403) {
+            const status = await window.initCheckToken()
+            if (status) {
                 window.location.href = '/'
+            } else {
+                console.log('error in status process comment')
             }
+        } else if (response.status === 201) {
+            window.location.href = '/'
         }
     })
 }
@@ -182,33 +186,39 @@ function initScroll() {
 
 async function setPostLike(div) {
     try {
-        const status = await window.checkToken()
         const id = div.getAttribute("data-id")
 
         const likesCount = document.getElementById(`like-button__count-id-${id}`);
 
-        if (status) {
-            const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/set-like/`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    }
-                })
-            const data = await response.json()
-            likesCount.textContent = data.likes;
+        const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/set-like/`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                }
+            })
 
-            if (data.liked) {
-                div.classList.add("like-button--active")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
-                likesCount.classList.add('dellikeanimate');
+        if (response.status === 401 || response.status === 403) {
+            const status = await window.initCheckToken()
+            if (status) {
+                setPostLike(div)
             } else {
-                div.classList.remove("like-button--active")
-                likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
-                void likesCount.offsetWidth; // Принудительная перерисовка
-                likesCount.classList.add('setlikeanimate');
+                console.log('error in status process comment')
             }
+        }
+        const data = await response.json()
+        likesCount.textContent = data.likes;
+
+        if (data.liked) {
+            div.classList.add("like-button--active")
+            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+            void likesCount.offsetWidth; // Принудительная перерисовка
+            likesCount.classList.add('dellikeanimate');
+        } else {
+            div.classList.remove("like-button--active")
+            likesCount.classList.remove('setlikeanimate', 'dellikeanimate'); // Убираем все
+            void likesCount.offsetWidth; // Принудительная перерисовка
+            likesCount.classList.add('setlikeanimate');
         }
     } catch (error) {
         console.error(error);
@@ -226,6 +236,7 @@ async function profilePostsFunc() {
     profileContentContainer.innerHTML = ''
 
     nextPostsPageUrl = `${BASE_URL}/frontend-api/v1/posts/get-user-posts/${currentProfile}`
+
 
     isLoadingPosts = false;
     postsContainer = profileContentContainer
@@ -289,6 +300,7 @@ async function initLoadPosts() {
     if (profileContentContainer) {
         postsContainer = profileContentContainer
     }
+
 
     for (let i = 0; i < data.results.length; i++) {
 
@@ -417,31 +429,37 @@ async function initScrollForPosts() {
 }
 
 async function initPostLikes() {
-    const status = await window.checkToken()
     const imgWrapper = document.querySelectorAll(".like-button");
     const BASE_URL = window.location.origin
 
-    if (status) {
-        for (const img of imgWrapper) {
-            const id = img.getAttribute("data-id");
-            const likesCount = document.getElementById(`like-button__count-id-${id}`);
-            const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    }
-                });
-            const data = await response.json();
-            if (data.is_authenticated) {
-                if (data.liked) {
-                    img.classList.add("like-button--active")
-                } else {
-                    img.classList.remove("like-button--active")
+    for (const img of imgWrapper) {
+        const id = img.getAttribute("data-id");
+        const likesCount = document.getElementById(`like-button__count-id-${id}`);
+        const response = await fetch(`${BASE_URL}/frontend-api/v1/posts/${id}/`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
                 }
+            });
+        if (response.status === 401 || response.status === 403) {
+            const status = await window.initCheckToken()
+            if (status) {
+                initPostLikes()
+            } else {
+                console.log('error in status process LIKES')
+            }
+        }
+        const data = await response.json();
+        console.log(data)
+        if (data.is_authenticated) {
+            if (data.liked) {
+                img.classList.add("like-button--active")
             } else {
                 img.classList.remove("like-button--active")
             }
+        } else {
+            img.classList.remove("like-button--active")
         }
     }
 }

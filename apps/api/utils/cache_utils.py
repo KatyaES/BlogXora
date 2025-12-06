@@ -10,7 +10,9 @@ class CacheAndClearMixin:
     cache_prefix = ''
 
     def clear_cache(self):
+
         keys = cache.get(f'{self.cache_prefix}_cache_keys') or set()
+
         for key in keys:
             cache.delete(key)
         cache.delete(f'{self.cache_prefix}_cache_keys')

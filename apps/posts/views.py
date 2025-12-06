@@ -21,6 +21,7 @@ def index(request):
                   select_related('category', 'user').
                   prefetch_related('liked_by', 'bookmark_user', 'comments').
                   order_by('?')[:5])
+
     return render(request, "posts/index.html", {
                                                 "news_posts": news_posts,
                                                 "form": form,
@@ -33,6 +34,7 @@ def add_post(request):
 def category_page(request, tag):
     category_first = Category.objects.filter(tag=tag).first()
     context = {'category': category_first}
+
     return render(request, "posts/category.html", context)
 
 def post_detail(request, pk):

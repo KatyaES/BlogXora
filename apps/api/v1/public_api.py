@@ -30,7 +30,6 @@ class CategoryViewSet(cache_utils.CacheAndClearMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
-
         data = self.get_cached_data(request,
                                 prefix='categories',
                                 queryset=queryset,
@@ -63,15 +62,12 @@ class UserViewSet(cache_utils.CacheAndClearMixin,
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
-
         data = self.get_cached_data(request,
                                prefix='users',
                                queryset=queryset,
                                page=page,
                                serializer_class=self.get_serializer_class(),
                                paginated_response=self.get_paginated_response)
-        from django.db import connection
-        print(len(connection.queries), 'queries executed')
         return Response(data)
 
 
@@ -94,11 +90,8 @@ class PostsViewSet(cache_utils.CacheAndClearMixin,
 
 
     def list(self, request, *args, **kwargs):
-        from django.db import connection
-        print(len(connection.queries), 'queries executed')
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
-
         data = self.get_cached_data(request, 'posts',
                                queryset,
                                page,
@@ -108,16 +101,14 @@ class PostsViewSet(cache_utils.CacheAndClearMixin,
 
     def get_queryset(self):
         user_pk = self.kwargs.get('user_pk')
-        print('self.kwargs: ', self.kwargs)
+
         if user_pk:
             queryset = (Post.objects.
                 select_related('category', 'user').
                 prefetch_related('liked_by', 'bookmark_user', 'comments').
                 filter(user=user_pk))
         else:
-            print('other')
             queryset = super().get_queryset()
-
         return queryset
 
 
@@ -137,20 +128,17 @@ class CommentsViewSet(cache_utils.CacheAndClearMixin,
 
     def list(self, request, *args, **kwargs):
         page = self.paginate_queryset(self.get_queryset())
-
         data = self.get_cached_data(request, 'comments',
                                self.get_queryset(),
                                page,
                                self.get_serializer_class(),
                                self.get_paginated_response)
-        from django.db import connection
-        print(len(connection.queries), 'queries executed')
-
         return Response(data)
 
     def get_queryset(self):
         post_pk = self.kwargs.get('post_pk')
         user_pk = self.kwargs.get('user_pk')
+
         if post_pk:
             queryset = (Comment.objects.
                     select_related('post', 'user').
@@ -163,5 +151,4 @@ class CommentsViewSet(cache_utils.CacheAndClearMixin,
                         filter(user=user_pk))
         else:
             queryset = super().get_queryset()
-
         return queryset

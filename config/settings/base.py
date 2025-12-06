@@ -2,8 +2,10 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
+
 from decouple import config
-from django.conf.global_settings import INTERNAL_IPS
+from django.conf.global_settings import INTERNAL_IPS, SESSION_CACHE_ALIAS, SESSION_COOKIE_NAME, SESSION_COOKIE_HTTPONLY, \
+    SESSION_COOKIE_SAMESITE
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    'debug_toolbar',
+    'test_without_migrations',
 ]
 
 REST_FRAMEWORK = {
@@ -50,9 +52,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
     ),
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
@@ -67,8 +68,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
+        'anon': '1000/day',
+        'user': '10000/day'
     },
 }
 
@@ -83,8 +84,8 @@ CACHES = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -96,10 +97,10 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'apps.api.utils.middleware.JWTCookieMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 INTERNAL_IPS = [
@@ -149,7 +150,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'PORT': config('DB_PORT')
     }
 }
 
@@ -221,6 +222,11 @@ CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_NAME = 'csrftoken'
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_CACHE_ALIAS = 'default'
+# SESSION_COOKIE_NAME = 'sessionid'
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SECURE = False
+# SESSION_COOKIE_SAMESITE = 'Lax'
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'

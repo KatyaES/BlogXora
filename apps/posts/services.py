@@ -18,7 +18,6 @@ def create_post(request):
     wrapp_img = request.FILES.get('wrapp_img')
     pub_date = timezone.now()
     post_type = request.POST.get('post_type')
-    print('post_type', post_type)
 
     form = PostForm(
         data= {
@@ -32,6 +31,7 @@ def create_post(request):
                 'wrapp_img': wrapp_img,
             }
         )
+
     if form.is_valid():
         post = form.save(commit=False)
         post.user = request.user
@@ -43,7 +43,6 @@ def create_post(request):
 
 def add_comment(request, pk):
     post = get_object_or_404(Post, id=pk, status='draft')
-    print(post.title)
     comments = Comment.objects.filter(post=post)
     post.views_count += 1
     post.save()

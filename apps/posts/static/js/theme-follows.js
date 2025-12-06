@@ -2,35 +2,32 @@ async function themeFollowFunc(span) {
     const userId = span.getAttribute('data-id')
     const tag = span.getAttribute('datatype')
 
-    const status = await window.checkToken()
     const BASE_URL = window.location.origin
     localStorage.setItem('isSearchMode', 'true')
 
-    if (status) {
-        const request = await fetch(`${BASE_URL}/users/theme_follows/?tag=${tag}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': window.csrfToken,
-            },
-            body: JSON.stringify({})
-            })
+    const request = await fetch(`${BASE_URL}/users/theme-follows/?tag=${tag}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrfToken,
+        },
+        body: JSON.stringify({})
+        })
 
-        const response = await request.json()
-        console.log(response.status, response)
+    const response = await request.json()
+    console.log(response.status, response)
 
-        if (response.status === 'add') {
-            span.style.background = '#E7E8EA'
-            span.style.color = '#70737B'
-            span.style.fontWeight = '600'
-            span.textContent = 'Отписаться'
-        } else {
-            span.style.background = '#4a90e2'
-            span.style.color = 'white'
-            span.style.fontWeight = ''
-            span.textContent = 'Подписаться'
-        }
+    if (response.status === 'add') {
+        span.style.background = '#E7E8EA'
+        span.style.color = '#70737B'
+        span.style.fontWeight = '600'
+        span.textContent = 'Отписаться'
+    } else {
+        span.style.background = '#4a90e2'
+        span.style.color = 'white'
+        span.style.fontWeight = ''
+        span.textContent = 'Подписаться'
     }
 }
 
@@ -40,20 +37,25 @@ async function initThemeFollows() {
         const tag = followBtn.getAttribute('datatype')
         const userId = followBtn.getAttribute('data-id')
 
-
-        const status = await window.checkToken(false)
-
-
         const BASE_URL = window.location.origin
 
         if (tag && followBtn && userId && status) {
-            const request = await fetch(`${BASE_URL}/users/theme_follows/?tag=${tag}`, {
+            const request = await fetch(`${BASE_URL}/users/theme-follows/?tag=${tag}`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 }
             })
+
+            if (request.status === 401 || request.status === 403) {
+                const status = await window.initCheckToken()
+                if (status) {
+                    initThemeFollows()
+                } else {
+                    console.log('error in status process LIKES')
+                }
+            }
 
             const response = await request.json()
 

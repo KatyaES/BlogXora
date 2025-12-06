@@ -60,7 +60,6 @@ function showChangeWrapper() {
 }
 
 async function saveProfileData() {
-    const status = await window.checkToken()
     const usernameError = document.querySelector('.settings__username-error')
 
     const username = document.querySelector('.settings__username-text').value
@@ -86,27 +85,25 @@ async function saveProfileData() {
         usernameError.textContent = 'Имя пользователя слишком короткое.'
         usernameError.style.color = '#e54848'
     } else {
-        if (status) {
-            const request = await fetch(`${BASE_URL}/users/change-settings-data/`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-CSRFToken': window.csrfToken,
-                },
-                body: data,
-            })
+        const request = await fetch(`${BASE_URL}/users/change-settings-data/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-CSRFToken': window.csrfToken,
+            },
+            body: data,
+        })
 
 
-            if (request.status === 204) {
-                location.reload()
-            } else {
-                const data = await request.json()
-                const dataError = document.querySelector('.settings__errors')
-                dataError.textContent = data.error
-                dataError.style.color = '#e54848'
+        if (request.status === 204) {
+            location.reload()
+        } else {
+            const data = await request.json()
+            const dataError = document.querySelector('.settings__errors')
+            dataError.textContent = data.error
+            dataError.style.color = '#e54848'
 
-                usernameError.textContent = ''
-            }
+            usernameError.textContent = ''
         }
     }
 }
@@ -115,7 +112,6 @@ async function saveProfileData() {
 async function changePassword(element) {
     const errorElem = document.querySelector('.settings__error-password-message')
     errorElem.textContent = ''
-    const status = await window.checkToken()
 
     const username = element.getAttribute('data-key')
 
@@ -126,33 +122,31 @@ async function changePassword(element) {
 
     if (!oldPassword || !newPassword) return;
 
-    if (status) {
-        const request = await fetch(`${BASE_URL}/users/change-settings-password/`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify({
-                'old_password':oldPassword,
-                'new_password':newPassword,
-            })
+    const request = await fetch(`${BASE_URL}/users/change-settings-password/`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+            'old_password':oldPassword,
+            'new_password':newPassword,
         })
-        const data = await request.json()
-        if (request.status === 200) {
-            alert('Пароль успешно обновлен')
-        } else {
-            if (data.error.length) {
-                for (let i = 0; i < data.error.length; i++) {
-                    errorElem.innerHTML += data.error[i] + '<br>'
-                }
-            } else {
-                errorElem.innerHTML += data.error + '<br>'
+    })
+    const data = await request.json()
+    if (request.status === 200) {
+        alert('Пароль успешно обновлен')
+    } else {
+        if (data.error.length) {
+            for (let i = 0; i < data.error.length; i++) {
+                errorElem.innerHTML += data.error[i] + '<br>'
             }
-            errorElem.style.display = 'flex'
-
+        } else {
+            errorElem.innerHTML += data.error + '<br>'
         }
+        errorElem.style.display = 'flex'
+
     }
 }
 

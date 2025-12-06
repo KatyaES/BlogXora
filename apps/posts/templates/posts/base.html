@@ -177,7 +177,11 @@
                             <div class="sidebar__article-item">
                                 <div class="sidebar__user-info">
                                     <div class="sidebar__user-info-details">
-                                        <img src="{{ post.user.image.url }}" class="sidebar__user-avatar">
+                                        {% if post.user.image %}
+                                            <img src="{{ post.user.image.url }}" class="sidebar__user-avatar">
+                                        {% else %}
+                                            <img src="{% static 'profile_pics/default_profile.jpg' %}" class="sidebar__user-avatar">
+                                        {% endif %}
                                         <a href="{% url 'profile' post.user.username %}" class="sidebar__user-username">{{ post.user.username }}</a>
                                     </div>
                                     <a class="sidebar__date">{{ post.pub_date|smart_time }}</a>

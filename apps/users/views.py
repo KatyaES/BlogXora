@@ -1,4 +1,7 @@
 import random
+import uuid
+from os import access
+from tokenize import TokenError
 
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -8,11 +11,15 @@ from django.shortcuts import render, redirect
 from django.template.defaulttags import csrf_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django_redis import get_redis_connection
 from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from django.contrib.auth import logout, get_user_model
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import ExpiredTokenError
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.users.forms import PasswordResetForm, ResetKeyForm, ResetPasswordForm
@@ -37,35 +44,18 @@ def login(request):
 def profile_page(request, username, section=None):
     profile_user = get_object_or_404(CustomUser, username=username)
     context = get_profile_user_data(profile_user, section)
+
     return render(request, 'users/profile.html', context)
 
 
-class LogoutView(APIView):
-    def post(self, request):
-        logout(request)
-        response = Response({'detail': 'Successfully logged out.'})
-        response.set_cookie(
-            key='refresh_token',
-            path='/',
-            secure=True,
-            httponly=True,
-            samesite='Strict'
-        )
-        response.delete_cookie(
-            key='access_token',
-            path='/',
-            domain='http://127.0.0.1:8000/',
-            samesite='Strict'
-        )
-        return response
-
 
 def profile_settings(request):
-    user = get_object_or_404(CustomUser, username=request.user.username)
+    user = get_object_or_404(User, username=request.user.username)
     random_posts = (Post.objects.all().
                     select_related('category', 'user').
                     prefetch_related('liked_by', 'bookmark_user', 'comments').
                     order_by('?')[:5])
+
     return render(request, 'users/profile_edit.html',
                   {'user': user,
                           'random_posts': random_posts})
@@ -74,6 +64,7 @@ def profile_settings(request):
 class ThemeFollows(APIView):
     def post(self, request):
         tag = request.GET.get('tag')
+
         return add_or_remove_followers(request, tag)
 
     def get(self, request):
@@ -84,6 +75,7 @@ class ThemeFollows(APIView):
             return Response({'status': 'subscribed'})
         return Response({'status': 'not subscribed'})
 
+
 class ChangePasswordView(APIView):
 
     def post(self, request):
@@ -91,8 +83,10 @@ class ChangePasswordView(APIView):
         old_password = data.get('old_password')
         new_password = data.get('new_password')
         user = request.user
+
         if not user.check_password(old_password):
             return Response({'error': 'Старый пароль неверный'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             validate_password(new_password,  user=user)
         except Exception as e:
@@ -101,7 +95,9 @@ class ChangePasswordView(APIView):
         user.set_password(new_password)
         user.save()
         auth.login(request, user)
+
         return Response({'status': 'success'}, status=200)
+
 
 class ChangeDataView(APIView):
 
@@ -110,18 +106,52 @@ class ChangeDataView(APIView):
         email = request.POST.get('email')
         bio = request.POST.get('about')
         avatar = request.FILES.get('avatar')
+
         return change_data(request, username, email, bio, avatar)
+
+
+class LogoutView(APIView):
+
+    @staticmethod
+    def post(request):
+        logout(request)
+        response = Response({'detail': 'Successfully logged out.'})
+        response.delete_cookie(
+            'access_token',
+            domain='127.0.0.1',
+        )
+        response.delete_cookie(
+            'refresh_token',
+            domain='127.0.0.1',
+        )
+        return response
 
 
 class CookieTokenRefreshView(TokenRefreshView):
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+
         refresh_token = request.COOKIES.get('refresh_token')
+
         if not refresh_token:
+            logout(request)
             return Response({'detail': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.get_serializer(data={'refresh': refresh_token})
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+        response = Response({'status': 'ok'})
+        response.set_cookie(
+            'access_token',
+            str(serializer.validated_data['access']),
+            domain='127.0.0.1',
+            path='/',
+            httponly=True,
+            secure=False,
+            samesite='Lax'
+        )
+        return response
+
 
 def send_email(request):
     if request.method == 'POST':
@@ -147,7 +177,6 @@ def send_email(request):
 
 
 def confirm_reset_key(request):
-    print(cache.get('confirm_access'))
     if not cache.get('confirm_access'):
         return redirect('password_reset')
 

@@ -17,7 +17,7 @@ def notification_processor(request):
         random_posts = Post.objects.all().order_by('?')[:5]
         if random_posts:
             random_posts_ids = list(random_posts.values_list('id', flat=True))
-            cache.set(cache_key, random_posts_ids, 1)
+            cache.set(cache_key, random_posts_ids, False)
         else:
             random_posts = Post.objects.none()
     login_form = UserLoginForm()

@@ -14,7 +14,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('config/', include('config.urls'))
 """
-from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
@@ -22,7 +21,7 @@ from django.conf.urls.static import static
 import config
 from apps.users import views
 from apps.users.views import profile_page
-from config import settings
+from django.conf import settings
 from apps.posts.views import index, add_post, category_page, post_detail
 
 urlpatterns = [
@@ -38,6 +37,5 @@ urlpatterns = [
     path('api/v1/', include('apps.api.v1.public_urls')),
 ]
 
-if config.settings.dev.DEBUG:
-    urlpatterns += static(config.settings.base.MEDIA_URL, document_root=config.settings.base.MEDIA_ROOT)
-    urlpatterns += debug_toolbar_urls()
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

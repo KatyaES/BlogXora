@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
-from apps.users.models import CustomUser
+User = get_user_model()
 
 
 class Post(models.Model):
@@ -17,10 +18,10 @@ class Post(models.Model):
                                                             ("published", "На рассмотрении"),
                                                             ("canceled", "Отклонено"),])
     views_count = models.IntegerField(default=0)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='posts')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     comment_count = models.IntegerField(default=0)
-    liked_by = models.ManyToManyField(CustomUser, related_name="liked_posts", blank=True)
-    bookmark_user = models.ManyToManyField(CustomUser, related_name="bookmarked_posts", blank=True)
+    liked_by = models.ManyToManyField(User, related_name="liked_posts", blank=True)
+    bookmark_user = models.ManyToManyField(User, related_name="bookmarked_posts", blank=True)
 
     def __str__(self):
         return self.title
@@ -37,16 +38,16 @@ class Comment(models.Model):
     description = models.CharField(max_length=2000)
     pub_date = models.DateTimeField(default=timezone.now)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='comments')
-    liked_by = models.ManyToManyField(CustomUser, related_name="liked_comments", blank=True)
-    bookmarked_by = models.ManyToManyField(CustomUser, related_name='bookmarked_comments', blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    liked_by = models.ManyToManyField(User, related_name="liked_comments", blank=True)
+    bookmarked_by = models.ManyToManyField(User, related_name='bookmarked_comments', blank=True)
 
     def __str__(self):
         return self.description
 
 
 class Category(models.Model):
-    followers = models.ManyToManyField(CustomUser, related_name="category_followers", blank=True)
+    followers = models.ManyToManyField(User, related_name="category_followers", blank=True)
     description = models.CharField(max_length=1000, default='Nothing', null=True, blank=True)
     cat_title = models.CharField(max_length=255, unique=True)
     tag = models.CharField(max_length=255, unique=True, null=True, blank=True)

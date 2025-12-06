@@ -1,11 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    initPostBookmarks(); // 1
-    initCommentLikes(); // 1
-    initPostLikes(); // 1
-    initCommentBookmarks(); // 1
-    initCommentLikes(); // 1 except profile
-    initUserFollows(); // 1
+    initCheckToken()
     initLoadComments()
     initScrollForPosts(); // 1
     initLoginCont();
@@ -18,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initLoadCommentForm();
     initLoadProfileData();
     initLoadPostComments();
+    initPostLikes();
+    initPostBookmarks(); // 1
+    initCommentLikes(); // 1
+    initCommentBookmarks(); // 1
+    initCommentLikes(); // 1 except profile
+    initUserFollows();
 
     if (nextPostsPageUrl && path.endsWith('/')) {
         initLoadPosts();
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('isSearchMode', 'false')
             localStorage.setItem('moreComments', false)
             await initLoadPostComments();
-
         }
         wait()
 
